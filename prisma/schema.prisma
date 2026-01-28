@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/lib/database/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Mood {
+  CANT_SLEEP
+  DARK
+  MISS_SOMEONE
+  EMPTY
+  REFLECTIVE
+  UNSETTLING
+}
+
+enum Category {
+  HORROR // psychological only
+  CONFESSION
+  ROMANCE // non-explicit
+  EXISTENTIAL
+  SURREAL
+}
+
+model Story {
+  id String @id @default(cuid())
+
+  // Core content
+  title String
+  body  String
+  slug  String @unique
+
+  // AI-generated metadata
+  mood       Mood
+  categories Category[]
+  tags       String[]
+
+  // Curation & safety
+  intensity Int     @default(3) // 1 (soft) → 5 (heavy)
+  approved  Boolean @default(false)
+  notes     String? // AI or human moderation notes
+
+  // System
+  createdAt   DateTime  @default(now())
+  publishedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([mood])
+  @@index([categories])
+  @@index([tags])
+  @@index([approved])
+  @@index([intensity])
+  @@index([publishedAt])
+  @@index([updatedAt])
+}
