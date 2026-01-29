@@ -19,6 +19,11 @@ export const storySchema = z.object({
   }),
   status: z.enum(Object.values(Status)).default(Status.PENDING),
   author: z.string().min(1).max(100),
+  publishedAt: z.date().optional(),
+  readTime: z.number().min(1).max(100),
+  wordCount: z.number().min(1).max(10000),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 
@@ -27,8 +32,8 @@ export const storyRequestSchema = z.object({
   content: z.string()
     .max(10000)
     .refine(
-      str => str.trim().split(/\s+/).length >= 15,
-      { message: "Content must be at least 15 words." }
+      str => str.trim().split(/\s+/).length >= 10,
+      { message: "Content must be at least 10 words." }
     ),
   author: z.string().min(1).max(100),
   status: z.enum(Object.values(StoryRequestStatus)).default(StoryRequestStatus.PENDING),

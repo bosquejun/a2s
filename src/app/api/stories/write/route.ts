@@ -18,25 +18,32 @@ const ratelimit = new Ratelimit({
 
 export async function POST(request: Request) {
   const body= await request.json();
+
+  const validated = createStoryRequestSchema.safeParse(body);
+
+  if (!validated.success) {
+    return NextResponse.json({ error: validated.error.issues.map(issue => issue.message).join("\n") }, { status: 400 });
+  }
+
+
   const anonId = await getAnonId();
 
+  try {
+    
 
-  const { success, reason,limit,remaining, deniedValue } = await ratelimit.limit(anonId);
 
-  console.log({reason,limit,remaining, deniedValue});
+  const { success } = await ratelimit.limit(anonId);
+
 
 
   if (!success) {
     return NextResponse.json({ error: "Writing request limit exceeded. Please try again later." }, { status: 429 });
   }
 
-  try {
-    
-  const validatedBody = createStoryRequestSchema.parse(body);
 
   const storyRequest = await prisma.storyRequest.create({
     data: {
-      content: validatedBody.content,
+      content: validated.data.content,
       trackCode: generateTrackCode(),
     },
   });

@@ -1,7 +1,8 @@
 "use client";
 
 import { getStoriesForMood } from "@/lib/data";
-import type { After2AmStory, Mood } from "@/lib/types";
+import { Mood } from "@/lib/database/generated/prisma/enums";
+import { Story } from "@/validations/story.validation";
 import {
   ArrowLeft,
   BookOpen,
@@ -17,7 +18,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 interface StoryReaderProps {
-  story: After2AmStory;
+  story: Story;
 }
 
 export function StoryReader({ story }: StoryReaderProps) {
@@ -26,7 +27,7 @@ export function StoryReader({ story }: StoryReaderProps) {
   const pathname = usePathname();
 
   const baseMoodParam = searchParams.get("mood") as Mood | null;
-  const baseMood: Mood = baseMoodParam ?? story.mood;
+  const baseMood = baseMoodParam ?? story.mood;
 
   const [isNoiseEnabled, setIsNoiseEnabled] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -201,7 +202,7 @@ export function StoryReader({ story }: StoryReaderProps) {
             <div className="flex flex-wrap items-center justify-center gap-4">
               <div className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold">
                 <BookOpen size={12} className="opacity-70" />
-                <span>{story.category}</span>
+                <span>{story.categories.join(", ")}</span>
               </div>
               <div className="h-4 w-[1px] bg-slate-800" />
               <div className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.4em] text-slate-500 font-medium">
@@ -223,9 +224,8 @@ export function StoryReader({ story }: StoryReaderProps) {
             </div>
           </div>
 
-          <div className="font-serif text-slate-300 text-xl sm:text-2xl md:text-3xl leading-[2.1] italic text-center select-text pb-12 opacity-90 whitespace-pre-line drop-shadow-[0_2px_15px_rgba(248,250,252,0.03)]">
-            {story.content}
-          </div>
+          <div className="font-serif text-slate-300 text-xl sm:text-2xl md:text-3xl leading-[2.1] italic select-text pb-12 opacity-90 whitespace-pre-line drop-shadow-[0_2px_15px_rgba(248,250,252,0.03)]" dangerouslySetInnerHTML={{ __html: story.content }} />
+          
 
           {story.author ? (
             <div className="mt-16 flex flex-col items-center space-y-3 opacity-40 pb-20">

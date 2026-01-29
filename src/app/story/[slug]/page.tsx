@@ -1,48 +1,47 @@
 import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleton";
 import { StoryReader } from "@/components/story-reader";
-import { getStoryById } from "@/lib/data";
-import prisma from "@/lib/database/prisma";
-import type { After2AmStory } from "@/lib/types";
+import { getStoryBySlug } from "@/lib/services/stories/get-story";
+import { Story } from "@/validations/story.validation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 interface PageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
-function buildStoryMetadata(story: After2AmStory): Metadata {
-  const title = `${story.title} | After 2AM Stories`;
+function buildStoryMetadata(story: Story): Metadata {
   const description = story.excerpt;
   const url = `https://after2am.stories/story/${story.id}`; // Update with your actual domain
+  ;
 
   return {
-    title,
+    title: story.seo.title || '',
     description,
     keywords: [
       ...story.tags,
-      story.category.toLowerCase(),
+      story.categories.map(category => category.toLowerCase()).join(", "),
       story.mood.toLowerCase(),
       "after 2am",
       "stories",
     ],
     openGraph: {
-      title,
-      description,
+      title: story.seo.title || '',
+      description: story.seo.description || '',
       type: "article",
       url,
       siteName: "After 2AM Stories",
       publishedTime: new Date().toISOString(), // You may want to add actual publish dates to stories
       authors: story.author ? [story.author] : undefined,
-      section: story.category,
+      section: story.categories[0].toLowerCase(),
       tags: story.tags,
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title: story.seo.title || '',
+      description: story.seo.description || '',
     },
     alternates: {
       canonical: url,
@@ -53,8 +52,8 @@ function buildStoryMetadata(story: After2AmStory): Metadata {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-  const story = getStoryById(id);
+  const { slug } = await params;
+  const story = await getStoryBySlug(slug);
 
   if (!story) {
     return {};
@@ -64,13 +63,10 @@ export async function generateMetadata({
 }
 
 export default async function StoryPage({ params }: PageProps) {
-  const { id } = await params;
+  const { slug } = await params;
   
-  const story = await prisma.story.findUnique({
-    where: {
-      id,
-    },
-  });
+  const story = await getStoryBySlug(slug);
+
 
   if (!story) {
     notFound();
