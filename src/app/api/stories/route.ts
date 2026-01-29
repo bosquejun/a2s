@@ -6,6 +6,7 @@ import prisma from "@/lib/database/prisma";
 import { WriteStoryWorkflowInput, writeStoryWorkflowInputSchema } from "@/validations/story.validation";
 import { WorkflowNonRetryableError } from "@upstash/workflow";
 import { serve } from "@upstash/workflow/nextjs";
+import { updateTag } from "next/cache";
 import slugify from "slugify";
 
 export const { POST } = serve<WriteStoryWorkflowInput>(
@@ -47,16 +48,18 @@ export const { POST } = serve<WriteStoryWorkflowInput>(
               data: { status: StoryRequestStatus.APPROVED, approvedAt: new Date() },
             });
 
+        const storySlug = slugify(agentResponse.title, {
+              lower: true,
+              strict: true,
+              locale: 'en',
+            });
+
         const   story = await prisma.story.create({
           data: {
             content: agentResponse.htmlBody || '',
             excerpt: agentResponse.excerpt || '',
             title: agentResponse.title,
-            slug: slugify(agentResponse.title, {
-              lower: true,
-              strict: true,
-              locale: 'en',
-            }),
+            slug: storySlug,
             mood: agentResponse.mood,
             categories: agentResponse.categories,
             tags: agentResponse.tags,
@@ -69,6 +72,14 @@ export const { POST } = serve<WriteStoryWorkflowInput>(
             author:agentResponse.author,
           },
         });
+
+            // Invalidate cache tags when a new story is published
+            if (agentResponse.approved) {
+              updateTag("stories"); // General stories tag
+              updateTag("stories-list"); // Published stories list
+              updateTag(`story-${storySlug}`); // Specific story
+              updateTag(`stories-mood-${agentResponse.mood}`); // Stories by mood
+            }
 
             return { success: true, message: 'Story saved successfully', storyId: story.id };
 

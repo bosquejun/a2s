@@ -1,6 +1,18 @@
-import prisma from "@/lib/database/prisma";
+"use cache";
 
-export async function getAllPublishedStories() {
+import prisma from "@/lib/database/prisma";
+import { cacheLife, cacheTag } from "next/cache";
+import { cache } from "react";
+
+/**
+ * Get all published stories with Next.js caching.
+ * Uses React.cache() for request-level deduplication and 'use cache' for cross-request caching.
+ */
+const getAllPublishedStoriesCached = cache(async () => {
+  "use cache";
+  cacheLife("hours"); // Cache for 1 hour, revalidate every 2 hours
+  cacheTag("stories", "stories-list"); // Tag for cache invalidation
+
   const stories = await prisma.story.findMany({
     where: {
       publishedAt: {
@@ -18,5 +30,9 @@ export async function getAllPublishedStories() {
   });
 
   return stories;
+});
+
+export async function getAllPublishedStories() {
+  return getAllPublishedStoriesCached();
 }
 
