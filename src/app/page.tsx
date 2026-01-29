@@ -3,7 +3,6 @@ import { AmbientSound } from "@/components/ambient-sound";
 import { LandingPage } from "@/components/landing-page";
 import { NightGate } from "@/components/night-gate";
 import { LandingSkeleton } from "@/components/skeletons/landing-skeleton";
-import { getMoodTargets } from "@/lib/mood-targets";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives. Choose your mood and discover stories written after 2AM.",
   alternates: {
-    canonical: "https://after2am.stories", // Update with your actual domain
+    canonical: "https://after2amstories.com",
   },
 };
 
@@ -21,7 +20,7 @@ const collectionPageSchema = {
   name: "After 2AM Stories",
   description:
     "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
-  url: "https://after2am.stories", // Update with your actual domain
+  url: "https://after2amstories.com",
   mainEntity: {
     "@type": "ItemList",
     itemListElement: [
@@ -59,11 +58,6 @@ const collectionPageSchema = {
   },
 };
 
-async function LandingPageWithTargets() {
-  const moodTargets = await getMoodTargets();
-  return <LandingPage moodTargets={moodTargets} />;
-}
-
 export default function Home() {
   return (
     <>
@@ -75,7 +69,7 @@ export default function Home() {
         <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col font-sans selection:bg-indigo-500/30 overflow-hidden">
           <main className="grow flex flex-col items-center justify-center transition-opacity duration-300 ease-in-out">
             <Suspense fallback={<LandingSkeleton />}>
-              <LandingPageWithTargets />
+              <LandingPage />
             </Suspense>
           </main>
 

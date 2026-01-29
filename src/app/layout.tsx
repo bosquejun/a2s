@@ -95,12 +95,12 @@ const websiteSchema = {
   name: "After 2AM Stories",
   description:
     "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
-  url: "https://after2am.stories", // Update with your actual domain
+  url: "https://after2amstories.com",
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: "https://after2am.stories/search?q={search_term_string}",
+      urlTemplate: "https://after2amstories.com/search?q={search_term_string}",
     },
     "query-input": "required name=search_term_string",
   },

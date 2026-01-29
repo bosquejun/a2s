@@ -1,22 +1,26 @@
 "use client";
 
-import { MOOD_CONFIG } from "@/lib/data";
-import type { Mood } from "@/lib/types";
+import { Mood } from "@/lib/database/generated/prisma/enums";
 import { PenSquare } from "lucide-react";
 import Link from "next/link";
 
-interface LandingPageProps {
-  moodTargets: Record<Mood, string>;
-}
+const MOOD_LABELS: Record<Mood, string> = {
+  [Mood.CANT_SLEEP]: "I can't sleep",
+  [Mood.DARK]: "I want something dark",
+  [Mood.MISS_SOMEONE]: "I miss someone",
+  [Mood.EMPTY]: "I feel empty",
+  [Mood.REFLECTIVE]: "I feel reflective",
+  [Mood.UNSETTLING]: "I feel uneasy",
+};
 
-export function LandingPage({ moodTargets }: LandingPageProps) {
+export function LandingPage() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-sm px-6 text-center animate-fade-in">
       <div className="space-y-16 w-full">
         <div className="space-y-4">
           <h1 className="text-slate-400 font-serif italic text-3xl md:text-4xl tracking-tight">
-            It’s late.
+            It&lsquo;s late.
           </h1>
           <p className="text-slate-600 text-xs font-medium uppercase tracking-[0.2em]">
             How do you feel right now?
@@ -24,13 +28,13 @@ export function LandingPage({ moodTargets }: LandingPageProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-3">
-          {MOOD_CONFIG.map((mood) => (
+          {Object.keys(MOOD_LABELS).map((moodKey) => (
             <Link
-              key={mood.id}
-              href={moodTargets[mood.id]}
+              key={moodKey}
+              href={`/api/stories/mood/${moodKey.toLowerCase()}`}
               className="group relative w-full justify-center py-5 text-[11px] tracking-[0.2em] uppercase text-slate-500 bg-slate-900/10 border border-slate-900 rounded-xl hover:border-slate-700 hover:text-slate-200 hover:bg-slate-900/30 transition-all duration-300 active:scale-[0.98] inline-flex items-center"
             >
-              <span className="relative z-10">{mood.phrase}</span>
+              <span className="relative z-10">{MOOD_LABELS[moodKey as Mood]}</span>
             </Link>
           ))}
         </div>

@@ -14,8 +14,7 @@ interface PageProps {
 
 function buildStoryMetadata(story: Story): Metadata {
   const description = story.excerpt;
-  const url = `https://after2am.stories/story/${story.id}`; // Update with your actual domain
-  ;
+  const url = `https://after2amstories.com/story/${story.slug}`;
 
   return {
     title: story.seo.title || '',
@@ -85,7 +84,7 @@ export default async function StoryPage({ params }: PageProps) {
     keywords: story.tags.join(", "),
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://after2am.stories/story/${story.id}`, // Update with your actual domain
+      "@id": `https://after2amstories.com/story/${story.slug}`,
     },
     datePublished: new Date().toISOString(), // You may want to add actual publish dates to stories
     dateModified: new Date().toISOString(),

@@ -1,6 +1,5 @@
 "use client";
 
-import { getStoriesForMood } from "@/lib/data";
 import { Mood } from "@/lib/database/generated/prisma/enums";
 import { Story } from "@/validations/story.validation";
 import {
@@ -17,7 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface StoryReaderProps {
   story: Story;
@@ -37,6 +36,7 @@ export function StoryReader({ story }: StoryReaderProps) {
   });
   const [isSharing, setIsSharing] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const excludedParam = searchParams.get("exclude") ?? "";
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -168,22 +168,10 @@ export function StoryReader({ story }: StoryReaderProps) {
     }
   };
 
-  const handleNext = () => {
-    const options = getStoriesForMood(baseMood);
-    const pool =
-      options.length > 0 && options.some((s) => s.id !== story.id)
-        ? options.filter((s) => s.id !== story.id)
-        : options.length > 0
-          ? options
-          : [story];
-
-    const index = Math.floor(Math.random() * pool.length);
-    const nextStory = pool[index];
-
-    router.push(
-      `/story/${nextStory.id}?mood=${encodeURIComponent(baseMood as string)}`,
-    );
-  };
+  const excludedSlugs = useMemo(() => {
+    const uniqueSlugs = Array.from(new Set([story.slug, ...(excludedParam.split(",") ?? [])]));
+    return uniqueSlugs.join(",");
+  }, [story.slug, excludedParam])
 
   return (
     <div className="flex flex-col w-full h-screen max-h-screen relative overflow-hidden bg-slate-950 animate-fade-in selection:bg-indigo-500/20 selection:text-slate-100">
@@ -360,9 +348,8 @@ export function StoryReader({ story }: StoryReaderProps) {
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={handleNext}
+          <Link
+            href={`/api/stories/mood/${baseMood}?exclude=${encodeURIComponent(excludedSlugs)}`}      
             className="w-full sm:w-auto flex items-center justify-center space-x-3 px-6 py-3 md:px-8 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0"
           >
             <span className="text-xs uppercase tracking-[0.4em] font-bold whitespace-nowrap">
@@ -372,7 +359,7 @@ export function StoryReader({ story }: StoryReaderProps) {
               size={16}
               className="group-hover:rotate-180 transition-transform duration-700 opacity-80 shrink-0"
             />
-          </button>
+          </Link>
         </div>
       </div>
 

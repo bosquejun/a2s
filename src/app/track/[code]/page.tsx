@@ -215,7 +215,7 @@ export default function TrackPage() {
                 Your whisper is live
               </h2>
               <Link
-                href={`/story/${storyRequest.story.id}`}
+                href={`/story/${storyRequest.story.slug}`}
                 className="flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors text-sm font-medium"
               >
                 <span>Read your story</span>
