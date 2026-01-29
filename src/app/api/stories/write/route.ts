@@ -40,15 +40,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Writing request limit exceeded. Please try again later." }, { status: 429 });
   }
 
+  
 
-  const storyRequest = await prisma.storyRequest.create({
-    data: {
-      content: validated.data.content,
-      trackCode: generateTrackCode(),
-    },
+  const storyRequest = await prisma.$transaction(async (tx) => {
+    const data = await tx.storyRequest.create({
+      data: {
+        content: validated.data.content,
+        trackCode: generateTrackCode(),
+      },
+    });
+
+    await triggerWorkflow('writeStory', { trackCode: storyRequest.trackCode });
+
+
+    return data;
   });
 
-  await triggerWorkflow('writeStory', { trackCode: storyRequest.trackCode });
 
   return NextResponse.json(storyRequest);
   } catch (error) {
