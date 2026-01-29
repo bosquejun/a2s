@@ -1,5 +1,6 @@
 import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleton";
 import { StoryReader } from "@/components/story-reader";
+import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { Story } from "@/validations/story.validation";
 import type { Metadata } from "next";
@@ -10,6 +11,14 @@ interface PageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+export async function generateStaticParams() {
+  const posts = await getAllPublishedStories(100);
+ 
+  return posts.map((post) => ({
+    slug: post.slug,
+  }))
 }
 
 function buildStoryMetadata(story: Story): Metadata {
@@ -32,7 +41,8 @@ function buildStoryMetadata(story: Story): Metadata {
       type: "article",
       url,
       siteName: "After 2AM Stories",
-      publishedTime: new Date().toISOString(), // You may want to add actual publish dates to stories
+      publishedTime: story.publishedAt?.toISOString() || '', // You may want to add actual publish dates to stories
+      modifiedTime: story.updatedAt?.toISOString() || '',
       authors: story.author ? [story.author] : undefined,
       section: story.categories[0].toLowerCase(),
       tags: story.tags,
@@ -86,8 +96,8 @@ export default async function StoryPage({ params }: PageProps) {
       "@type": "WebPage",
       "@id": `https://after2amstories.com/story/${story.slug}`,
     },
-    datePublished: new Date().toISOString(), // You may want to add actual publish dates to stories
-    dateModified: new Date().toISOString(),
+    datePublished: story.publishedAt, // You may want to add actual publish dates to stories
+    dateModified: story.updatedAt,
     publisher: {
       "@type": "Organization",
       name: "After 2AM Stories",

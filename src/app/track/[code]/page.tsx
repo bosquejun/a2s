@@ -2,15 +2,15 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
-    AlertCircle,
-    CheckCircle2,
-    Clock,
-    ExternalLink,
-    XCircle
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  XCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type StoryRequestStatus = "PENDING" | "REJECTED" | "APPROVED" | "FAILED";
 
@@ -81,7 +81,8 @@ const statusConfig: Record<
   },
 };
 
-export default function TrackPage() {
+
+function TrackPageContent() {
   const params = useParams();
   const code = params.code as string;
   const [storyRequest, setStoryRequest] = useState<StoryRequest | null>(null);
@@ -111,7 +112,7 @@ export default function TrackPage() {
           clearInterval(intervalId);
           intervalId = null;
         }
-      } catch (err) {
+      } catch {
         setError("An unexpected error occurred");
       } finally {
         setLoading(false);
@@ -249,6 +250,22 @@ export default function TrackPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TrackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+          <div className="max-w-3xl mx-auto space-y-12">
+            <div className="text-slate-500 text-center">Loading...</div>
+          </div>
+        </div>
+      }
+    >
+      <TrackPageContent />
+    </Suspense>
   );
 }
 
