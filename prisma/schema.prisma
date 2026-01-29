@@ -30,35 +30,74 @@ enum Category {
   SURREAL
 }
 
+enum Status {
+  PENDING
+  REJECTED
+  PUBLISHED
+  ARCHIVED
+}
+
 model Story {
   id String @id @default(cuid())
 
   // Core content
-  title String
-  body  String
-  slug  String @unique
-
-  // AI-generated metadata
+  title      String
+  content    String
+  slug       String     @unique
+  author     String
+  excerpt    String?
   mood       Mood
   categories Category[]
   tags       String[]
+  wordCount  Int        @default(0)
+  readTime   Int        @default(0)
 
   // Curation & safety
   intensity Int     @default(3) // 1 (soft) → 5 (heavy)
-  approved  Boolean @default(false)
   notes     String? // AI or human moderation notes
+
+  // SEO
+  seo Json? @default("{}")
 
   // System
   createdAt   DateTime  @default(now())
   publishedAt DateTime?
   updatedAt   DateTime  @updatedAt
 
+  storyRequestId String?       @unique
+  storyRequest   StoryRequest? @relation(fields: [storyRequestId], references: [id])
+
   @@index([slug])
   @@index([mood])
   @@index([categories])
   @@index([tags])
-  @@index([approved])
   @@index([intensity])
   @@index([publishedAt])
   @@index([updatedAt])
+  @@index([readTime])
+}
+
+enum StoryRequestStatus {
+  PENDING
+  REJECTED
+  APPROVED
+  FAILED
+}
+
+model StoryRequest {
+  id         String             @id @default(cuid())
+  content    String
+  status     StoryRequestStatus @default(PENDING)
+  notes      String?
+  trackCode  String             @unique
+  approvedAt DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  story Story?
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([trackCode])
 }

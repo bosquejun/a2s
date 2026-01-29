@@ -65,33 +65,27 @@ export async function generateMetadata({
 
 export default async function StoryPage({ params }: PageProps) {
   const { id } = await params;
-  const story = getStoryById(id);
-
-  if (!story) {
-    notFound();
-  }
-
-  const storyFetched = await prisma.story.findUnique({
+  
+  const story = await prisma.story.findUnique({
     where: {
       id,
     },
   });
 
-  console.log({storyFetched});
+  if (!story) {
+    notFound();
+  }
+
+
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: story.title,
-    description: story.excerpt,
+    description: story.excerpt || '',
     articleBody: story.content,
-    author: story.author
-      ? {
-          "@type": "Person",
-          name: story.author,
-        }
-      : undefined,
-    articleSection: story.category,
+    author: story.author,
+    articleSection: story.categories[0],
     keywords: story.tags.join(", "),
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -112,7 +106,21 @@ export default async function StoryPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Suspense fallback={<StoryReaderSkeleton />}>
-        <StoryReader story={story} />
+        <StoryReader story={{
+          ...story,
+          content: story.content,
+          excerpt: story.excerpt || '',
+          author: story.author,
+          category: story.categories[0],
+          mood: story.mood,
+          timestamp: new Date().toISOString(),
+          readTime: story.readTime + ' min read',
+          tags: story.tags,
+          likes: 0,
+          commentsCount: 0,
+          // category: story.categories[0],
+          // mood: story.mood,
+        }} />
       </Suspense>
     </>
   );

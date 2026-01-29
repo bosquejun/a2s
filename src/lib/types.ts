@@ -1,6 +1,4 @@
-export type Mood = "Haunting" | "Emotional" | "Confessional" | "Thoughtful" | "Eerie";
-
-export type Category = "Fiction" | "Reality" | "Poetry" | "Journal" | "Urban Legend";
+import { Category, Mood } from "@/lib/database/generated/prisma/enums";
 
 export interface MoodMetadata {
   id: Mood;

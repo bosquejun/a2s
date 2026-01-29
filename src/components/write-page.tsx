@@ -1,5 +1,8 @@
 "use client";
 
+import { EditorProvider, type Editor, type JSONContent } from "@/components/kibo-ui/editor";
+import type { Mood } from "@/lib/types";
+import { EditorContent, useCurrentEditor } from "@tiptap/react";
 import {
   ArrowLeft,
   Check,
@@ -8,35 +11,57 @@ import {
   Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Mood } from "@/lib/types";
 
 interface WritePageProps {
   initialMood?: Mood;
 }
 
+function EditorWrapper() {
+  const { editor } = useCurrentEditor();
+  if (!editor) return null;
+  return <EditorContent editor={editor} />;
+}
+
 export function WritePage({ initialMood }: WritePageProps) {
-  const [content, setContent] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return window.localStorage.getItem("after2am_draft_content") ?? "";
-  });
+  const [content, setContent] = useState<JSONContent | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [isSaved, setIsSaved] = useState(false);
-
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [wordCount, setWordCount] = useState(0);
+  const editorRef = useRef<Editor | null>(null);
+  const saveTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const timer = window.setTimeout(() => {
-      window.localStorage.setItem("after2am_draft_content", content);
-      setIsSaved(true);
-      window.setTimeout(() => setIsSaved(false), 2000);
-    }, 1000);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [content]);
+    const saved = window.localStorage.getItem("after2am_draft_content");
+    if (saved) {
+      try {
+        setContent(JSON.parse(saved));
+      } catch {
+        // If JSON parse fails, treat as plain text
+        const text = window.localStorage.getItem("after2am_draft_content_text") || saved;
+        setContent({
+          type: "doc",
+          content: text
+            ? [
+                {
+                  type: "paragraph",
+                  content: text.split("\n").map((line) => ({
+                    type: "text",
+                    text: line,
+                  })),
+                },
+              ]
+            : [],
+        });
+      }
+    } else {
+      setContent({
+        type: "doc",
+        content: [],
+      });
+    }
+  }, []);
 
   const generatePrompt = useCallback(async () => {
     if (isAiLoading) return;
@@ -65,25 +90,79 @@ export function WritePage({ initialMood }: WritePageProps) {
     }
   }, [initialMood, isAiLoading]);
 
+  const handleUpdate = ({ editor }: { editor: Editor }) => {
+    editorRef.current = editor;
+    const json = editor.getJSON();
+    const text = editor.getText();
+    const count = text.trim() ? text.trim().split(/\s+/).length : 0;
+    setWordCount(count);
+    setContent(json);
+
+    // Auto-save to localStorage
+    if (typeof window !== "undefined") {
+      if (saveTimeoutRef.current !== null) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = window.setTimeout(() => {
+        window.localStorage.setItem("after2am_draft_content", JSON.stringify(json));
+        window.localStorage.setItem("after2am_draft_content_text", text);
+        setIsSaved(true);
+        window.setTimeout(() => setIsSaved(false), 2000);
+      }, 1000);
+    }
+  };
+
   const clearDraft = () => {
     if (typeof window === "undefined") return;
     const confirmed = window.confirm("Delete this draft?");
     if (!confirmed) return;
-    setContent("");
     window.localStorage.removeItem("after2am_draft_content");
-  };
-
-  const handleRelease = () => {
-    if (typeof window !== "undefined") {
-      // This mirrors the playful original behavior.
-      // eslint-disable-next-line no-alert
-      window.alert("Whisper released into the void.");
-      window.localStorage.removeItem("after2am_draft_content");
+    window.localStorage.removeItem("after2am_draft_content_text");
+    setContent({
+      type: "doc",
+      content: [],
+    });
+    if (editorRef.current) {
+      editorRef.current.commands.clearContent();
     }
-    setContent("");
   };
 
-  const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
+  const handleRelease = async () => {
+    if (typeof window !== "undefined" && editorRef.current) {
+      const text = editorRef.current.getText();
+      if (!text.trim()) return;
+
+      const response = await fetch('/api/stories/write', {
+        method: 'POST',
+        body: JSON.stringify({ content: text }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to publish story");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      
+      setContent({
+        type: "doc",
+        content: [],
+      });
+      if (editorRef.current) {
+        editorRef.current.commands.clearContent();
+      }
+    }
+  };
+
+  if (content === null) {
+    return (
+      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+        <div className="max-w-3xl mx-auto space-y-12">
+          <div className="text-slate-500 text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
@@ -142,14 +221,21 @@ export function WritePage({ initialMood }: WritePageProps) {
         </div>
 
         <div className="pt-4">
-          <textarea
-            ref={textareaRef}
+          <EditorProvider
+            className="w-full min-h-[60vh] [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[60vh] [&_.ProseMirror]:bg-transparent [&_.ProseMirror]:text-2xl [&_.ProseMirror]:font-serif [&_.ProseMirror]:text-slate-400 [&_.ProseMirror]:leading-relaxed prose prose-invert prose-p:text-slate-400 prose-p:text-2xl prose-p:font-serif prose-p:leading-relaxed max-w-none"
+            content={content}
+            onUpdate={handleUpdate}
+            onCreate={({ editor }) => {
+              editorRef.current = editor;
+              editor.commands.focus();
+              const text = editor.getText();
+              const count = text.trim() ? text.trim().split(/\s+/).length : 0;
+              setWordCount(count);
+            }}
             placeholder="Start writing your midnight thoughts..."
-            className="w-full min-h-[60vh] bg-transparent border-none text-2xl font-serif text-slate-400 placeholder:text-slate-900 focus:outline-none focus:ring-0 resize-none leading-relaxed"
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            autoFocus
-          />
+          >
+            <EditorWrapper />
+          </EditorProvider>
         </div>
 
         <footer className="fixed bottom-0 left-0 w-full p-6 flex justify-center pointer-events-none">
@@ -160,7 +246,7 @@ export function WritePage({ initialMood }: WritePageProps) {
             <button
               type="button"
               onClick={handleRelease}
-              disabled={!content.trim()}
+              disabled={wordCount === 0}
               className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-800 text-white text-xs font-bold uppercase tracking-widest transition-all"
             >
               <span>Publish Whisper</span>
