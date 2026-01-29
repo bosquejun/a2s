@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       },
     });
 
-    await triggerWorkflow('writeStory', { trackCode: storyRequest.trackCode });
+    await triggerWorkflow('writeStory', { trackCode: data.trackCode });
 
 
     return data;
