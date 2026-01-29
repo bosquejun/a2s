@@ -1,6 +1,5 @@
 import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleton";
 import { StoryReader } from "@/components/story-reader";
-import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { Story } from "@/validations/story.validation";
 import type { Metadata } from "next";
@@ -13,13 +12,13 @@ interface PageProps {
   }>;
 }
 
-export async function generateStaticParams() {
-  const posts = await getAllPublishedStories(100);
+// export async function generateStaticParams() {
+//   const posts = await getAllPublishedStories(100);
  
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
-}
+//   return posts.map((post) => ({
+//     slug: post.slug,
+//   }))
+// }
 
 function buildStoryMetadata(story: Story): Metadata {
   const description = story.excerpt;
