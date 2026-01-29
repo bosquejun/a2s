@@ -102,21 +102,7 @@ export default async function StoryPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Suspense fallback={<StoryReaderSkeleton />}>
-        <StoryReader story={{
-          ...story,
-          content: story.content,
-          excerpt: story.excerpt || '',
-          author: story.author,
-          category: story.categories[0],
-          mood: story.mood,
-          timestamp: new Date().toISOString(),
-          readTime: story.readTime + ' min read',
-          tags: story.tags,
-          likes: 0,
-          commentsCount: 0,
-          // category: story.categories[0],
-          // mood: story.mood,
-        }} />
+        <StoryReader story={story} />
       </Suspense>
     </>
   );
