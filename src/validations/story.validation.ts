@@ -86,7 +86,12 @@ export const nightEditorAgentOutputSchema = createStorySchema.omit({
   })
 })
 
+export const nightWriterStoryWorkflowOutputSchema = nightEditorAgentOutputSchema.omit({
+  approved:true,
+  notes:true,
+})
 
 export type Story = z.infer<typeof storySchema>;
 export type CreateStoryData = z.infer<typeof createStorySchema>
 export type NightEditorAgentOutput = z.infer<typeof nightEditorAgentOutputSchema>
+export type WriteStoryWorkflowOutput = z.infer<typeof writeStoryWorkflowOutputSchema>

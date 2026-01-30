@@ -1,5 +1,6 @@
 import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleton";
 import { StoryReader } from "@/components/story-reader";
+import { Category } from "@/lib/database/generated/prisma/enums";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { Story } from "@/validations/story.validation";
 import type { Metadata } from "next";
@@ -29,7 +30,7 @@ function buildStoryMetadata(story: Story): Metadata {
     description,
     keywords: [
       ...story.tags,
-      story.categories.map(category => category.toLowerCase()).join(", "),
+      story.categories.map((category: Category) => category.toLowerCase()).join(", "),
       story.mood.toLowerCase(),
       "after 2am",
       "stories",
