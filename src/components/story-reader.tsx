@@ -350,7 +350,7 @@ export function StoryReader({ story }: StoryReaderProps) {
           </div>
 
           <Link
-            href={`/api/stories/mood/${baseMood}?exclude=${encodeURIComponent(excludedSlugs)}`}
+            href={`/mood/${baseMood.toLowerCase()}?exclude=${encodeURIComponent(excludedSlugs)}`}
             className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
           >
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
