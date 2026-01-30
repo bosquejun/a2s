@@ -17,4 +17,3 @@ export async function getStoriesByMood(mood: Mood) {
 
   return stories;
 }
-

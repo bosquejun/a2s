@@ -25,7 +25,7 @@ export function AmbientSound() {
         audioRef.current = null;
       }
     },
-    [],
+    []
   );
 
   const ensureAudio = () => {
@@ -46,12 +46,10 @@ export function AmbientSound() {
     if (isPlaying) {
       audio.pause();
     } else {
-      void audio
-        .play()
-        .catch(() => {
-          // User interaction required for audio; ignore but keep toggle state unchanged.
-          return;
-        });
+      void audio.play().catch(() => {
+        // User interaction required for audio; ignore but keep toggle state unchanged.
+        return;
+      });
     }
 
     const nextState = !isPlaying;
@@ -63,14 +61,14 @@ export function AmbientSound() {
     <button
       type="button"
       onClick={toggleSound}
-      className={`fixed bottom-6 right-6 p-3 rounded-full transition-all duration-500 z-40 border ${
+      className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 p-2.5 sm:p-3 rounded-full transition-all duration-500 z-30 border touch-manipulation ${
         isPlaying
           ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
           : "bg-slate-900/50 text-slate-600 hover:text-slate-400 border-slate-800/50"
       }`}
       aria-label="Toggle Global Night Ambience"
     >
-      {isPlaying ? <Volume2 size={16} /> : <VolumeX size={16} />}
+      {isPlaying ? <Volume2 size={14} className="sm:w-4 sm:h-4" /> : <VolumeX size={14} className="sm:w-4 sm:h-4" />}
     </button>
   );
 }

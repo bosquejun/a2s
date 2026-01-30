@@ -2,7 +2,8 @@ import { MetadataRoute } from "next";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://after2amstories.com";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://after2amstories.com";
 
   // Get all published stories
   const stories = await getAllPublishedStories();
@@ -33,4 +34,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [...staticRoutes, ...storyRoutes];
 }
-

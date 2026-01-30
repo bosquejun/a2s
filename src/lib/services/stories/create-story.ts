@@ -1,19 +1,19 @@
-import { updateTag } from "next/cache";
 import prisma from "@/lib/database/prisma";
 import { CreateStoryData } from "@/validations/story.validation";
+import { revalidateTag } from "next/cache";
 
 export async function createStory(data: CreateStoryData) {
   const newStory = await prisma.story.create({
-    data
+    data,
   });
 
   // Invalidate cache tags when a new story is created
   // Only invalidate if the story is published
   if (newStory.publishedAt) {
-    updateTag("stories"); // General stories tag
-    updateTag("stories-list"); // Published stories list
-    updateTag(`story-${newStory.slug}`); // Specific story
-    updateTag(`stories-mood-${newStory.mood}`); // Stories by mood
+    revalidateTag("stories", "max"); // General stories tag
+    revalidateTag("stories-list", "max"); // Published stories list
+    revalidateTag(`story-${newStory.slug}`, "max"); // Specific story
+    revalidateTag(`stories-mood-${newStory.mood}`, "max"); // Stories by mood
   }
 
   return newStory;

@@ -15,7 +15,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface StoryReaderProps {
@@ -23,7 +23,6 @@ interface StoryReaderProps {
 }
 
 export function StoryReader({ story }: StoryReaderProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -43,7 +42,6 @@ export function StoryReader({ story }: StoryReaderProps) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
-
 
   const startNoise = () => {
     if (typeof window === "undefined" || typeof AudioContext === "undefined") {
@@ -169,9 +167,11 @@ export function StoryReader({ story }: StoryReaderProps) {
   };
 
   const excludedSlugs = useMemo(() => {
-    const uniqueSlugs = Array.from(new Set([story.slug, ...(excludedParam.split(",") ?? [])]));
+    const uniqueSlugs = Array.from(
+      new Set([story.slug, ...(excludedParam.split(",") ?? [])])
+    );
     return uniqueSlugs.join(",");
-  }, [story.slug, excludedParam])
+  }, [story.slug, excludedParam]);
 
   return (
     <div className="flex flex-col w-full h-screen max-h-screen relative overflow-hidden bg-slate-950 animate-fade-in selection:bg-indigo-500/20 selection:text-slate-100">
@@ -186,7 +186,7 @@ export function StoryReader({ story }: StoryReaderProps) {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="grow w-full overflow-y-auto overflow-x-hidden pt-20 sm:pt-24 pb-40 px-4 sm:px-6 md:px-12 lg:px-16 scroll-smooth touch-pan-y mask-fade-bottom overscroll-contain"
+        className="grow w-full overflow-y-auto overflow-x-hidden pt-20 sm:pt-24 pb-32 sm:pb-40 px-4 sm:px-6 md:px-12 lg:px-16 scroll-smooth touch-pan-y mask-fade-bottom overscroll-contain"
       >
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           <div className="mb-12 sm:mb-16 flex flex-col items-center text-center space-y-8 sm:space-y-10 w-full">
@@ -217,9 +217,7 @@ export function StoryReader({ story }: StoryReaderProps) {
                   <span className="font-serif italic">{story.author}</span>
                 </div>
               )}
-              {story.author && (
-                <div className="h-3 w-px bg-slate-800/50" />
-              )}
+              {story.author && <div className="h-3 w-px bg-slate-800/50" />}
               <div className="flex items-center space-x-1.5 text-[10px] uppercase tracking-[0.3em]">
                 <Clock size={11} className="opacity-60" />
                 <span>{story.readTime} min</span>
@@ -252,8 +250,11 @@ export function StoryReader({ story }: StoryReaderProps) {
           </div>
 
           {/* Story content with improved readability */}
-          <div className="font-serif text-slate-200/90 text-lg sm:text-xl md:text-2xl lg:text-2xl leading-[2.2] sm:leading-[2.3] italic select-text pb-12 px-2 sm:px-4 whitespace-pre-line drop-shadow-[0_2px_20px_rgba(248,250,252,0.03)] [&_p]:mb-6 [&_p:last-child]:mb-0 [&_p]:indent-0 [&_p]:text-slate-200/90 [&_strong]:font-semibold [&_strong]:text-slate-100 [&_strong]:not-italic [&_em]:not-italic [&_em]:text-slate-300/80 [&_h1]:text-slate-100 [&_h2]:text-slate-100 [&_h3]:text-slate-100 [&_h4]:text-slate-100 [&_a]:text-indigo-400/80 [&_a:hover]:text-indigo-300 [&_code]:text-slate-300 [&_code]:bg-slate-900/50 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_blockquote]:border-l-2 [&_blockquote]:border-slate-700/50 [&_blockquote]:pl-4 [&_blockquote]:text-slate-300/80 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:space-y-2 [&_li]:text-slate-200/90" dangerouslySetInnerHTML={{ __html: story.content }} />
-          
+          <div
+            className="font-serif text-slate-200/90 text-lg sm:text-xl md:text-2xl lg:text-2xl leading-[2.2] sm:leading-[2.3] italic select-text pb-12 px-2 sm:px-4 whitespace-pre-line drop-shadow-[0_2px_20px_rgba(248,250,252,0.03)] [&_p]:mb-6 [&_p:last-child]:mb-0 [&_p]:indent-0 [&_p]:text-slate-200/90 [&_strong]:font-semibold [&_strong]:text-slate-100 [&_strong]:not-italic [&_em]:not-italic [&_em]:text-slate-300/80 [&_h1]:text-slate-100 [&_h2]:text-slate-100 [&_h3]:text-slate-100 [&_h4]:text-slate-100 [&_a]:text-indigo-400/80 [&_a:hover]:text-indigo-300 [&_code]:text-slate-300 [&_code]:bg-slate-900/50 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_blockquote]:border-l-2 [&_blockquote]:border-slate-700/50 [&_blockquote]:pl-4 [&_blockquote]:text-slate-300/80 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:space-y-2 [&_li]:text-slate-200/90"
+            dangerouslySetInnerHTML={{ __html: story.content }}
+          />
+
           {/* Tags section - improved UI with badge styling */}
           {story.tags && story.tags.length > 0 && (
             <div className="mt-16 sm:mt-20 flex flex-col items-center space-y-4 pb-12">
@@ -283,24 +284,24 @@ export function StoryReader({ story }: StoryReaderProps) {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 w-full p-4 sm:p-6 md:p-10 pointer-events-none z-50">
-        <div className="max-w-5xl mx-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pointer-events-auto">
-          <div className="flex items-center justify-center sm:justify-start flex-wrap gap-2">
+      <div className="fixed bottom-0 left-0 w-full p-3 sm:p-4 md:p-6 lg:p-10 pointer-events-none z-50 safe-area-inset-bottom">
+        <div className="py-2 max-w-5xl mx-auto flex flex-col gap-2.5 sm:gap-3 sm:flex-row sm:items-center sm:justify-between pointer-events-auto">
+          <div className="flex items-center justify-center sm:justify-start flex-wrap gap-2 sm:gap-2.5">
             <Link
               href="/"
-              className="p-3 sm:p-4 rounded-full bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/30 transition-all group shrink-0"
+              className="p-2.5 sm:p-3 md:p-4 rounded-full bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
               title="Return Home"
             >
               <ArrowLeft
-                size={18}
-                className="group-hover:-translate-x-0.5 transition-transform"
+                size={16}
+                className="sm:w-[18px] sm:h-[18px] group-hover:-translate-x-0.5 transition-transform"
               />
             </Link>
 
             <button
               type="button"
               onClick={handleShare}
-              className={`p-3 sm:p-4 rounded-full bg-slate-900/40 backdrop-blur-xl border transition-all group relative shrink-0 ${
+              className={`p-2.5 sm:p-3 md:p-4 rounded-full bg-slate-900/40 backdrop-blur-xl border transition-all group relative shrink-0 touch-manipulation ${
                 isSharing
                   ? "border-emerald-500/30 text-emerald-500 bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.15)]"
                   : "border-slate-800/50 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/20"
@@ -308,13 +309,13 @@ export function StoryReader({ story }: StoryReaderProps) {
               title="Share this whisper"
             >
               <Share2
-                size={18}
-                className={`${
+                size={16}
+                className={`sm:w-[18px] sm:h-[18px] ${
                   isSharing ? "scale-90" : "group-hover:scale-110"
                 } transition-all duration-300 ease-out`}
               />
               {isSharing ? (
-                <span className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-500 text-white text-[10px] uppercase tracking-widest rounded shadow-lg animate-fade-in whitespace-nowrap z-50">
+                <span className="absolute -top-11 sm:-top-12 left-1/2 -translate-x-1/2 px-2.5 sm:px-3 py-1 bg-emerald-500 text-white text-[9px] sm:text-[10px] uppercase tracking-widest rounded shadow-lg animate-fade-in whitespace-nowrap z-50">
                   Link Copied
                 </span>
               ) : null}
@@ -322,10 +323,10 @@ export function StoryReader({ story }: StoryReaderProps) {
 
             <Link
               href="/write"
-              className="p-3 sm:p-4 rounded-full bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/30 transition-all group shrink-0"
+              className="p-2.5 sm:p-3 md:p-4 rounded-full bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 text-slate-500 hover:text-indigo-400 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
               title="Whisper a Story"
             >
-              <PenSquare size={18} />
+              <PenSquare size={16} className="sm:w-[18px] sm:h-[18px]" />
             </Link>
 
             <button
@@ -349,24 +350,22 @@ export function StoryReader({ story }: StoryReaderProps) {
           </div>
 
           <Link
-            href={`/api/stories/mood/${baseMood}?exclude=${encodeURIComponent(excludedSlugs)}`}      
-            className="w-full sm:w-auto flex items-center justify-center space-x-3 px-6 py-3 md:px-8 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0"
+            href={`/api/stories/mood/${baseMood}?exclude=${encodeURIComponent(excludedSlugs)}`}
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
           >
-            <span className="text-xs uppercase tracking-[0.4em] font-bold whitespace-nowrap">
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
               More like this
             </span>
             <RefreshCw
-              size={16}
-              className="group-hover:rotate-180 transition-transform duration-700 opacity-80 shrink-0"
+              size={14}
+              className="sm:w-4 sm:h-4 group-hover:rotate-180 transition-transform duration-700 opacity-80 shrink-0"
             />
           </Link>
         </div>
       </div>
 
       {/* Softer gradient fade at bottom */}
-      <div className="fixed bottom-0 left-0 w-full h-48 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent pointer-events-none z-40" />
+      <div className="fixed bottom-0 left-0 w-full h-40 sm:h-48 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent pointer-events-none z-40" />
     </div>
   );
 }
-
-

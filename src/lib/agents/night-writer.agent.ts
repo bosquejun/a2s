@@ -1,18 +1,21 @@
-import { Category, Mood } from '@/lib/database/generated/prisma/enums';
-import { nightWriterStoryWorkflowOutputSchema } from '@/validations/story.validation';
-import { openrouter } from '@openrouter/ai-sdk-provider';
-import { Output, ToolLoopAgent } from 'ai';
-import z from 'zod';
+import { Category, Mood } from "@/lib/database/generated/prisma/enums";
+import { nightWriterStoryWorkflowOutputSchema } from "@/validations/story.validation";
+import { openrouter } from "@openrouter/ai-sdk-provider";
+import { Output, ToolLoopAgent } from "ai";
+import z from "zod";
 
 export const nightWriterAgent = new ToolLoopAgent({
-  model: openrouter('@preset/a2s-story-telling-models'),
+  model: openrouter("@preset/a2s-story-telling-models"),
   output: Output.object({
-    schema: nightWriterStoryWorkflowOutputSchema
-  })
+    schema: nightWriterStoryWorkflowOutputSchema,
+  }),
 });
 
-
-export const createUserPrompt = (data: {content: string, mood: Mood, category: Category, intensity: number}) => {
+export const createUserPrompt = (data: {
+  mood: Mood;
+  category: Category;
+  intensity: number;
+}) => {
   return `
   Write a short after‑2am story using the inputs below and return the result in structured JSON.
 Inputs
@@ -77,10 +80,8 @@ OUTPUT RULES
 Output STRICT JSON only
 Match the provided JSON schema exactly
 No commentary, no markdown, no extra text
-STORY:
-{{${data.content}}}
 
 JSON OUTPUT SCHEMA:
 ${z.toJSONSchema(nightWriterStoryWorkflowOutputSchema)}
-  `
-}
+  `;
+};

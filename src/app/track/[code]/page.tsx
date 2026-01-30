@@ -2,11 +2,11 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
-  XCircle
+    AlertCircle,
+    CheckCircle2,
+    Clock,
+    ExternalLink,
+    XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -81,7 +81,6 @@ const statusConfig: Record<
   },
 };
 
-
 function TrackPageContent() {
   const params = useParams();
   const code = params.code as string;
@@ -137,7 +136,7 @@ function TrackPageContent() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
           <div className="text-slate-500 text-center">Loading...</div>
         </div>
@@ -147,7 +146,7 @@ function TrackPageContent() {
 
   if (error || !storyRequest) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
           <Alert variant="destructive">
             <XCircle className="size-3.5" />
@@ -165,29 +164,28 @@ function TrackPageContent() {
   const StatusIcon = config.icon;
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
-      <div className="max-w-3xl mx-auto space-y-12">
-        <header className="flex items-center justify-between py-4 border-b border-slate-900">
+    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+      <div className="max-w-3xl mx-auto space-y-8 sm:space-y-12">
+        <header className="flex items-center justify-between py-3 sm:py-4 border-b border-slate-900">
           <Link
             href="/"
-            className="text-slate-500 hover:text-slate-300 transition-colors flex items-center space-x-2 text-xs uppercase tracking-widest"
+            className="text-slate-500 hover:text-slate-300 transition-colors flex items-center space-x-2 text-[10px] sm:text-xs uppercase tracking-widest touch-manipulation"
           >
             <span>← Back</span>
           </Link>
         </header>
 
-        <div className="space-y-6">
+        <div className="space-y-5 sm:space-y-6">
           <div>
-            <h1 className="text-2xl font-serif text-slate-300 mb-2">
+            <h1 className="text-xl sm:text-2xl font-serif text-slate-300 mb-2">
               Whisper Status
             </h1>
-            <div className="flex items-center gap-2 text-xs text-slate-600 font-mono">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-[10px] sm:text-xs text-slate-600 font-mono">
               <span>Track Code:</span>
               <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900/50 border border-slate-800 rounded-lg">
-                <code className="text-slate-400 tracking-wider">
+                <code className="text-slate-400 tracking-wider break-all">
                   {storyRequest.trackCode}
                 </code>
-                
               </div>
             </div>
           </div>
@@ -212,37 +210,37 @@ function TrackPageContent() {
 
           {storyRequest.status === "APPROVED" && storyRequest.story && (
             <div className="space-y-3">
-              <h2 className="text-lg font-serif text-slate-300">
+              <h2 className="text-base sm:text-lg font-serif text-slate-300">
                 Your whisper is live
               </h2>
               <Link
                 href={`/story/${storyRequest.story.slug}`}
-                className="flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors text-sm font-medium"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium touch-manipulation w-full sm:w-auto"
               >
                 <span>Read your story</span>
-                <ExternalLink className="size-4" />
+                <ExternalLink className="size-3.5 sm:size-4" />
               </Link>
             </div>
           )}
 
-          <div className="pt-6 border-t border-slate-900 space-y-2 text-xs text-slate-600">
-            <div className="flex justify-between">
+          <div className="pt-5 sm:pt-6 border-t border-slate-900 space-y-2 text-[10px] sm:text-xs text-slate-600">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
               <span>Submitted:</span>
-              <span className="font-mono">
+              <span className="font-mono break-all sm:break-normal">
                 {new Date(storyRequest.createdAt).toLocaleString()}
               </span>
             </div>
             {storyRequest.approvedAt && (
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
                 <span>Approved:</span>
-                <span className="font-mono">
+                <span className="font-mono break-all sm:break-normal">
                   {new Date(storyRequest.approvedAt).toLocaleString()}
                 </span>
               </div>
             )}
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
               <span>Last updated:</span>
-              <span className="font-mono">
+              <span className="font-mono break-all sm:break-normal">
                 {new Date(storyRequest.updatedAt).toLocaleString()}
               </span>
             </div>
@@ -268,4 +266,3 @@ export default function TrackPage() {
     </Suspense>
   );
 }
-

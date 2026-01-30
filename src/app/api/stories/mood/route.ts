@@ -2,11 +2,9 @@ import { Mood } from "@/lib/database/generated/prisma/enums";
 import { getRandomStoryByMood } from "@/lib/services/stories/get-random-story-by-mood";
 import { NextResponse } from "next/server";
 
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const moodParam = searchParams.get("mood") as Mood;
-
 
   if (!moodParam) {
     return NextResponse.json(
@@ -15,7 +13,6 @@ export async function GET(request: Request) {
     );
   }
 
-  
   if (!Object.values(Mood).includes(moodParam)) {
     return NextResponse.redirect(new URL("/404", request.url), { status: 404 });
   }
@@ -25,7 +22,9 @@ export async function GET(request: Request) {
 
     if (!story) {
       // Redirect to 404 page
-      return NextResponse.redirect(new URL("/404", request.url), { status: 404 });
+      return NextResponse.redirect(new URL("/404", request.url), {
+        status: 404,
+      });
     }
 
     // Redirect to the story with mood query parameter
@@ -39,4 +38,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

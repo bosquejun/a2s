@@ -1,6 +1,10 @@
 "use client";
 
-import { EditorProvider, type Editor, type JSONContent } from "@/components/kibo-ui/editor";
+import {
+  EditorProvider,
+  type Editor,
+  type JSONContent,
+} from "@/components/kibo-ui/editor";
 import {
   Alert,
   AlertAction,
@@ -59,7 +63,8 @@ export function WritePage({ initialMood }: WritePageProps) {
         setContent(JSON.parse(saved));
       } catch {
         // If JSON parse fails, treat as plain text
-        const text = window.localStorage.getItem("after2am_draft_content_text") || saved;
+        const text =
+          window.localStorage.getItem("after2am_draft_content_text") || saved;
         setContent({
           type: "doc",
           content: text
@@ -102,9 +107,7 @@ export function WritePage({ initialMood }: WritePageProps) {
       const data: { prompt: string } = await response.json();
       setPrompt(data.prompt.trim());
     } catch {
-      setPrompt(
-        "What is the sound that silence makes when it's tired?",
-      );
+      setPrompt("What is the sound that silence makes when it's tired?");
     } finally {
       setIsAiLoading(false);
     }
@@ -124,7 +127,10 @@ export function WritePage({ initialMood }: WritePageProps) {
         window.clearTimeout(saveTimeoutRef.current);
       }
       saveTimeoutRef.current = window.setTimeout(() => {
-        window.localStorage.setItem("after2am_draft_content", JSON.stringify(json));
+        window.localStorage.setItem(
+          "after2am_draft_content",
+          JSON.stringify(json)
+        );
         window.localStorage.setItem("after2am_draft_content_text", text);
         setIsSaved(true);
         window.setTimeout(() => setIsSaved(false), 2000);
@@ -157,10 +163,10 @@ export function WritePage({ initialMood }: WritePageProps) {
       setIsSubmitting(true);
 
       try {
-        const response = await fetch('/api/stories/write', {
-          method: 'POST',
+        const response = await fetch("/api/stories/write", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ content: text }),
         });
@@ -168,13 +174,14 @@ export function WritePage({ initialMood }: WritePageProps) {
         const data = await response.json();
 
         if (!response.ok) {
-          let errorMessage = "We hit a problem. It's not your fault. Please try again soon.";
-          
-          if(response.status === 400) {
+          let errorMessage =
+            "We hit a problem. It's not your fault. Please try again soon.";
+
+          if (response.status === 400) {
             errorMessage = data.error;
-          }
-          else if(response.status === 429) {
-            errorMessage = "You've already shared something today. Come back later when it feels right.";
+          } else if (response.status === 429) {
+            errorMessage =
+              "You've already shared something today. Come back later when it feels right.";
             setIsRateLimited(true);
           }
           setSubmissionResult({
@@ -200,7 +207,7 @@ export function WritePage({ initialMood }: WritePageProps) {
         if (editorRef.current) {
           editorRef.current.commands.clearContent();
         }
-        
+
         // Clear localStorage draft
         window.localStorage.removeItem("after2am_draft_content");
         window.localStorage.removeItem("after2am_draft_content_text");
@@ -226,7 +233,7 @@ export function WritePage({ initialMood }: WritePageProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-28 sm:pb-32 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto space-y-12">
         <header className="flex items-center justify-between py-4 border-b border-slate-900">
           <button
@@ -257,7 +264,9 @@ export function WritePage({ initialMood }: WritePageProps) {
 
         {submissionResult && (
           <Alert
-            variant={submissionResult.type === "error" ? "destructive" : "default"}
+            variant={
+              submissionResult.type === "error" ? "destructive" : "default"
+            }
             className={`animate-fade-in ${
               submissionResult.type === "success"
                 ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 [&_svg]:text-emerald-400"
@@ -269,63 +278,75 @@ export function WritePage({ initialMood }: WritePageProps) {
             ) : (
               <XCircle className="size-3.5 mt-0.5" />
             )}
-            <AlertTitle className={submissionResult.type === "success" ? "text-emerald-300" : ""}>
-              {submissionResult.type === "success" ? "Whisper Accepted" : "Not quite yet"}
+            <AlertTitle
+              className={
+                submissionResult.type === "success" ? "text-emerald-300" : ""
+              }
+            >
+              {submissionResult.type === "success"
+                ? "Whisper Accepted"
+                : "Not quite yet"}
             </AlertTitle>
-            <AlertDescription className={submissionResult.type === "success" ? "text-emerald-400/90" : ""}>
+            <AlertDescription
+              className={
+                submissionResult.type === "success" ? "text-emerald-400/90" : ""
+              }
+            >
               {submissionResult.message}
-              {submissionResult.type === "success" && submissionResult.trackCode && (
-                <div className="mt-3 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase tracking-widest text-emerald-500/70 font-mono">
-                      Track Code:
-                    </span>
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900/50 border border-emerald-500/20 rounded-lg">
-                      {isCopied ? (
-                        <div className="flex items-center gap-2 animate-fade-in">
-                          <Check className="size-3.5 text-emerald-400" />
-                          <span className="text-xs font-mono text-emerald-300 tracking-wider">
-                            Copied!
-                          </span>
-                        </div>
-                      ) : (
-                        <code className="text-xs font-mono text-emerald-300 tracking-wider">
-                          {submissionResult.trackCode}
-                        </code>
-                      )}
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          if (submissionResult.trackCode) {
-                            await navigator.clipboard.writeText(submissionResult.trackCode);
-                            setIsCopied(true);
-                            setTimeout(() => {
-                              setIsCopied(false);
-                            }, 2000);
-                          }
-                        }}
-                        className="text-emerald-400/60 hover:text-emerald-300 transition-colors"
-                        aria-label="Copy track code"
-                        title="Copy track code"
-                      >
+              {submissionResult.type === "success" &&
+                submissionResult.trackCode && (
+                  <div className="mt-3 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase tracking-widest text-emerald-500/70 font-mono">
+                        Track Code:
+                      </span>
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900/50 border border-emerald-500/20 rounded-lg">
                         {isCopied ? (
-                          <Check className="size-3 text-emerald-400" />
+                          <div className="flex items-center gap-2 animate-fade-in">
+                            <Check className="size-3.5 text-emerald-400" />
+                            <span className="text-xs font-mono text-emerald-300 tracking-wider">
+                              Copied!
+                            </span>
+                          </div>
                         ) : (
-                          <Copy className="size-3" />
+                          <code className="text-xs font-mono text-emerald-300 tracking-wider">
+                            {submissionResult.trackCode}
+                          </code>
                         )}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (submissionResult.trackCode) {
+                              await navigator.clipboard.writeText(
+                                submissionResult.trackCode
+                              );
+                              setIsCopied(true);
+                              setTimeout(() => {
+                                setIsCopied(false);
+                              }, 2000);
+                            }
+                          }}
+                          className="text-emerald-400/60 hover:text-emerald-300 transition-colors"
+                          aria-label="Copy track code"
+                          title="Copy track code"
+                        >
+                          {isCopied ? (
+                            <Check className="size-3 text-emerald-400" />
+                          ) : (
+                            <Copy className="size-3" />
+                          )}
+                        </button>
+                      </div>
+                      <Link
+                        href={`/track/${submissionResult.trackCode}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium hover:!text-emerald-300"
+                      >
+                        <span>View Progress</span>
+                        <ExternalLink className="size-3" />
+                      </Link>
                     </div>
-                     <Link
-                    href={`/track/${submissionResult.trackCode}`}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium hover:!text-emerald-300"
-                  >
-                    <span>View Progress</span>
-                    <ExternalLink className="size-3" />
-                  </Link>
                   </div>
-                 
-                </div>
-              )}
+                )}
             </AlertDescription>
             <AlertAction>
               <button
@@ -402,26 +423,26 @@ export function WritePage({ initialMood }: WritePageProps) {
           </EditorProvider>
         </div>
 
-        <footer className="fixed bottom-0 left-0 w-full p-6 flex justify-center pointer-events-none">
-          <div className="max-w-3xl w-full flex items-center justify-between bg-slate-950/80 backdrop-blur-md border border-slate-900 p-2 rounded-2xl pointer-events-auto">
-            <span className="px-6 text-[10px] uppercase tracking-widest text-slate-700 font-mono">
+        <footer className="fixed bottom-0 left-0 w-full p-3 sm:p-4 md:p-6 flex justify-center pointer-events-none safe-area-inset-bottom z-50">
+          <div className="max-w-3xl w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 bg-slate-950/80 backdrop-blur-md border border-slate-900 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl pointer-events-auto">
+            <span className="px-4 sm:px-6 py-2 sm:py-0 text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-700 font-mono text-center sm:text-left shrink-0">
               {wordCount} words
             </span>
             <button
               type="button"
               onClick={handleRelease}
               disabled={wordCount === 0 || isSubmitting || isRateLimited}
-              className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-800 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-widest transition-all relative"
+              className="flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-800 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all relative touch-manipulation w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="size-4 animate-spin" />
+                  <Loader2 className="size-3.5 sm:size-4 animate-spin" />
                   <span>Submitting...</span>
                 </>
               ) : (
                 <>
                   <span>Submit Whisper</span>
-                  <Send size={14} />
+                  <Send size={12} className="sm:w-[14px] sm:h-[14px]" />
                 </>
               )}
             </button>
@@ -431,5 +452,3 @@ export function WritePage({ initialMood }: WritePageProps) {
     </div>
   );
 }
-
-

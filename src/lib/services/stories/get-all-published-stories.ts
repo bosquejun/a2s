@@ -36,4 +36,3 @@ const getAllPublishedStoriesCached = cache(async (limit?: number) => {
 export async function getAllPublishedStories(limit?: number) {
   return getAllPublishedStoriesCached(limit);
 }
-

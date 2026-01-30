@@ -3,4 +3,3 @@ import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleto
 export default function StoryLoading() {
   return <StoryReaderSkeleton />;
 }
-

@@ -1,9 +1,9 @@
-import { customAlphabet } from "nanoid"
+import { customAlphabet } from "nanoid";
 
 const nanoid = customAlphabet(
   "23456789abcdefghjkmnpqrstuvwxyz", // no 0,1,i,l,o
   4
-)
+);
 
 const WORDS = [
   "moon",
@@ -51,11 +51,11 @@ const WORDS = [
   "echoes",
   "tiredness",
   "awake",
-  "latehour"
-]
+  "latehour",
+];
 
 export function generateTrackCode() {
-  const word = WORDS[Math.floor(Math.random() * WORDS.length)]
-  const code = nanoid().toLowerCase()
-  return `${word}-${code}`
+  const word = WORDS[Math.floor(Math.random() * WORDS.length)];
+  const code = nanoid().toLowerCase();
+  return `${word}-${code}`;
 }

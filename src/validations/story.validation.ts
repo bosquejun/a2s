@@ -1,4 +1,9 @@
-import { Category, Mood, Status, StoryRequestStatus } from "@/lib/database/generated/prisma/client";
+import {
+  Category,
+  Mood,
+  Status,
+  StoryRequestStatus,
+} from "@/lib/database/generated/prisma/client";
 import { z } from "zod";
 
 export const storySchema = z.object({
@@ -8,7 +13,10 @@ export const storySchema = z.object({
   content: z.string().min(1).max(10000),
   slug: z.string().slugify().min(1),
   mood: z.enum(Object.values(Mood)),
-  categories: z.array(z.enum(Object.values(Category))).min(1).max(3),
+  categories: z
+    .array(z.enum(Object.values(Category)))
+    .min(1)
+    .max(3),
   tags: z.array(z.string()).min(1).max(5),
   intensity: z.number().min(1).max(5),
   seo: z.object({
@@ -26,17 +34,18 @@ export const storySchema = z.object({
   updatedAt: z.date(),
 });
 
-
 export const storyRequestSchema = z.object({
   id: z.string(),
-  content: z.string()
+  content: z
+    .string()
     .max(10000)
-    .refine(
-      str => str.trim().split(/\s+/).length >= 10,
-      { message: "Content must be at least 10 words." }
-    ),
+    .refine((str) => str.trim().split(/\s+/).length >= 10, {
+      message: "Content must be at least 10 words.",
+    }),
   author: z.string().min(1).max(100),
-  status: z.enum(Object.values(StoryRequestStatus)).default(StoryRequestStatus.PENDING),
+  status: z
+    .enum(Object.values(StoryRequestStatus))
+    .default(StoryRequestStatus.PENDING),
   notes: z.string().optional(),
   trackCode: z.string().min(1).max(100),
   approvedAt: z.date().optional(),
@@ -44,54 +53,71 @@ export const storyRequestSchema = z.object({
   updatedAt: z.date().optional(),
 });
 
-
 export const createStoryRequestSchema = storyRequestSchema.pick({
   content: true,
 });
 
 export type CreateStoryRequestInput = z.infer<typeof createStoryRequestSchema>;
 
-export const writeStoryWorkflowInputSchema =  storyRequestSchema.pick({
+export const writeStoryWorkflowInputSchema = storyRequestSchema.pick({
   trackCode: true,
-})
-
-export type WriteStoryWorkflowInput = z.infer<typeof writeStoryWorkflowInputSchema>;
-
-export const createStorySchema = storySchema.pick({
-    title: true,
-    content: true,
-    slug: true,
-    mood: true,
-    categories: true,
-    tags: true,
-    intensity: true,
-    seo: true,
-    author: true,
 });
 
+export const generateStoryWorkflowInputSchema = z.object({
+  mood: z.enum(Object.values(Mood)),
+  category: z.enum(Object.values(Category)),
+  intensity: z.number().min(1).max(5).default(3).optional(),
+});
 
-export const nightEditorAgentOutputSchema = createStorySchema.omit({
-    slug:true,
-    seo:true,
-    content:true,
-}).extend({
-  excerpt: storySchema.shape.excerpt,
-  approved: z.boolean(),
-  notes: z.string(),
-  htmlBody: z.string().describe("HTML formatted body"),
-  readTime: z.number().describe("Estimated read time in minutes"),
-  wordCount: z.number().describe("Estimated word count"),
-  seo: createStorySchema.shape.seo.omit({
-    image:true
+export type GenerateStoryWorkflowInput = z.infer<
+  typeof generateStoryWorkflowInputSchema
+>;
+
+export type WriteStoryWorkflowInput = z.infer<
+  typeof writeStoryWorkflowInputSchema
+>;
+
+export const createStorySchema = storySchema.pick({
+  title: true,
+  content: true,
+  slug: true,
+  mood: true,
+  categories: true,
+  tags: true,
+  intensity: true,
+  seo: true,
+  author: true,
+});
+
+export const nightEditorAgentOutputSchema = createStorySchema
+  .omit({
+    slug: true,
+    seo: true,
+    content: true,
   })
-})
+  .extend({
+    excerpt: storySchema.shape.excerpt,
+    approved: z.boolean(),
+    notes: z.string(),
+    htmlBody: z.string().describe("HTML formatted body"),
+    readTime: z.number().describe("Estimated read time in minutes"),
+    wordCount: z.number().describe("Estimated word count"),
+    seo: createStorySchema.shape.seo.omit({
+      image: true,
+    }),
+  });
 
-export const nightWriterStoryWorkflowOutputSchema = nightEditorAgentOutputSchema.omit({
-  approved:true,
-  notes:true,
-})
+export const nightWriterStoryWorkflowOutputSchema =
+  nightEditorAgentOutputSchema.omit({
+    approved: true,
+    notes: true,
+  });
 
 export type Story = z.infer<typeof storySchema>;
-export type CreateStoryData = z.infer<typeof createStorySchema>
-export type NightEditorAgentOutput = z.infer<typeof nightEditorAgentOutputSchema>
-export type WriteStoryWorkflowOutput = z.infer<typeof writeStoryWorkflowOutputSchema>
+export type CreateStoryData = z.infer<typeof createStorySchema>;
+export type NightEditorAgentOutput = z.infer<
+  typeof nightEditorAgentOutputSchema
+>;
+export type WriteStoryWorkflowOutput = z.infer<
+  typeof nightEditorAgentOutputSchema
+>;

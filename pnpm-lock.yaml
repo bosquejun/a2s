@@ -65,6 +65,9 @@ importers:
       '@tiptap/suggestion':
         specifier: ^3.18.0
         version: 3.18.0(@tiptap/core@3.18.0(@tiptap/pm@3.18.0))(@tiptap/pm@3.18.0)
+      '@upstash/qstash':
+        specifier: ^2.9.0
+        version: 2.9.0
       '@upstash/ratelimit':
         specifier: ^2.0.8
         version: 2.0.8(@upstash/redis@1.36.1)
@@ -2339,6 +2342,9 @@ packages:
   '@upstash/core-analytics@0.0.10':
     resolution: {integrity: sha512-7qJHGxpQgQr9/vmeS1PktEwvNAF7TI4iJDi8Pu2CFZ9YUGHZH4fOP5TfYlZ4aVxfopnELiE4BS4FBjyK7V1/xQ==}
     engines: {node: '>=16.0.0'}
+
+  '@upstash/qstash@2.9.0':
+    resolution: {integrity: sha512-RFvWB98ot5SXUZFIV/Av6hYdS+yu700kg+azUaJqV/fqgylUrWkYnCTOE4DJgdMHUEb0l7tH2Xhl70Zd4Q4zHw==}
 
   '@upstash/qstash@2.9.0-rc':
     resolution: {integrity: sha512-T2VGOuK/XOFe+kppsANdiaXxpqPvnXl8XWmZzAtqZKsHWkBXPYqAvr/Pek8TZEKeOLAgc7wrl4Rm0KNqec9Fww==}
@@ -7791,6 +7797,12 @@ snapshots:
   '@upstash/core-analytics@0.0.10':
     dependencies:
       '@upstash/redis': 1.36.1
+
+  '@upstash/qstash@2.9.0':
+    dependencies:
+      crypto-js: 4.2.0
+      jose: 5.10.0
+      neverthrow: 7.2.0
 
   '@upstash/qstash@2.9.0-rc':
     dependencies:

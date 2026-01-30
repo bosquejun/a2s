@@ -54,7 +54,8 @@ export function NightGate({ children }: NightGateProps) {
           id="night-gate-description"
           className="text-slate-500 text-xs uppercase tracking-widest"
         >
-          It&apos;s not quite that late yet, but if you&apos;re awake, you&apos;re invited.
+          It&apos;s not quite that late yet, but if you&apos;re awake,
+          you&apos;re invited.
         </p>
         <Button
           ref={dismissButtonRef}
@@ -69,5 +70,3 @@ export function NightGate({ children }: NightGateProps) {
     </div>
   );
 }
-
-

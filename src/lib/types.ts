@@ -20,5 +20,3 @@ export interface After2AmStory {
   likes: number;
   commentsCount: number;
 }
-
-

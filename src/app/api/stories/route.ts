@@ -1,5 +1,8 @@
 // import { CreateStoryInput, createStoryInputSchema } from "@/validations/story.validation"
-import { createUserPrompt, nightEditorAgent } from "@/lib/agents/night-editor.agent";
+import {
+  createUserPrompt,
+  nightEditorAgent,
+} from "@/lib/agents/night-editor.agent";
 import { StoryRequestStatus } from "@/lib/database/generated/prisma/client";
 import prisma from "@/lib/database/prisma";
 import {
@@ -53,8 +56,8 @@ export const { POST } = serve<WriteStoryWorkflowInput>(
           const storySlug = slugify(agentResponse.title, {
             lower: true,
             strict: true,
-            locale: "en",   
-          }); 
+            locale: "en",
+          });
 
           const story = await prisma.story.create({
             data: {
@@ -72,6 +75,7 @@ export const { POST } = serve<WriteStoryWorkflowInput>(
               readTime: agentResponse.readTime,
               wordCount: agentResponse.wordCount,
               author: agentResponse.author,
+              storyRequestId: storyRequest.id,
             },
           });
 

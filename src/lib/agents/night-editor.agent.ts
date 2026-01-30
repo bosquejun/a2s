@@ -1,18 +1,17 @@
-import { Category, Mood } from '@/lib/database/generated/prisma/enums';
-import { nightEditorAgentOutputSchema } from '@/validations/story.validation';
-import { openrouter } from '@openrouter/ai-sdk-provider';
-import { Output, ToolLoopAgent } from 'ai';
-import z from 'zod';
+import { Category, Mood } from "@/lib/database/generated/prisma/enums";
+import { nightEditorAgentOutputSchema } from "@/validations/story.validation";
+import { openrouter } from "@openrouter/ai-sdk-provider";
+import { Output, ToolLoopAgent } from "ai";
+import z from "zod";
 
 export const nightEditorAgent = new ToolLoopAgent({
-  model: openrouter('@preset/a2s-models'),
+  model: openrouter("@preset/a2s-models"),
   output: Output.object({
-    schema: nightEditorAgentOutputSchema
-  })
+    schema: nightEditorAgentOutputSchema,
+  }),
 });
 
-
-export const createUserPrompt = (data: {content: string}) => {
+export const createUserPrompt = (data: { content: string }) => {
   return `
   Evaluate the following story for the “after 2am stories” website.
 
@@ -32,10 +31,10 @@ TASKS:
    - Should feel like a quiet label, not a headline
 
 2. Assign ONE mood from:
-   ${Object.values(Mood).join(', ')}
+   ${Object.values(Mood).join(", ")}
 
 3. Assign up to 2 categories from:
-   ${Object.values(Category).join(', ')}
+   ${Object.values(Category).join(", ")}
 
 4. Generate 3–5 lowercase tags:
    - Derived only from ideas present in the text
@@ -103,5 +102,5 @@ STORY:
 
 JSON OUTPUT SCHEMA:
 ${z.toJSONSchema(nightEditorAgentOutputSchema)}
-  `
-}
+  `;
+};
