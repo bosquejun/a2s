@@ -17,6 +17,12 @@ export const triggerWorkflow = async <T>(endpoint: keyof typeof ENDPOINTS, paylo
     url,
     body: payload,
     retries:3,
+    flowControl:{
+      key: 'write-story-workflow',
+      rate: 1,
+      period: '1m',
+      parallelism:1
+    }
   });
   return workflowRunId;
 };
