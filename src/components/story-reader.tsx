@@ -186,7 +186,7 @@ export function StoryReader({ story }: StoryReaderProps) {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="grow w-full overflow-y-auto overflow-x-hidden pt-20 sm:pt-24 pb-32 sm:pb-40 px-4 sm:px-6 md:px-12 lg:px-16 scroll-smooth touch-pan-y mask-fade-bottom overscroll-contain"
+        className="grow w-full overflow-y-auto overflow-x-hidden pt-20 sm:pt-24 pb-40 px-4 sm:px-6 md:px-12 lg:px-16 scroll-smooth touch-pan-y mask-fade-bottom overscroll-contain "
       >
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           <div className="mb-12 sm:mb-16 flex flex-col items-center text-center space-y-8 sm:space-y-10 w-full">
