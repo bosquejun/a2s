@@ -27,6 +27,7 @@ export const { POST } = serve<GenerateStoryWorkflowInput>(async (context) => {
       data: {
         content: generatedStory.htmlBody,
         title: generatedStory.title,
+        excerpt: generatedStory.excerpt,
         slug: slugify(generatedStory.title, { lower: true, strict: true, locale: "en" }),
         author: generatedStory.author,
         mood: generatedStory.mood,

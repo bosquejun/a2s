@@ -17,6 +17,7 @@ export const triggerWorkflow = async <T>(
   payload: T,
   flowControl?: FlowControl
 ): Promise<string> => {
+  
   console.log(`[triggerWorkflow] Starting workflow trigger - endpoint: ${endpoint}`);
   console.log(`[triggerWorkflow] Payload:`, JSON.stringify(payload));
   
@@ -26,14 +27,14 @@ export const triggerWorkflow = async <T>(
   const finalFlowControl: FlowControl = {
     key: "write-story-workflow",
     rate: 1,
-    period: "1m",
+    period: "30s",
     parallelism: 1,
     ...flowControl
   };
   console.log(`[triggerWorkflow] Flow control settings:`, JSON.stringify(finalFlowControl));
   
   try {
-    const { workflowRunId } = await client.trigger({
+    const { workflowRunId, } = await client.trigger({
       url,
       body: payload,
       retries: 3,

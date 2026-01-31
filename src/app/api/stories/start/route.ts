@@ -34,9 +34,11 @@ export const POST = async (request: Request) => {
             console.log(`[POST /api/stories/start] Triggering workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`);
             triggerWorkflow("generateStory", contextData, {
                 key: "generate-story-workflow",
-                rate: 1,
-                period: "5m",
+                rate: 3,
+                period: "1m",
                 parallelism: 1,
+            }).catch(error => {
+                console.error(`[POST /api/stories/start] Failed to trigger workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`, error);
             });
             workflowCount++;
         })
@@ -53,9 +55,11 @@ export const POST = async (request: Request) => {
             console.log(`[POST /api/stories/start] Triggering workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`);
             triggerWorkflow("generateStory", contextData, {
                 key: "generate-story-workflow",
-                rate: 1,
-                period: "5m",
+                rate: 3,
+                period: "1m",
                 parallelism: 1,
+            }).catch(error => {
+                console.error(`[POST /api/stories/start] Failed to trigger workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`, error);
             });
             workflowCount++;
         })
@@ -73,6 +77,8 @@ export const POST = async (request: Request) => {
             rate: 1,
             period: "5m",
             parallelism: 1,
+        }).catch(error => {
+            console.error(`[POST /api/stories/start] Failed to trigger workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`, error);
         });
         workflowCount = 1;
         console.log(`[POST /api/stories/start] Triggered 1 workflow`);
@@ -89,9 +95,11 @@ export const POST = async (request: Request) => {
                 console.log(`[POST /api/stories/start] Triggering workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`);
                 triggerWorkflow("generateStory", contextData, {
                     key: "generate-story-workflow",
-                    rate: 1,
-                    period: "5m",
+                    rate: 3,
+                    period: "1m",
                     parallelism: 1,
+                }).catch(error => {
+                    console.error(`[POST /api/stories/start] Failed to trigger workflow - category: ${category}, mood: ${mood}, intensity: ${contextData.intensity}`, error);
                 });
                 workflowCount++;
             })
