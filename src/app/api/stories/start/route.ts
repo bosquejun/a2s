@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 export const POST = async (request: Request) => {
     const body = await request.json();
 
-    const {data,success, error} = generateStoryWorkflowInputSchema.safeParse(body);
+    const {data,success, error} = generateStoryWorkflowInputSchema.partial().safeParse(body);
 
     if (!success) {
         return NextResponse.json({ error: error.issues.map((issue) => issue.message).join("\n") }, { status: 400 });
