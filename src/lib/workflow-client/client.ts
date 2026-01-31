@@ -17,18 +17,33 @@ export const triggerWorkflow = async <T>(
   payload: T,
   flowControl?: FlowControl
 ): Promise<string> => {
+  console.log(`[triggerWorkflow] Starting workflow trigger - endpoint: ${endpoint}`);
+  console.log(`[triggerWorkflow] Payload:`, JSON.stringify(payload));
+  
   const url = `${BASE_URL}/${ENDPOINTS[endpoint]}`;
-  const { workflowRunId } = await client.trigger({
-    url,
-    body: payload,
-    retries: 3,
-    flowControl: {
-      key: "write-story-workflow",
-      rate: 1,
-      period: "1m",
-      parallelism: 1,
-      ...flowControl
-    },
-  });
-  return workflowRunId;
+  console.log(`[triggerWorkflow] Target URL: ${url}`);
+  
+  const finalFlowControl: FlowControl = {
+    key: "write-story-workflow",
+    rate: 1,
+    period: "1m",
+    parallelism: 1,
+    ...flowControl
+  };
+  console.log(`[triggerWorkflow] Flow control settings:`, JSON.stringify(finalFlowControl));
+  
+  try {
+    const { workflowRunId } = await client.trigger({
+      url,
+      body: payload,
+      retries: 3,
+      flowControl: finalFlowControl,
+    });
+    
+    console.log(`[triggerWorkflow] Workflow triggered successfully - runId: ${workflowRunId}, endpoint: ${endpoint}`);
+    return workflowRunId;
+  } catch (error) {
+    console.error(`[triggerWorkflow] Failed to trigger workflow - endpoint: ${endpoint}`, error);
+    throw error;
+  }
 };
