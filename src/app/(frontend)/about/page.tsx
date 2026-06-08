@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "After 2AM Stories is a quiet place for late-night thoughts, confessions, and the things we only say when the world is asleep.",
-  alternates: { canonical: "https://after2amstories.com/about" },
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

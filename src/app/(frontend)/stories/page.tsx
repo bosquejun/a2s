@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "All Stories",
   description:
     "Browse every story written after 2am — sorted by the feeling that brought you here.",
-  alternates: { canonical: "https://after2amstories.com/stories" },
+  alternates: { canonical: "/stories" },
 };
 
 interface PageProps {

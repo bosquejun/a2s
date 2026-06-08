@@ -4,6 +4,7 @@ import type { Category } from "@/lib/content/taxonomy";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { Story } from "@/lib/types";
+import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/seo";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -24,7 +25,7 @@ export async function generateStaticParams() {
 
 function buildStoryMetadata(story: Story): Metadata {
   const description = story.excerpt ?? story.seo?.description ?? "";
-  const url = `https://after2amstories.com/story/${story.slug}`;
+  const url = absoluteUrl(`/story/${story.slug}`);
   const title = story.seo?.title || story.title;
 
   return {
@@ -44,7 +45,7 @@ function buildStoryMetadata(story: Story): Metadata {
       description: story.seo?.description || description,
       type: "article",
       url,
-      siteName: "After 2AM Stories",
+      siteName: SITE_NAME,
       publishedTime: story.publishedAt ?? undefined,
       modifiedTime: story.updatedAt ?? undefined,
       authors: story.author ? [story.author] : undefined,
@@ -84,25 +85,52 @@ export default async function StoryPage({ params }: PageProps) {
     notFound();
   }
 
+  const storyUrl = absoluteUrl(`/story/${story.slug}`);
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: story.title,
-    description: story.excerpt || "",
-    articleBody: story.content,
-    author: story.author,
-    articleSection: story.categories[0] ?? undefined,
-    keywords: story.tags.join(", "),
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://after2amstories.com/story/${story.slug}`,
-    },
-    datePublished: story.publishedAt, // You may want to add actual publish dates to stories
-    dateModified: story.updatedAt,
-    publisher: {
-      "@type": "Organization",
-      name: "After 2AM Stories",
-    },
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: story.title,
+        description: story.hook || story.excerpt || "",
+        image: `${storyUrl}/opengraph-image`,
+        author: story.author
+          ? { "@type": "Person", name: story.author }
+          : { "@type": "Organization", name: SITE_NAME },
+        articleSection: story.categories[0] ?? undefined,
+        keywords: story.tags.join(", "),
+        wordCount: story.wordCount || undefined,
+        inLanguage: "en-US",
+        mainEntityOfPage: { "@type": "WebPage", "@id": storyUrl },
+        datePublished: story.publishedAt ?? undefined,
+        dateModified: story.updatedAt ?? story.publishedAt ?? undefined,
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: SITE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Stories",
+            item: absoluteUrl("/stories"),
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: story.title,
+            item: storyUrl,
+          },
+        ],
+      },
+    ],
   };
 
   return (

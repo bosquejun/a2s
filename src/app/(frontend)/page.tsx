@@ -7,6 +7,7 @@ import { NightGate } from "@/components/night-gate";
 import { RecentStories } from "@/components/recent-stories";
 import { LandingSkeleton } from "@/components/skeletons/landing-skeleton";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -14,17 +15,17 @@ export const metadata: Metadata = {
   description:
     "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives. Choose your mood and discover stories written after 2AM.",
   alternates: {
-    canonical: "https://after2amstories.com",
+    canonical: "/",
   },
 };
 
 const collectionPageSchema = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  name: "After 2AM Stories",
+  name: SITE_NAME,
   description:
     "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
-  url: "https://after2amstories.com",
+  url: SITE_URL,
   mainEntity: {
     "@type": "ItemList",
     itemListElement: [

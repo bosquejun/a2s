@@ -1,9 +1,18 @@
 import { Toaster } from "@/components/ui/sonner";
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+} from "@/lib/seo";
 import { Analytics } from "@vercel/analytics/next";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 
 import "./globals.css";
+
+const SITE_TITLE = `${SITE_NAME} – ${SITE_TAGLINE}`;
 
 const nunitoSans = Nunito_Sans({
   variable: "--font-sans",
@@ -26,36 +35,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "After 2AM Stories – Midnight Whispers & Late Night Confessions",
-    template: "%s | After 2AM Stories",
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
-  keywords: [
-    "after 2am",
-    "stories",
-    "horror",
-    "confessions",
-    "late night",
-    "midnight tales",
-    "storytelling",
-    "nighttime stories",
-  ],
-  authors: [{ name: "After 2AM Stories" }],
-  creator: "After 2AM Stories",
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "After 2AM Stories – Midnight Whispers & Late Night Confessions",
-    description:
-      "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
-    siteName: "After 2AM Stories",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "After 2AM Stories – Midnight Whispers & Late Night Confessions",
-    description:
-      "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   robots: {
     index: true,
@@ -68,21 +73,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    // Add your verification codes here when available
-    // google: "your-google-verification-code",
-    // yandex: "your-yandex-verification-code",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#020617" },
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-  ],
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
@@ -90,21 +80,38 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#020617" },
+    { media: "(prefers-color-scheme: dark)", color: "#020617" },
+  ],
+};
+
 const websiteSchema = {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "After 2AM Stories",
-  description:
-    "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives.",
-  url: "https://after2amstories.com",
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: "https://after2amstories.com/search?q={search_term_string}",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      url: SITE_URL,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en-US",
     },
-    "query-input": "required name=search_term_string",
-  },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      logo: `${SITE_URL}/opengraph-image`,
+    },
+  ],
 };
 
 export default function RootLayout({
