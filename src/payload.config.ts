@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
@@ -42,6 +43,20 @@ export default buildConfig({
     api: "/payload-api",
   },
   plugins: [
+    // Cloudflare R2 (S3-compatible) for media uploads.
+    s3Storage({
+      collections: { media: true },
+      bucket: process.env.R2_BUCKET || "",
+      config: {
+        endpoint: process.env.R2_ENDPOINT || "",
+        region: "auto",
+        forcePathStyle: true,
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
+        },
+      },
+    }),
     seoPlugin({
       collections: ["stories"],
       uploadsCollection: "media",

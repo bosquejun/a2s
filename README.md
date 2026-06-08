@@ -11,6 +11,7 @@ and haunting narratives. Built with **Next.js 16** and **Payload CMS 3**
   **Postgres** via `@payloadcms/db-postgres`
 - **OpenRouter + Vercel AI SDK** for the night-writer / night-editor agents
 - **Upstash** Workflow/QStash (async generation) + Redis (rate limiting)
+- **Cloudflare R2** (S3-compatible) for media uploads via `@payloadcms/storage-s3`
 
 ## Architecture
 
@@ -36,7 +37,9 @@ and haunting narratives. Built with **Next.js 16** and **Payload CMS 3**
 ## Getting started
 
 1. Copy env: `cp .env.example .env` and fill in `DATABASE_URL`,
-   `PAYLOAD_SECRET` (e.g. `openssl rand -hex 32`), and the Upstash/OpenRouter keys.
+   `PAYLOAD_SECRET` (e.g. `openssl rand -hex 32`), the Upstash/OpenRouter keys,
+   and the Cloudflare R2 credentials (`R2_ENDPOINT`, `R2_BUCKET`,
+   `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`).
 2. Install: `pnpm install`
 3. Dev: `pnpm dev` (uses `--no-server-fast-refresh`, required by Payload on
    Next 16.2+). On first boot Payload runs migrations against your Postgres,
