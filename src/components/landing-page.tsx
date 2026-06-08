@@ -1,17 +1,6 @@
-"use client";
-
-import { Mood } from "@/lib/content/taxonomy";
+import { Mood, MOOD_LABELS } from "@/lib/content/taxonomy";
 import { PenSquare } from "lucide-react";
 import Link from "next/link";
-
-const MOOD_LABELS: Record<Mood, string> = {
-  [Mood.CANT_SLEEP]: "I can't sleep",
-  [Mood.DARK]: "I want something dark",
-  [Mood.MISS_SOMEONE]: "I miss someone",
-  [Mood.EMPTY]: "I feel empty",
-  [Mood.REFLECTIVE]: "I feel reflective",
-  [Mood.UNSETTLING]: "I feel uneasy",
-};
 
 export function LandingPage() {
   return (

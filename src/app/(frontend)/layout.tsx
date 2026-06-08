@@ -8,30 +8,26 @@ import {
 } from "@/lib/seo";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
+import { Geist_Mono, Nunito_Sans } from "next/font/google";
 
 import "./globals.css";
 
 const SITE_TITLE = `${SITE_NAME} – ${SITE_TAGLINE}`;
 
+// Primary body font — preloaded.
 const nunitoSans = Nunito_Sans({
   variable: "--font-sans",
-  display: "swap",
-  preload: true,
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
   preload: true,
 });
 
+// Used only for `font-mono` (track codes, code blocks) — not preloaded.
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
-  preload: false, // Only preload primary fonts
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -127,9 +123,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistMono.variable} antialiased`}>
         {children}
         <Toaster />
         <Analytics />
