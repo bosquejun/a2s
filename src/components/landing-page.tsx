@@ -1,6 +1,6 @@
 "use client";
 
-import { Mood } from "@/lib/database/generated/prisma/enums";
+import { Mood } from "@/lib/content/taxonomy";
 import { PenSquare } from "lucide-react";
 import Link from "next/link";
 

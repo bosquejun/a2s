@@ -1,4 +1,4 @@
-import { Category, Mood } from "@/lib/database/generated/prisma/enums";
+import { Category, Mood } from "@/lib/content/taxonomy";
 import { nightEditorAgentOutputSchema } from "@/validations/story.validation";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { Output, ToolLoopAgent } from "ai";

@@ -1,75 +1,44 @@
-"use cache";
-
-import { Prisma } from "@/lib/database/generated/prisma/client";
-import { Mood } from "@/lib/database/generated/prisma/enums";
-import prisma from "@/lib/database/prisma";
 import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
+import { getPayloadClient } from "@/lib/payload";
+import type { Mood } from "@/lib/content/taxonomy";
 
 /**
- * Get a random story by mood with Next.js caching.
- * Uses React.cache() for request-level deduplication and 'use cache' for cross-request caching.
- * Note: Random selection is cached per mood+exclude combination to ensure variety.
+ * Get a random published story slug by mood.
+ * Cached per mood+exclude combination (short TTL) to keep some variety.
  */
 const getRandomStoryByMoodCached = cache(
   async (mood: Mood, exclude?: string | null) => {
     "use cache";
-    // Shorter cache for random selection to ensure variety (5 minutes stale, 10 minutes revalidate)
-    cacheLife({
-      stale: 300, // 5 minutes - serve stale while revalidating
-      revalidate: 600, // 10 minutes - background revalidation interval
-      expire: 1800, // 30 minutes - hard expiration
+    cacheLife({ stale: 300, revalidate: 600, expire: 1800 });
+    cacheTag("stories", `stories-mood-${mood}`);
+
+    const excludeSlugs = (exclude ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "stories",
+      where: {
+        mood: { equals: mood },
+        _status: { equals: "published" },
+        ...(excludeSlugs.length
+          ? { slug: { not_in: excludeSlugs } }
+          : {}),
+      },
+      depth: 0,
+      pagination: false,
+      select: { slug: true },
     });
-    cacheTag("stories", `stories-mood-${mood}`); // Tag for cache invalidation
 
-    // Use raw SQL with ORDER BY RANDOM() for efficient random selection
-    // This is much more efficient than fetching all stories and selecting in JavaScript
-    let query: Prisma.Sql;
+    if (!docs.length) return null;
 
-    if (exclude) {
-      const excludeSlugs = exclude.split(",").filter(Boolean);
-      if (excludeSlugs.length > 0) {
-        // Build query with exclusions using Prisma.sql for safe SQL construction
-        const excludeValues = excludeSlugs.map((s) =>
-          Prisma.raw(`'${s.replace(/'/g, "''")}'`)
-        );
-        query = Prisma.sql`
-        SELECT slug
-        FROM "Story"
-        WHERE mood = ${mood}::"Mood"
-          AND "publishedAt" IS NOT NULL
-          AND slug NOT IN (${Prisma.join(excludeValues, ", ")})
-        ORDER BY RANDOM()
-        LIMIT 1
-      `;
-      } else {
-        query = Prisma.sql`
-        SELECT slug
-        FROM "Story"
-        WHERE mood = ${mood}::"Mood"
-          AND "publishedAt" IS NOT NULL
-        ORDER BY RANDOM()
-        LIMIT 1
-      `;
-      }
-    } else {
-      query = Prisma.sql`
-      SELECT slug
-      FROM "Story"
-      WHERE mood = ${mood}::"Mood"
-        AND "publishedAt" IS NOT NULL
-      ORDER BY RANDOM()
-      LIMIT 1
-    `;
-    }
-
-    const result = await prisma.$queryRaw<Array<{ slug: string }>>(query);
-
-    if (!result || result.length === 0) {
-      return null;
-    }
-
-    return result[0];
+    const pick = docs[Math.floor(Math.random() * docs.length)] as {
+      slug: string;
+    };
+    return { slug: pick.slug };
   }
 );
 
