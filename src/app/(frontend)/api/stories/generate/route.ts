@@ -31,6 +31,7 @@ export const { POST } = serve<GenerateStoryWorkflowInput>(async (context) => {
         title: generatedStory.title,
         htmlBody: generatedStory.htmlBody,
         excerpt: generatedStory.excerpt,
+        hook: generatedStory.hook,
         author: generatedStory.author,
         mood: generatedStory.mood,
         categories: [category],

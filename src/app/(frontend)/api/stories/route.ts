@@ -61,6 +61,7 @@ export const { POST } = serve<WriteStoryWorkflowInput>(
             title: agentResponse.title,
             htmlBody: agentResponse.htmlBody || "",
             excerpt: agentResponse.excerpt || "",
+            hook: agentResponse.hook,
             author: agentResponse.author,
             mood: agentResponse.mood,
             categories: agentResponse.categories,

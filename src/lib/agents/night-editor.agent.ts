@@ -77,6 +77,13 @@ SEO METADATA (quiet, grounded, non-clickbait):
    - No emojis
    - Reads like an invitation, not a hook
 
+12b. Generate hook:
+   - Max 120 characters
+   - A single, punchy line used on social share images
+   - Grounded in a real detail from the story
+   - Quietly compelling, never clickbait
+   - No spoilers, no emojis
+
 12. Generate author:
    - Fully anonymous, never a real identity
    - Must feel like a person online, not a concept or location

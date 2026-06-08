@@ -10,6 +10,7 @@ export interface StoryIngestInput {
   title: string;
   htmlBody: string;
   excerpt: string;
+  hook?: string;
   author: string;
   mood: Mood;
   categories: Category[];
@@ -75,6 +76,7 @@ export async function ingestStory(
       title: input.title,
       author: input.author,
       excerpt: input.excerpt,
+      hook: input.hook,
       content,
       mood: input.mood,
       categories: input.categories,

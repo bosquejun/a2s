@@ -52,6 +52,15 @@ export const Stories: CollectionConfig = {
       },
     },
     { name: "excerpt", type: "textarea", maxLength: 200 },
+    {
+      name: "hook",
+      type: "text",
+      maxLength: 120,
+      admin: {
+        description:
+          "Short, punchy one-line hook used on social share (OG) images.",
+      },
+    },
     { name: "content", type: "richText", required: true },
     {
       type: "row",

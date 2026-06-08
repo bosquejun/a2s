@@ -10,6 +10,8 @@ export interface Story {
   slug: string;
   author?: string | null;
   excerpt?: string | null;
+  /** Short, punchy one-line hook used on social share (OG) images. */
+  hook?: string | null;
   /** Rendered HTML (converted from the Lexical `content` field). */
   content: string;
   mood: Mood;

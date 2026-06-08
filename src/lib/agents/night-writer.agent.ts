@@ -69,6 +69,12 @@ Generate excerpt:
 100 characters
 No spoilers
 Invitation‑like, not a hook
+Generate hook:
+Max 120 characters
+A single, punchy line used on social share images
+Grounded in a real detail from the story
+Quietly compelling, never clickbait
+No spoilers, no emojis
 Generate author:
 Fully anonymous username
 Feels like a quiet person online

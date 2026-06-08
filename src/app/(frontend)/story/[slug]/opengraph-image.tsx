@@ -50,11 +50,10 @@ export default async function Image({
     story.title.length > 60
       ? story.title.substring(0, 57) + "..."
       : story.title;
-  const excerpt = story.excerpt
-    ? story.excerpt.length > 120
-      ? story.excerpt.substring(0, 117) + "..."
-      : story.excerpt
-    : "";
+  // Prefer the dedicated social hook; fall back to the excerpt.
+  const hookText = story.hook || story.excerpt || "";
+  const excerpt =
+    hookText.length > 120 ? hookText.substring(0, 117) + "..." : hookText;
 
   return new ImageResponse(
     <div

@@ -55,6 +55,11 @@ const seoSchema = z.object({
 export const nightEditorAgentOutputSchema = z.object({
   title: z.string().min(1).max(60),
   excerpt: z.string().min(1).max(160),
+  hook: z
+    .string()
+    .min(1)
+    .max(120)
+    .describe("A short, punchy one-line hook for social share images"),
   mood: z.enum(Object.values(Mood)),
   categories: z.array(z.enum(Object.values(Category))).min(1).max(3),
   tags: z.array(z.string()).min(1).max(5),

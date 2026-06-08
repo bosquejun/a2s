@@ -14,6 +14,7 @@ export type StoryDoc = {
   slug: string;
   author?: string | null;
   excerpt?: string | null;
+  hook?: string | null;
   content?: SerializedEditorState | null;
   mood: string;
   categories?: string[] | null;
@@ -60,6 +61,7 @@ export function normalizeStory(doc: StoryDoc): Story {
     slug: doc.slug,
     author: doc.author ?? null,
     excerpt: doc.excerpt ?? null,
+    hook: doc.hook ?? null,
     content: contentToHtml(doc.content),
     mood: doc.mood as Mood,
     categories: (doc.categories ?? []) as Category[],
