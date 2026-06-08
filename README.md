@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# After 2AM Stories
 
-## Getting Started
+A quiet, intimate storytelling platform for late-night thoughts, confessions,
+and haunting narratives. Built with **Next.js 16** and **Payload CMS 3**
+(embedded), with AI-assisted story generation.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js 16 (App Router)** + React 19 + Tailwind v4 + shadcn/ui
+- **Payload CMS 3** embedded in the same app (admin at `/admin`), backed by
+  **Postgres** via `@payloadcms/db-postgres`
+- **OpenRouter + Vercel AI SDK** for the night-writer / night-editor agents
+- **Upstash** Workflow/QStash (async generation) + Redis (rate limiting)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Architecture
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- The frontend lives under `src/app/(frontend)` and reads content through
+  Payload's in-process **Local API** (`src/lib/payload.ts`).
+- Payload (admin + REST/GraphQL) lives under `src/app/(payload)`. To avoid
+  colliding with the app's `/api/*` routes, Payload's REST/GraphQL are served
+  under **`/payload-api`** (configured in `src/payload.config.ts`).
+- Collections: `Stories`, `StoryRequests`, `Tags`, `Media`, `Users`, plus a
+  `SiteSettings` global. Stories have drafts/versions enabled.
+- Content authoring: stories use a Lexical rich-text `content` field. AI output
+  (HTML) is converted to Lexical on ingest (`src/lib/content/html-to-lexical.ts`)
+  and rendered back to HTML for the reader (`src/lib/content/normalize.ts`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Content generation flow
 
-## Learn More
+- **Mood generation** (`/api/stories/start` → `generate` workflow): the
+  night-writer agent produces a story that is **auto-published**.
+- **Reader submissions** (`/write` → `/api/stories/write`): the night-editor
+  agent reviews the whisper; approved stories are created as **drafts** for
+  human review/publishing in `/admin`.
 
-To learn more about Next.js, take a look at the following resources:
+## Getting started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Copy env: `cp .env.example .env` and fill in `DATABASE_URL`,
+   `PAYLOAD_SECRET` (e.g. `openssl rand -hex 32`), and the Upstash/OpenRouter keys.
+2. Install: `pnpm install`
+3. Dev: `pnpm dev` (uses `--no-server-fast-refresh`, required by Payload on
+   Next 16.2+). On first boot Payload runs migrations against your Postgres,
+   regenerates `src/payload-types.ts`, and the admin is available at
+   `http://localhost:3000/admin` (create your first user there).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> Type generation: types are regenerated automatically on dev startup. To run
+> the CLI manually, prefer `pnpm payload generate:types --use-swc`.
 
-## Deploy on Vercel
+## Useful scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `pnpm dev` / `pnpm build` / `pnpm start`
+- `pnpm payload` — Payload CLI (migrations, types, etc.)
+- `pnpm generate:types` — regenerate `payload-types.ts`
+- `pnpm lint` / `pnpm format`
