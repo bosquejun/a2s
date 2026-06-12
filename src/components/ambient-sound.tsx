@@ -1,74 +1,30 @@
 "use client";
 
+import { useBrownNoise } from "@/hooks/use-brown-noise";
 import { Volume2, VolumeX } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 const AMBIENT_STORAGE_KEY = "after2am_ambient_global";
-const AMBIENT_SRC =
-  "https://assets.mixkit.co/active_storage/sfx/2381/2381-preview.mp3";
-
-function getInitialIsPlaying(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem(AMBIENT_STORAGE_KEY) === "true";
-}
 
 export function AmbientSound() {
-  const [isPlaying, setIsPlaying] = useState<boolean>(getInitialIsPlaying);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(
-    () => () => {
-      // Cleanup when component unmounts.
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-        audioRef.current = null;
-      }
-    },
-    []
-  );
-
-  const ensureAudio = () => {
-    if (audioRef.current) return audioRef.current;
-
-    const audio = new Audio(AMBIENT_SRC);
-    audio.loop = true;
-    audio.volume = 0.15;
-    audioRef.current = audio;
-    return audio;
-  };
-
-  const toggleSound = () => {
-    if (typeof window === "undefined") return;
-
-    const audio = ensureAudio();
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      void audio.play().catch(() => {
-        // User interaction required for audio; ignore but keep toggle state unchanged.
-        return;
-      });
-    }
-
-    const nextState = !isPlaying;
-    setIsPlaying(nextState);
-    window.localStorage.setItem(AMBIENT_STORAGE_KEY, String(nextState));
-  };
+  const { isEnabled, toggle } = useBrownNoise(AMBIENT_STORAGE_KEY, 0.02);
 
   return (
     <button
       type="button"
-      onClick={toggleSound}
-      className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 p-2.5 sm:p-3 rounded-full transition-all duration-500 z-30 border touch-manipulation ${
-        isPlaying
-          ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-          : "bg-slate-900/50 text-slate-600 hover:text-slate-400 border-slate-800/50"
+      onClick={toggle}
+      className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 p-2.5 sm:p-3 rounded-full transition-all duration-500 z-30 border touch-manipulation backdrop-blur-sm ${
+        isEnabled
+          ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/30 shadow-[0_0_24px_rgba(99,102,241,0.15)]"
+          : "bg-card/50 text-muted-foreground/60 hover:text-muted-foreground border-border/60"
       }`}
       aria-label="Toggle Global Night Ambience"
+      aria-pressed={isEnabled}
     >
-      {isPlaying ? <Volume2 size={14} className="sm:w-4 sm:h-4" /> : <VolumeX size={14} className="sm:w-4 sm:h-4" />}
+      {isEnabled ? (
+        <Volume2 size={14} className="sm:w-4 sm:h-4" />
+      ) : (
+        <VolumeX size={14} className="sm:w-4 sm:h-4" />
+      )}
     </button>
   );
 }

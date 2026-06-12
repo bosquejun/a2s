@@ -2,6 +2,7 @@ import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import type { Category, Mood } from "@/lib/content/taxonomy";
 import type { Story, StorySummary } from "@/lib/types";
+import { sanitizeStoryHtml } from "@/lib/utils/sanitize-story-html";
 
 /**
  * A loosely-typed Payload `stories` document. We avoid depending on the
@@ -42,7 +43,12 @@ function tagNames(tags: StoryDoc["tags"]): string[] {
 function contentToHtml(content?: SerializedEditorState | null): string {
   if (!content) return "";
   try {
-    return convertLexicalToHTML({ data: content, disableContainer: true });
+    // Every consumer renders this HTML with dangerouslySetInnerHTML, so it
+    // is funneled through the allowlist sanitizer here — a tampered DB row
+    // or prompt-injected agent output cannot become stored XSS.
+    return sanitizeStoryHtml(
+      convertLexicalToHTML({ data: content, disableContainer: true })
+    );
   } catch {
     return "";
   }

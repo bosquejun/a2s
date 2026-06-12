@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
+import { serializeJsonLd } from "@/lib/utils/json-ld";
 import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
@@ -8,7 +9,7 @@ import {
 } from "@/lib/seo";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Nunito_Sans } from "next/font/google";
+import { Geist_Mono, Newsreader, Nunito_Sans } from "next/font/google";
 
 import "./globals.css";
 
@@ -18,6 +19,15 @@ const SITE_TITLE = `${SITE_NAME} – ${SITE_TAGLINE}`;
 const nunitoSans = Nunito_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
+});
+
+// Literary serif with true italics — titles, story bodies, pull quotes.
+const newsreader = Newsreader({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
   preload: true,
 });
@@ -81,10 +91,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#020617" },
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-  ],
+  themeColor: "#100e1a",
+  colorScheme: "dark",
 };
 
 const websiteSchema = {
@@ -116,11 +124,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={nunitoSans.variable}>
+    <html
+      lang="en"
+      className={`dark ${nunitoSans.variable} ${newsreader.variable}`}
+    >
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteSchema) }}
         />
       </head>
       <body className={`${geistMono.variable} antialiased`}>

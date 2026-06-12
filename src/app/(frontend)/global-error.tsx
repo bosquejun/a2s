@@ -18,8 +18,8 @@ export default function GlobalError({
 
   return (
     <html>
-      <body className="bg-slate-950 text-slate-200">
-        <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+      <body className="bg-background text-slate-200">
+        <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
           <div className="max-w-3xl mx-auto space-y-12 flex flex-col items-center justify-center min-h-screen">
             <div className="w-full space-y-6">
               <Alert

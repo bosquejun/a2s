@@ -136,7 +136,7 @@ function TrackPageContent() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
           <div className="text-slate-500 text-center">Loading...</div>
         </div>
@@ -146,7 +146,7 @@ function TrackPageContent() {
 
   if (error || !storyRequest) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
           <Alert variant="destructive">
             <XCircle className="size-3.5" />
@@ -164,7 +164,7 @@ function TrackPageContent() {
   const StatusIcon = config.icon;
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto space-y-8 sm:space-y-12">
         <header className="flex items-center justify-between py-3 sm:py-4 border-b border-slate-900">
           <Link
@@ -255,7 +255,7 @@ export default function TrackPage() {
   return (
     <Suspense
       fallback={
-        <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+        <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
           <div className="max-w-3xl mx-auto space-y-12">
             <div className="text-slate-500 text-center">Loading...</div>
           </div>

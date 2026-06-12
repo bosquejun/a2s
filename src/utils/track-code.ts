@@ -1,8 +1,11 @@
 import { customAlphabet } from "nanoid";
 
+// Track codes act as capability tokens (knowing one reveals the submitted
+// story and its status), so they need real entropy: 12 chars over a
+// 31-symbol alphabet is ~59 bits, which is not enumerable.
 const nanoid = customAlphabet(
   "23456789abcdefghjkmnpqrstuvwxyz", // no 0,1,i,l,o
-  4
+  12
 );
 
 const WORDS = [

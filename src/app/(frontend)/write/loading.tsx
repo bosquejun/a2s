@@ -1,6 +1,6 @@
 export default function WriteLoading() {
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto space-y-12">
         {/* Header skeleton */}
         <header className="flex items-center justify-between py-4 border-b border-slate-900">
@@ -28,7 +28,7 @@ export default function WriteLoading() {
 
         {/* Footer skeleton */}
         <footer className="fixed bottom-0 left-0 w-full p-6 flex justify-center pointer-events-none">
-          <div className="max-w-3xl w-full flex items-center justify-between bg-slate-950/80 backdrop-blur-md border border-slate-900 p-2 rounded-2xl pointer-events-auto">
+          <div className="max-w-3xl w-full flex items-center justify-between bg-background/80 backdrop-blur-md border border-slate-900 p-2 rounded-2xl pointer-events-auto">
             <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse" />
             <div className="h-10 w-32 bg-indigo-600/30 rounded-xl animate-pulse" />
           </div>

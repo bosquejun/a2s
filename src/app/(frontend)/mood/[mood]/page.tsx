@@ -49,7 +49,7 @@ function MoodRedirectContent() {
       : "Finding your story";
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto space-y-12 flex flex-col items-center justify-center min-h-screen">
         <div className="text-center space-y-5 sm:space-y-6">
           <Loader2 className="size-7 sm:size-8 animate-spin text-indigo-400 mx-auto" />
@@ -71,7 +71,7 @@ export default function MoodRedirectPage() {
   return (
     <Suspense
       fallback={
-        <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+        <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
           <div className="max-w-3xl mx-auto space-y-12 flex flex-col items-center justify-center min-h-screen">
             <div className="text-center space-y-6">
               <Loader2 className="size-7 sm:size-8 animate-spin text-indigo-400 mx-auto" />

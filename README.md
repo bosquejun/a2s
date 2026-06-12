@@ -55,3 +55,36 @@ and haunting narratives. Built with **Next.js 16** and **Payload CMS 3**
 - `pnpm payload` — Payload CLI (migrations, types, etc.)
 - `pnpm generate:types` — regenerate `payload-types.ts`
 - `pnpm lint` / `pnpm format`
+
+## Security
+
+The app ships with a hardened default posture:
+
+- **Security headers** (`next.config.ts`): baseline headers
+  (`X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS in
+  production) are sent on every route; the public site additionally gets a
+  Content-Security-Policy and `X-Frame-Options: DENY`. The Payload admin
+  (`/admin`, `/payload-api`) is excluded from the strict CSP so its own
+  inline assets keep working.
+- **Story HTML sanitization**: Lexical content is converted to HTML in one
+  place (`src/lib/content/normalize.ts`) and always passed through the
+  allowlist sanitizer (`src/lib/utils/sanitize-story-html.ts`) on the server,
+  so tampered rows or prompt-injected agent output cannot become stored XSS.
+- **JSON-LD escaping**: structured data is serialized with
+  `src/lib/utils/json-ld.ts`, which escapes `<` so `</script>` sequences in
+  content cannot break out of the script tag.
+- **Anonymous identity**: `a2s_anon_id` is issued by `src/proxy.ts` as an
+  `HttpOnly`, `SameSite=Lax` (and `Secure` in production) cookie and is used
+  for submission rate limiting (1/day via Upstash). Cookieless clients fall
+  back to per-IP limiting.
+- **Generation campaigns are operator-only**: `POST /api/stories/start`
+  requires `Authorization: Bearer <secret>` where the secret is
+  `STORY_GENERATION_SECRET` (or `CRON_SECRET` for Vercel Cron). Unset means
+  the endpoint is disabled.
+- **Workflow endpoints** (`/api/stories`, `/api/stories/generate`) are
+  protected by Upstash QStash request signing (`QSTASH_CURRENT_SIGNING_KEY` /
+  `QSTASH_NEXT_SIGNING_KEY`).
+- **Track codes** are unguessable capability tokens (~59 bits of entropy).
+- **No third-party media on the public site**: the night ambience is brown
+  noise synthesized locally with the Web Audio API, so `media-src` stays
+  `'self'`.

@@ -224,18 +224,21 @@ export function WritePage({ initialMood }: WritePageProps) {
 
   if (content === null) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
-          <div className="text-slate-500 text-center">Loading...</div>
+          <div className="text-muted-foreground text-center font-serif italic">
+            Gathering your draft…
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-28 sm:pb-32 px-4 sm:px-6 animate-fade-in">
-      <div className="max-w-3xl mx-auto space-y-12">
-        <header className="flex items-center justify-between py-4 border-b border-slate-900">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-28 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+      <div className="grain-overlay" aria-hidden="true" />
+      <div className="max-w-3xl mx-auto space-y-12 relative">
+        <header className="flex items-center justify-between py-4 border-b border-border/40">
           <button
             type="button"
             onClick={() => window.history.back()}
@@ -393,7 +396,7 @@ export function WritePage({ initialMood }: WritePageProps) {
 
         <div className="pt-4 relative">
           {isSubmitting && (
-            <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
+            <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
                 <Loader2 className="size-6 animate-spin text-indigo-400" />
                 <span className="text-xs text-slate-500 uppercase tracking-widest">
@@ -403,7 +406,7 @@ export function WritePage({ initialMood }: WritePageProps) {
             </div>
           )}
           <EditorProvider
-            className={`w-full min-h-[60vh] [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[60vh] [&_.ProseMirror]:bg-transparent [&_.ProseMirror]:text-2xl [&_.ProseMirror]:font-serif [&_.ProseMirror]:text-slate-400 [&_.ProseMirror]:leading-relaxed prose prose-invert prose-p:text-slate-400 prose-p:text-2xl prose-p:font-serif prose-p:leading-relaxed max-w-none ${
+            className={`w-full min-h-[60vh] [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[60vh] [&_.ProseMirror]:bg-transparent [&_.ProseMirror]:text-2xl [&_.ProseMirror]:font-serif [&_.ProseMirror]:text-foreground/85 [&_.ProseMirror]:leading-relaxed prose prose-invert prose-p:text-foreground/85 prose-p:text-2xl prose-p:font-serif prose-p:leading-relaxed max-w-none ${
               isSubmitting ? "pointer-events-none opacity-50" : ""
             }`}
             content={content}
@@ -424,15 +427,15 @@ export function WritePage({ initialMood }: WritePageProps) {
         </div>
 
         <footer className="fixed bottom-0 left-0 w-full p-3 sm:p-4 md:p-6 flex justify-center pointer-events-none safe-area-inset-bottom z-50">
-          <div className="max-w-3xl w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 bg-slate-950/80 backdrop-blur-md border border-slate-900 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl pointer-events-auto">
-            <span className="px-4 sm:px-6 py-2 sm:py-0 text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-700 font-mono text-center sm:text-left shrink-0">
+          <div className="max-w-3xl w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 bg-background/80 backdrop-blur-md border border-border/50 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl pointer-events-auto shadow-[0_8px_40px_rgba(0,0,0,0.35)]">
+            <span className="px-4 sm:px-6 py-2 sm:py-0 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground/60 font-mono text-center sm:text-left shrink-0">
               {wordCount} words
             </span>
             <button
               type="button"
               onClick={handleRelease}
               disabled={wordCount === 0 || isSubmitting || isRateLimited}
-              className="flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-800 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all relative touch-manipulation w-full sm:w-auto"
+              className="flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-card disabled:text-muted-foreground/40 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all relative touch-manipulation w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <>

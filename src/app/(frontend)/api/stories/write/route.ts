@@ -17,7 +17,12 @@ const ratelimit = new Ratelimit({
 });
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
 
   const validated = createStoryRequestSchema.safeParse(body);
 
@@ -30,7 +35,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const anonId = await getAnonId();
+  // Rate-limit per anon cookie; if the cookie is missing (cleared or
+  // blocked), fall back to the client IP so cookieless clients neither
+  // share one bucket nor bypass the limit entirely.
+  let anonId = await getAnonId();
+  if (anonId === "anon_unknown") {
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    anonId = `ip_${forwardedFor?.split(",")[0]?.trim() || "unknown"}`;
+  }
 
   try {
     const { success } = await ratelimit.limit(anonId);
