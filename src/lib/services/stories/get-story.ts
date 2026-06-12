@@ -1,28 +1,32 @@
-"use cache";
-
-import prisma from "@/lib/database/prisma";
-import { storySchema } from "@/validations/story.validation";
 import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
+import { normalizeStory, type StoryDoc } from "@/lib/content/normalize";
+import { getPayloadClient } from "@/lib/payload";
 
 /**
- * Get a story by slug with Next.js caching.
- * Uses React.cache() for request-level deduplication and 'use cache' for cross-request caching.
+ * Get a published story by slug.
+ * React.cache() dedupes within a request; 'use cache' caches across requests.
  */
 const getStoryBySlugCached = cache(async (slug: string) => {
   "use cache";
-  cacheLife("hours"); // Cache for 1 hour, revalidate every 2 hours
-  cacheTag("stories", `story-${slug}`); // Tag for cache invalidation
+  cacheLife("hours");
+  cacheTag("stories", `story-${slug}`);
 
-  const story = await prisma.story.findUnique({
-    where: { slug },
+  const payload = await getPayloadClient();
+  const { docs } = await payload.find({
+    collection: "stories",
+    where: {
+      slug: { equals: slug },
+      _status: { equals: "published" },
+    },
+    depth: 1,
+    limit: 1,
   });
 
-  if (!story) {
-    return null;
-  }
+  const doc = docs[0];
+  if (!doc) return null;
 
-  return storySchema.parse(story);
+  return normalizeStory(doc as unknown as StoryDoc);
 });
 
 export async function getStoryBySlug(slug: string) {

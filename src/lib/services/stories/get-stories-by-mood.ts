@@ -1,19 +1,23 @@
-import prisma from "@/lib/database/prisma";
-import { Mood } from "@/lib/database/generated/prisma/enums";
+import {
+  normalizeStorySummary,
+  type StoryDoc,
+} from "@/lib/content/normalize";
+import { getPayloadClient } from "@/lib/payload";
+import type { Mood } from "@/lib/content/taxonomy";
+import type { StorySummary } from "@/lib/types";
 
-export async function getStoriesByMood(mood: Mood) {
-  const stories = await prisma.story.findMany({
+export async function getStoriesByMood(mood: Mood): Promise<StorySummary[]> {
+  const payload = await getPayloadClient();
+  const { docs } = await payload.find({
+    collection: "stories",
     where: {
-      mood,
-      publishedAt: {
-        not: null,
-      },
+      mood: { equals: mood },
+      _status: { equals: "published" },
     },
-    select: {
-      slug: true,
-      id: true,
-    },
+    sort: "-publishedAt",
+    depth: 1,
+    pagination: false,
   });
 
-  return stories;
+  return docs.map((doc) => normalizeStorySummary(doc as unknown as StoryDoc));
 }

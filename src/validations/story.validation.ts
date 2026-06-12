@@ -1,38 +1,9 @@
+import { z } from "zod";
 import {
   Category,
   Mood,
-  Status,
   StoryRequestStatus,
-} from "@/lib/database/generated/prisma/client";
-import { z } from "zod";
-
-export const storySchema = z.object({
-  id: z.string(),
-  title: z.string().min(1).max(30),
-  excerpt: z.string().min(1).max(100),
-  content: z.string().min(1).max(10000),
-  slug: z.string().slugify().min(1),
-  mood: z.enum(Object.values(Mood)),
-  categories: z
-    .array(z.enum(Object.values(Category)))
-    .min(1)
-    .max(3),
-  tags: z.array(z.string()).min(1).max(5),
-  intensity: z.number().min(1).max(5),
-  seo: z.object({
-    title: z.string().min(1).max(30),
-    description: z.string().min(1).max(155),
-    keywords: z.array(z.string()).min(1).max(5),
-    image: z.string().url().optional(),
-  }),
-  status: z.enum(Object.values(Status)).default(Status.PENDING),
-  author: z.string().min(1).max(100),
-  publishedAt: z.date().optional(),
-  readTime: z.number().min(1).max(100),
-  wordCount: z.number().min(1).max(10000),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
+} from "@/lib/content/taxonomy";
 
 export const storyRequestSchema = z.object({
   id: z.string(),
@@ -42,7 +13,7 @@ export const storyRequestSchema = z.object({
     .refine((str) => str.trim().split(/\s+/).length >= 10, {
       message: "Content must be at least 10 words.",
     }),
-  author: z.string().min(1).max(100),
+  author: z.string().min(1).max(100).optional(),
   status: z
     .enum(Object.values(StoryRequestStatus))
     .default(StoryRequestStatus.PENDING),
@@ -56,68 +27,61 @@ export const storyRequestSchema = z.object({
 export const createStoryRequestSchema = storyRequestSchema.pick({
   content: true,
 });
-
 export type CreateStoryRequestInput = z.infer<typeof createStoryRequestSchema>;
 
 export const writeStoryWorkflowInputSchema = storyRequestSchema.pick({
   trackCode: true,
 });
+export type WriteStoryWorkflowInput = z.infer<
+  typeof writeStoryWorkflowInputSchema
+>;
 
 export const generateStoryWorkflowInputSchema = z.object({
   mood: z.enum(Object.values(Mood)),
   category: z.enum(Object.values(Category)),
   intensity: z.number().min(1).max(5).default(3).optional(),
 });
-
 export type GenerateStoryWorkflowInput = z.infer<
   typeof generateStoryWorkflowInputSchema
 >;
 
-export type WriteStoryWorkflowInput = z.infer<
-  typeof writeStoryWorkflowInputSchema
->;
-
-export const createStorySchema = storySchema.pick({
-  title: true,
-  content: true,
-  slug: true,
-  mood: true,
-  categories: true,
-  tags: true,
-  intensity: true,
-  seo: true,
-  author: true,
+const seoSchema = z.object({
+  title: z.string().min(1).max(60),
+  description: z.string().min(1).max(160),
+  keywords: z.array(z.string()).min(1).max(5),
 });
 
-export const nightEditorAgentOutputSchema = createStorySchema
-  .omit({
-    slug: true,
-    seo: true,
-    content: true,
-  })
-  .extend({
-    excerpt: storySchema.shape.excerpt,
-    approved: z.boolean(),
-    notes: z.string(),
-    htmlBody: z.string().describe("HTML formatted body"),
-    readTime: z.number().describe("Estimated read time in minutes"),
-    wordCount: z.number().describe("Estimated word count"),
-    seo: createStorySchema.shape.seo.omit({
-      image: true,
-    }),
-  });
+/** Structured output produced by the night-editor agent (reviewing a whisper). */
+export const nightEditorAgentOutputSchema = z.object({
+  title: z.string().min(1).max(60),
+  excerpt: z.string().min(1).max(160),
+  hook: z
+    .string()
+    .min(1)
+    .max(120)
+    .describe("A short, punchy one-line hook for social share images"),
+  mood: z.enum(Object.values(Mood)),
+  categories: z.array(z.enum(Object.values(Category))).min(1).max(3),
+  tags: z.array(z.string()).min(1).max(5),
+  intensity: z.number().min(1).max(5),
+  author: z.string().min(1).max(100),
+  approved: z.boolean(),
+  notes: z.string(),
+  htmlBody: z.string().describe("HTML formatted body"),
+  readTime: z.number().describe("Estimated read time in minutes"),
+  wordCount: z.number().describe("Estimated word count"),
+  seo: seoSchema,
+});
+export type NightEditorAgentOutput = z.infer<
+  typeof nightEditorAgentOutputSchema
+>;
 
+/** Structured output produced by the night-writer agent (mood generation). */
 export const nightWriterStoryWorkflowOutputSchema =
   nightEditorAgentOutputSchema.omit({
     approved: true,
     notes: true,
   });
-
-export type Story = z.infer<typeof storySchema>;
-export type CreateStoryData = z.infer<typeof createStorySchema>;
-export type NightEditorAgentOutput = z.infer<
-  typeof nightEditorAgentOutputSchema
->;
 export type WriteStoryWorkflowOutput = z.infer<
-  typeof nightEditorAgentOutputSchema
+  typeof nightWriterStoryWorkflowOutputSchema
 >;

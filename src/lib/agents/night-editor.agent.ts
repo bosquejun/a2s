@@ -1,4 +1,4 @@
-import { Category, Mood } from "@/lib/database/generated/prisma/enums";
+import { Category, Mood } from "@/lib/content/taxonomy";
 import { nightEditorAgentOutputSchema } from "@/validations/story.validation";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { Output, ToolLoopAgent } from "ai";
@@ -76,6 +76,13 @@ SEO METADATA (quiet, grounded, non-clickbait):
    - No spoilers
    - No emojis
    - Reads like an invitation, not a hook
+
+12b. Generate hook:
+   - Max 120 characters
+   - A single, punchy line used on social share images
+   - Grounded in a real detail from the story
+   - Quietly compelling, never clickbait
+   - No spoilers, no emojis
 
 12. Generate author:
    - Fully anonymous, never a real identity

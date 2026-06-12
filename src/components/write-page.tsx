@@ -11,7 +11,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert";
-import { Mood } from "@/lib/database/generated/prisma/enums";
+import { Mood } from "@/lib/content/taxonomy";
 import { EditorContent, useCurrentEditor } from "@tiptap/react";
 import {
   ArrowLeft,

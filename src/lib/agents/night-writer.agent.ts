@@ -1,4 +1,4 @@
-import { Category, Mood } from "@/lib/database/generated/prisma/enums";
+import { Category, Mood } from "@/lib/content/taxonomy";
 import { nightWriterStoryWorkflowOutputSchema } from "@/validations/story.validation";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { Output, ToolLoopAgent } from "ai";
@@ -69,6 +69,12 @@ Generate excerpt:
 100 characters
 No spoilers
 Invitation‑like, not a hook
+Generate hook:
+Max 120 characters
+A single, punchy line used on social share images
+Grounded in a real detail from the story
+Quietly compelling, never clickbait
+No spoilers, no emojis
 Generate author:
 Fully anonymous username
 Feels like a quiet person online

@@ -1,7 +1,7 @@
 "use client";
 
-import { Mood } from "@/lib/database/generated/prisma/enums";
-import { Story } from "@/validations/story.validation";
+import { Mood } from "@/lib/content/taxonomy";
+import { Story } from "@/lib/types";
 import {
   ArrowLeft,
   Calendar,

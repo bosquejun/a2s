@@ -1,37 +1,32 @@
-"use cache";
-
-import prisma from "@/lib/database/prisma";
 import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
+import {
+  normalizeStorySummary,
+  type StoryDoc,
+} from "@/lib/content/normalize";
+import { getPayloadClient } from "@/lib/payload";
+import type { StorySummary } from "@/lib/types";
 
-/**
- * Get all published stories with Next.js caching.
- * Uses React.cache() for request-level deduplication and 'use cache' for cross-request caching.
- */
-const getAllPublishedStoriesCached = cache(async (limit?: number) => {
-  "use cache";
-  cacheLife("hours"); // Cache for 1 hour, revalidate every 2 hours
-  cacheTag("stories", "stories-list"); // Tag for cache invalidation
+/** Get all published stories (newest first) as lightweight summaries. */
+const getAllPublishedStoriesCached = cache(
+  async (limit?: number): Promise<StorySummary[]> => {
+    "use cache";
+    cacheLife("hours");
+    cacheTag("stories", "stories-list");
 
-  const stories = await prisma.story.findMany({
-    where: {
-      publishedAt: {
-        not: null,
-      },
-    },
-    select: {
-      slug: true,
-      updatedAt: true,
-      publishedAt: true,
-    },
-    orderBy: {
-      publishedAt: "desc",
-    },
-    ...(limit ? { take: limit } : {}),
-  });
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "stories",
+      where: { _status: { equals: "published" } },
+      sort: "-publishedAt",
+      depth: 1,
+      limit: limit ?? 0,
+      pagination: limit ? true : false,
+    });
 
-  return stories;
-});
+    return docs.map((doc) => normalizeStorySummary(doc as unknown as StoryDoc));
+  }
+);
 
 export async function getAllPublishedStories(limit?: number) {
   return getAllPublishedStoriesCached(limit);
