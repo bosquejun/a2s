@@ -59,7 +59,8 @@ const statusConfig: Record<
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/40",
     textColor: "text-emerald-400",
-    description: "Your whisper has been approved and published.",
+    description:
+      "Your whisper has been approved. It will appear here once an editor publishes it.",
   },
   REJECTED: {
     label: "Rejected",
@@ -106,8 +107,12 @@ function TrackPageContent() {
         const data = await response.json();
         setStoryRequest(data);
 
-        // Stop polling if status is final (not PENDING)
-        if (data.status !== "PENDING" && intervalId) {
+        // Keep polling while pending, or while approved but awaiting an
+        // editor to publish (the story link appears once it's live).
+        const stillWaiting =
+          data.status === "PENDING" ||
+          (data.status === "APPROVED" && !data.story);
+        if (!stillWaiting && intervalId) {
           clearInterval(intervalId);
           intervalId = null;
         }

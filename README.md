@@ -88,3 +88,26 @@ The app ships with a hardened default posture:
 - **No third-party media on the public site**: the night ambience is brown
   noise synthesized locally with the Web Audio API, so `media-src` stays
   `'self'`.
+
+## Automated content generation
+
+Two AI pipelines keep the site alive, both running as Upstash Workflows
+(QStash-signed callbacks):
+
+- **Scheduled generation** — `vercel.json` defines a daily cron
+  (`0 2 * * *`, after 2AM, naturally) that calls `GET /api/stories/start`
+  with `Authorization: Bearer $CRON_SECRET`. Each run picks a random
+  mood × category, the NightWriter agent writes the story, and it is
+  created in Payload as **published** (slug deduplication is automatic).
+  Operators can also `POST /api/stories/start` with an optional
+  `{ mood, category }` body to fan out a full campaign (up to 30 workflows).
+- **Reader submissions** — `POST /api/stories/write` stores the whisper and
+  triggers the NightEditor agent, which approves or rejects it. Approved
+  stories are created as **drafts** for a human to publish from `/admin`;
+  the `/track/[code]` page shows progress and links the story once live.
+
+Requirements: `CRON_SECRET` (or `STORY_GENERATION_SECRET`) set in the
+environment, plus the QStash, OpenRouter, and database variables from
+`.env.example`. `NEXT_PUBLIC_SITE_URL` should point at the deployed URL so
+QStash can call the workflow endpoints back (on Vercel it falls back to
+`VERCEL_PROJECT_PRODUCTION_URL` automatically).

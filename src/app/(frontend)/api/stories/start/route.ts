@@ -1,4 +1,4 @@
-import { Category, Mood } from "@/lib/content/taxonomy";
+import { CATEGORIES, Category, Mood, MOODS } from "@/lib/content/taxonomy";
 import { triggerWorkflow } from "@/lib/workflow-client/client";
 import { generateStoryWorkflowInputSchema } from "@/validations/story.validation";
 import { timingSafeEqual } from "crypto";
@@ -24,6 +24,53 @@ function isAuthorized(request: Request): boolean {
     timingSafeEqual(headerBuffer, expectedBuffer)
   );
 }
+
+/**
+ * Scheduled generation (Vercel Cron invokes via GET with
+ * `Authorization: Bearer $CRON_SECRET`). Each run writes one story for a
+ * random mood × category, keeping the feed alive without manual triggers —
+ * see `vercel.json` for the schedule.
+ */
+export const GET = async (request: Request) => {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const mood = MOODS[Math.floor(Math.random() * MOODS.length)];
+  const category = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
+  const contextData = {
+    intensity: Math.floor(Math.random() * 5) + 1,
+    category,
+    mood,
+  };
+
+  try {
+    await triggerWorkflow("generateStory", contextData, {
+      key: "generate-story-workflow",
+      rate: 1,
+      period: "5m",
+      parallelism: 1,
+    });
+  } catch (error) {
+    console.error(
+      `[GET /api/stories/start] Failed to trigger scheduled workflow - category: ${category}, mood: ${mood}`,
+      error
+    );
+    return NextResponse.json(
+      { error: "Failed to trigger workflow" },
+      { status: 502 }
+    );
+  }
+
+  console.log(
+    `[GET /api/stories/start] Scheduled generation triggered mood=${mood} category=${category}`
+  );
+  return NextResponse.json({
+    message: "Scheduled story generation started",
+    mood,
+    category,
+  });
+};
 
 export const POST = async (request: Request) => {
   if (!isAuthorized(request)) {
