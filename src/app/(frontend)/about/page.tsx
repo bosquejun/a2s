@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, PenSquare } from "lucide-react";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "About",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background text-slate-200 font-sans selection:bg-indigo-500/30">
+    <div className="relative min-h-screen bg-background text-foreground font-sans">
       <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6 sm:py-24">
         <Link
           href="/"
@@ -60,6 +61,9 @@ export default function AboutPage() {
           </Link>
         </div>
       </div>
+
+      <SiteFooter />
+      <div className="grain-overlay" aria-hidden="true" />
     </div>
   );
 }

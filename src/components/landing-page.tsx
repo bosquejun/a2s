@@ -1,59 +1,29 @@
 "use client";
 
-import { Mood } from "@/lib/content/taxonomy";
+import {
+  Mood,
+  MOOD_LABELS,
+  MOOD_WHISPERS,
+  MOODS,
+} from "@/lib/content/taxonomy";
 import { MoonStar, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const MOODS: Array<{
-  mood: Mood;
-  label: string;
-  whisper: string;
-  hoverClass: string;
-}> = [
-  {
-    mood: Mood.CANT_SLEEP,
-    label: "I can't sleep",
-    whisper: "for the restless",
-    hoverClass:
-      "hover:border-indigo-400/40 hover:shadow-[0_0_40px_-12px_rgba(129,140,248,0.35)]",
-  },
-  {
-    mood: Mood.DARK,
-    label: "I want something dark",
-    whisper: "for the curious",
-    hoverClass:
-      "hover:border-rose-400/30 hover:shadow-[0_0_40px_-12px_rgba(251,113,133,0.3)]",
-  },
-  {
-    mood: Mood.MISS_SOMEONE,
-    label: "I miss someone",
-    whisper: "for the longing",
-    hoverClass:
-      "hover:border-amber-300/30 hover:shadow-[0_0_40px_-12px_rgba(252,211,77,0.25)]",
-  },
-  {
-    mood: Mood.EMPTY,
-    label: "I feel empty",
-    whisper: "for the hollow",
-    hoverClass:
-      "hover:border-slate-300/30 hover:shadow-[0_0_40px_-12px_rgba(203,213,225,0.25)]",
-  },
-  {
-    mood: Mood.REFLECTIVE,
-    label: "I feel reflective",
-    whisper: "for the quiet",
-    hoverClass:
-      "hover:border-sky-300/30 hover:shadow-[0_0_40px_-12px_rgba(125,211,252,0.3)]",
-  },
-  {
-    mood: Mood.UNSETTLING,
-    label: "I feel uneasy",
-    whisper: "for the unsettled",
-    hoverClass:
-      "hover:border-violet-400/40 hover:shadow-[0_0_40px_-12px_rgba(167,139,250,0.35)]",
-  },
-];
+const MOOD_HOVER_CLASSES: Record<Mood, string> = {
+  [Mood.CANT_SLEEP]:
+    "hover:border-indigo-400/40 hover:shadow-[0_0_40px_-12px_rgba(129,140,248,0.35)]",
+  [Mood.DARK]:
+    "hover:border-rose-400/30 hover:shadow-[0_0_40px_-12px_rgba(251,113,133,0.3)]",
+  [Mood.MISS_SOMEONE]:
+    "hover:border-amber-300/30 hover:shadow-[0_0_40px_-12px_rgba(252,211,77,0.25)]",
+  [Mood.EMPTY]:
+    "hover:border-slate-300/30 hover:shadow-[0_0_40px_-12px_rgba(203,213,225,0.25)]",
+  [Mood.REFLECTIVE]:
+    "hover:border-sky-300/30 hover:shadow-[0_0_40px_-12px_rgba(125,211,252,0.3)]",
+  [Mood.UNSETTLING]:
+    "hover:border-violet-400/40 hover:shadow-[0_0_40px_-12px_rgba(167,139,250,0.35)]",
+};
 
 function useClock() {
   const [time, setTime] = useState<string | null>(null);
@@ -96,21 +66,21 @@ export function LandingPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
-          {MOODS.map(({ mood, label, whisper, hoverClass }, index) => (
+          {MOODS.map((mood, index) => (
             <Link
               key={mood}
-              href={`/mood/${mood.toLowerCase()}`}
+              href={`/mood/${mood.toLowerCase()}/random`}
               style={{ animationDelay: `${120 + index * 70}ms` }}
-              className={`group relative w-full py-4 sm:py-5 px-6 rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm text-muted-foreground transition-all duration-300 active:scale-[0.98] touch-manipulation animate-fade-up hover:bg-card/60 hover:text-foreground ${hoverClass}`}
+              className={`group relative w-full py-4 sm:py-5 px-6 rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm text-muted-foreground transition-all duration-300 active:scale-[0.98] touch-manipulation animate-fade-up hover:bg-card/60 hover:text-foreground ${MOOD_HOVER_CLASSES[mood]}`}
             >
               <span className="block text-[11px] sm:text-xs tracking-[0.2em] uppercase">
-                {label}
+                {MOOD_LABELS[mood]}
               </span>
               <span
                 aria-hidden="true"
                 className="block h-0 overflow-hidden font-serif italic normal-case tracking-normal text-[11px] text-muted-foreground/0 transition-all duration-300 group-hover:h-4 group-hover:mt-1 group-hover:text-muted-foreground/60"
               >
-                {whisper}
+                {MOOD_WHISPERS[mood]}
               </span>
             </Link>
           ))}

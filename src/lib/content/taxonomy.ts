@@ -66,6 +66,29 @@ export const MOOD_LABELS: Record<Mood, string> = {
   UNSETTLING: "I feel uneasy",
 };
 
+/** Whispered subtitles paired with each mood across the site. */
+export const MOOD_WHISPERS: Record<Mood, string> = {
+  CANT_SLEEP: "for the restless",
+  DARK: "for the curious",
+  MISS_SOMEONE: "for the longing",
+  EMPTY: "for the hollow",
+  REFLECTIVE: "for the quiet",
+  UNSETTLING: "for the unsettled",
+};
+
+/** Longer descriptions for mood archive pages and their metadata. */
+export const MOOD_DESCRIPTIONS: Record<Mood, string> = {
+  CANT_SLEEP:
+    "Stories for the restless - the ones you read when sleep will not come.",
+  DARK: "Dark, haunting narratives for when you want something with teeth.",
+  MISS_SOMEONE:
+    "Stories about absence and longing, for the nights someone is missing.",
+  EMPTY: "Quiet, hollow stories for when you feel like an empty room.",
+  REFLECTIVE:
+    "Thoughtful, slow stories for when the night turns you inward.",
+  UNSETTLING: "Eerie, uneasy stories that sit just under the skin.",
+};
+
 export const CATEGORY_LABELS: Record<Category, string> = {
   HORROR: "Horror",
   CONFESSION: "Confession",

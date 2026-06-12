@@ -1,90 +1,114 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, Sparkles } from "lucide-react";
+import { SiteFooter } from "@/components/site-footer";
+import { StoryFeed } from "@/components/story-feed";
+import {
+  MOOD_DESCRIPTIONS,
+  MOOD_LABELS,
+  MOOD_WHISPERS,
+  MOODS,
+  type Mood,
+} from "@/lib/content/taxonomy";
+import { absoluteUrl } from "@/lib/seo";
+import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
+import { serializeJsonLd } from "@/lib/utils/json-ld";
 
-import { Mood } from "@/lib/content/taxonomy";
-import { Loader2 } from "lucide-react";
-import { useParams, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+interface PageProps {
+  params: Promise<{ mood: string }>;
+}
 
-const MOOD_LABELS: Record<Mood, string> = {
-  [Mood.CANT_SLEEP]: "I can't sleep",
-  [Mood.DARK]: "I want something dark",
-  [Mood.MISS_SOMEONE]: "I miss someone",
-  [Mood.EMPTY]: "I feel empty",
-  [Mood.REFLECTIVE]: "I feel reflective",
-  [Mood.UNSETTLING]: "I feel uneasy",
-};
+function parseMood(param: string): Mood | null {
+  const candidate = param.toUpperCase() as Mood;
+  return MOODS.includes(candidate) ? candidate : null;
+}
 
-function MoodRedirectContent() {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const moodParam = params.mood as string;
-  const exclude = searchParams.get("exclude");
+export function generateStaticParams() {
+  return MOODS.map((mood) => ({ mood: mood.toLowerCase() }));
+}
 
-  useEffect(() => {
-    // Validate mood before redirecting
-    const mood = moodParam?.toUpperCase();
-    if (!mood || !Object.values(Mood).includes(mood as Mood)) {
-      // Invalid mood, redirect to home
-      window.location.href = "/";
-      return;
-    }
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { mood: moodParam } = await params;
+  const mood = parseMood(moodParam);
+  if (!mood) return {};
 
-    // Build API URL with query params
-    const apiUrl = `/api/stories/mood/${moodParam.toLowerCase()}${exclude ? `?exclude=${encodeURIComponent(exclude)}` : ""}`;
-    
-    // Call API - the API will handle the redirect server-side
-    try {
-      window.location.href = apiUrl;
-    } catch (error) {
-      console.error("Error redirecting to API:", error);
-      // Fallback: redirect to home if redirect fails
-      window.location.href = "/";
-    }
-  }, [moodParam, exclude]);
+  return {
+    title: `${MOOD_LABELS[mood]} — Stories ${MOOD_WHISPERS[mood]}`,
+    description: MOOD_DESCRIPTIONS[mood],
+    alternates: { canonical: `/mood/${mood.toLowerCase()}` },
+  };
+}
 
-  const mood = moodParam?.toUpperCase() as Mood;
-  const moodLabel =
-    mood && Object.values(Mood).includes(mood)
-      ? MOOD_LABELS[mood]
-      : "Finding your story";
+export default async function MoodPage({ params }: PageProps) {
+  const { mood: moodParam } = await params;
+  const mood = parseMood(moodParam);
+  if (!mood) {
+    notFound();
+  }
+
+  const all = await getAllPublishedStories();
+  const stories = all.filter((story) => story.mood === mood);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${MOOD_LABELS[mood]} — After 2AM Stories`,
+    description: MOOD_DESCRIPTIONS[mood],
+    url: absoluteUrl(`/mood/${mood.toLowerCase()}`),
+  };
 
   return (
-    <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
-      <div className="max-w-3xl mx-auto space-y-12 flex flex-col items-center justify-center min-h-screen">
-        <div className="text-center space-y-5 sm:space-y-6">
-          <Loader2 className="size-7 sm:size-8 animate-spin text-indigo-400 mx-auto" />
-          <div className="space-y-2">
-            <p className="text-slate-400 font-serif italic text-lg sm:text-xl">
-              {moodLabel}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      <div className="relative min-h-screen bg-background text-foreground font-sans">
+        <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <header className="mb-12 flex flex-col items-center gap-5 text-center animate-fade-up">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60 transition-colors hover:text-foreground/80"
+            >
+              <ArrowLeft size={12} />
+              Home
+            </Link>
+            <h1 className="font-serif text-3xl italic text-foreground/90 text-glow sm:text-4xl md:text-5xl">
+              {MOOD_LABELS[mood]}
+            </h1>
+            <p className="font-serif italic text-sm text-muted-foreground/60">
+              {MOOD_WHISPERS[mood]}
             </p>
-            <p className="text-slate-600 text-[10px] sm:text-xs uppercase tracking-widest">
-              Finding your story...
+            <p className="max-w-md text-sm text-muted-foreground">
+              {MOOD_DESCRIPTIONS[mood]}
             </p>
-          </div>
+
+            <Link
+              href={`/mood/${mood.toLowerCase()}/random`}
+              className="group mt-2 inline-flex items-center gap-2.5 rounded-full bg-indigo-600 px-7 py-3.5 text-[10px] font-bold uppercase tracking-[0.3em] text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] transition-all hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] active:scale-95"
+            >
+              <Sparkles
+                size={13}
+                className="opacity-80 transition-transform group-hover:rotate-12"
+              />
+              Read one at random
+            </Link>
+          </header>
+
+          <StoryFeed
+            stories={stories}
+            emptyMessage="Nothing here yet for this feeling. Check back after 2am."
+          />
         </div>
+
+        <SiteFooter />
+
+        <div className="grain-overlay" aria-hidden="true" />
+        <div className="pointer-events-none fixed left-[-10%] top-[-12%] h-[45%] w-[45%] rounded-full bg-indigo-500/8 blur-[130px] animate-drift" />
       </div>
-    </div>
+    </>
   );
 }
-
-export default function MoodRedirectPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
-          <div className="max-w-3xl mx-auto space-y-12 flex flex-col items-center justify-center min-h-screen">
-            <div className="text-center space-y-6">
-              <Loader2 className="size-7 sm:size-8 animate-spin text-indigo-400 mx-auto" />
-              <p className="text-slate-600 text-[10px] sm:text-xs uppercase tracking-widest">
-                Loading...
-              </p>
-            </div>
-          </div>
-        </div>
-      }
-    >
-      <MoodRedirectContent />
-    </Suspense>
-  );
-}
-
