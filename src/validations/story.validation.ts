@@ -59,7 +59,11 @@ export const nightEditorAgentOutputSchema = z.object({
     .string()
     .min(1)
     .max(120)
-    .describe("A short, punchy one-line hook for social share images"),
+    .describe(
+      "A quiet cliffhanger that hooks the reader: surface one unsettling or " +
+        "unresolved detail from the story and stop there, creating curiosity " +
+        "through restraint (no drama, no invented events, no clean resolution)."
+    ),
   mood: z.enum(Object.values(Mood)),
   categories: z.array(z.enum(Object.values(Category))).min(1).max(3),
   tags: z.array(z.string()).min(1).max(5),

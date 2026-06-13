@@ -72,6 +72,16 @@ The TITLE:
 - References a real detail or recurring thought in the story.
 - Quiet label, not a headline. No new imagery.
 
+The HOOK (≤120 chars) — the line that makes a reader stop scrolling:
+- A quiet cliffhanger: surface ONE unsettling or unresolved detail from the
+  story and stop there, leaving the reader needing the rest.
+- Create curiosity through restraint, not drama. Withhold the answer; never
+  sensationalize or over-explain.
+- Pull from a real moment in the story — never invent events the body doesn't
+  contain (the no-drama rule still applies).
+- First person, present feel. No clean resolution.
+- Example: "I counted the hallway twice tonight. The number wasn't the same."
+
 TAGS: 3–5 lowercase tags, directly grounded in the story text. No generic tags.
 
 SEO:
@@ -87,7 +97,7 @@ SEO:
 {
   "title": "string, 1–60 chars",
   "excerpt": "string, 1–160 chars",
-  "hook": "string, 1–120 chars — one-line hook for share images",
+  "hook": "string, 1–120 chars — quiet-cliffhanger line that hooks the reader (see HOOK rules)",
   "mood": "one of the allowed mood values",
   "categories": ["1–3 of the allowed category values"],
   "tags": ["1–5 lowercase tags"],
