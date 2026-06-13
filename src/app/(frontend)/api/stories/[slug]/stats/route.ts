@@ -1,8 +1,9 @@
 import { getViewCount } from "@/lib/services/stories/view-count";
 import { NextResponse } from "next/server";
 
-// Live, uncached read — the cached story page HTML can be hours stale.
-export const dynamic = "force-dynamic";
+// Live, uncached read — the cached story page HTML can be hours stale. Under
+// Cache Components a route handler is dynamic by default (no `'use cache'`), so
+// no segment config is needed; `export const dynamic` is rejected by the build.
 
 export async function GET(
   _request: Request,
