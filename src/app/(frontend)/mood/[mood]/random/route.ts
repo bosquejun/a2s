@@ -30,7 +30,12 @@ export async function GET(
       );
     }
 
-    const redirectUrl = `/story/${story.slug}?mood=${encodeURIComponent(mood.toLowerCase())}`;
+    // Forward the accumulated exclude list so repeated "Surprise me" hops keep
+    // skipping everything already seen instead of resetting each redirect.
+    let redirectUrl = `/story/${story.slug}?mood=${encodeURIComponent(mood.toLowerCase())}`;
+    if (exclude) {
+      redirectUrl += `&exclude=${encodeURIComponent(exclude)}`;
+    }
     const response = NextResponse.redirect(new URL(redirectUrl, request.url), {
       status: 302,
     });

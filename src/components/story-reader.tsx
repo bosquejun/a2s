@@ -2,16 +2,18 @@
 
 import { useBrownNoise } from "@/hooks/use-brown-noise";
 import { featureFlags } from "@/lib/feature-flags";
-import { Mood } from "@/lib/content/taxonomy";
-import { Story } from "@/lib/types";
+import { Mood, MOOD_LABELS } from "@/lib/content/taxonomy";
+import { Story, StorySummary } from "@/lib/types";
 import {
   ArrowLeft,
+  ArrowRight,
   Calendar,
   Clock,
   Hash,
   PenLine,
-  RefreshCw,
+  Shuffle,
   Share2,
+  Sparkles,
   User,
   Volume2,
   VolumeX,
@@ -22,9 +24,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 interface StoryReaderProps {
   story: Story;
+  /** Similar stories surfaced in the "More like this" section. */
+  related?: StorySummary[];
+  /** Deterministic next story for the "Next story" CTA. */
+  next?: StorySummary | null;
 }
 
-export function StoryReader({ story }: StoryReaderProps) {
+export function StoryReader({ story, related = [], next = null }: StoryReaderProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -213,6 +219,46 @@ export function StoryReader({ story }: StoryReaderProps) {
               </div>
             </div>
           )}
+
+          {/* More like this — stories ranked by shared mood, categories, tags */}
+          {related.length > 0 && (
+            <section className="mt-2 w-full border-t border-border/40 pt-12 pb-8">
+              <div className="mb-6 flex items-center justify-center gap-1.5 text-muted-foreground/50">
+                <Sparkles size={13} className="opacity-50" />
+                <span className="text-[9px] uppercase tracking-[0.4em] font-medium">
+                  More like this
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {related.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/story/${item.slug}`}
+                    className="group flex flex-col gap-1.5 rounded-2xl border border-border/40 bg-card/30 px-5 py-4 backdrop-blur-sm transition-all hover:border-indigo-400/30 hover:bg-card/60"
+                  >
+                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.25em] text-muted-foreground/60">
+                      <span className="text-indigo-300/70">
+                        {MOOD_LABELS[item.mood]}
+                      </span>
+                      <span className="h-1 w-1 rounded-full bg-border" />
+                      <span className="flex items-center gap-1">
+                        <Clock size={10} className="opacity-60" />
+                        {item.readTime} min
+                      </span>
+                    </div>
+                    <h3 className="font-serif text-lg italic leading-snug text-foreground/85 transition-colors group-hover:text-foreground">
+                      {item.title}
+                    </h3>
+                    {item.excerpt && (
+                      <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/70">
+                        {item.excerpt}
+                      </p>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
 
@@ -253,6 +299,19 @@ export function StoryReader({ story }: StoryReaderProps) {
               ) : null}
             </button>
 
+            {next && (
+              <Link
+                href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
+                className="p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
+                title="Surprise me — a random story in this mood"
+              >
+                <Shuffle
+                  size={16}
+                  className="sm:w-[18px] sm:h-[18px] group-hover:rotate-12 transition-transform"
+                />
+              </Link>
+            )}
+
             {featureFlags.whisper && (
               <Link
                 href="/write"
@@ -284,18 +343,33 @@ export function StoryReader({ story }: StoryReaderProps) {
             </button>
           </div>
 
-          <Link
-            href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
-          >
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
-              More like this
-            </span>
-            <RefreshCw
-              size={14}
-              className="sm:w-4 sm:h-4 group-hover:rotate-180 transition-transform duration-700 opacity-80 shrink-0"
-            />
-          </Link>
+          {next ? (
+            <Link
+              href={`/story/${next.slug}?mood=${baseMood.toLowerCase()}`}
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
+            >
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
+                Next story
+              </span>
+              <ArrowRight
+                size={14}
+                className="sm:w-4 sm:h-4 group-hover:translate-x-0.5 transition-transform duration-300 opacity-80 shrink-0"
+              />
+            </Link>
+          ) : (
+            <Link
+              href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
+            >
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
+                Surprise me
+              </span>
+              <Shuffle
+                size={14}
+                className="sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform duration-300 opacity-80 shrink-0"
+              />
+            </Link>
+          )}
         </div>
       </div>
 

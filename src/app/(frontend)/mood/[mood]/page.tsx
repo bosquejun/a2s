@@ -11,9 +11,14 @@ import {
   MOODS,
   type Mood,
 } from "@/lib/content/taxonomy";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, SITE_KEYWORDS, SITE_NAME } from "@/lib/seo";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
-import { serializeJsonLd } from "@/lib/utils/json-ld";
+import {
+  breadcrumbList,
+  serializeJsonLd,
+  storyItemList,
+  WEBSITE_ID,
+} from "@/lib/utils/json-ld";
 
 interface PageProps {
   params: Promise<{ mood: string }>;
@@ -35,10 +40,31 @@ export async function generateMetadata({
   const mood = parseMood(moodParam);
   if (!mood) return {};
 
+  const title = `${MOOD_LABELS[mood]} — Stories ${MOOD_WHISPERS[mood]}`;
+  const description = MOOD_DESCRIPTIONS[mood];
+  const url = absoluteUrl(`/mood/${mood.toLowerCase()}`);
+
   return {
-    title: `${MOOD_LABELS[mood]} — Stories ${MOOD_WHISPERS[mood]}`,
-    description: MOOD_DESCRIPTIONS[mood],
+    title,
+    description,
+    keywords: [
+      `${MOOD_LABELS[mood].toLowerCase()} stories`,
+      MOOD_LABELS[mood].toLowerCase(),
+      ...SITE_KEYWORDS,
+    ],
     alternates: { canonical: `/mood/${mood.toLowerCase()}` },
+    openGraph: {
+      title: `${MOOD_LABELS[mood]} | ${SITE_NAME}`,
+      description,
+      type: "website",
+      url,
+      siteName: SITE_NAME,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${MOOD_LABELS[mood]} | ${SITE_NAME}`,
+      description,
+    },
   };
 }
 
@@ -54,10 +80,21 @@ export default async function MoodPage({ params }: PageProps) {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: `${MOOD_LABELS[mood]} — After 2AM Stories`,
-    description: MOOD_DESCRIPTIONS[mood],
-    url: absoluteUrl(`/mood/${mood.toLowerCase()}`),
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: `${MOOD_LABELS[mood]} — After 2AM Stories`,
+        description: MOOD_DESCRIPTIONS[mood],
+        url: absoluteUrl(`/mood/${mood.toLowerCase()}`),
+        isPartOf: { "@id": WEBSITE_ID },
+        mainEntity: storyItemList(stories),
+      },
+      breadcrumbList([
+        { name: "Home", path: "/" },
+        { name: "Stories", path: "/stories" },
+        { name: MOOD_LABELS[mood], path: `/mood/${mood.toLowerCase()}` },
+      ]),
+    ],
   };
 
   return (

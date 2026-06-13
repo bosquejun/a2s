@@ -39,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: story.updatedAt || story.publishedAt || new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.7,
+    images: [absoluteUrl(`/story/${story.slug}/opengraph-image`)],
   }));
 
   return [...staticRoutes, ...moodRoutes, ...storyRoutes];
