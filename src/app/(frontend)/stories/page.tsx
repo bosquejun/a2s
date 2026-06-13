@@ -3,16 +3,43 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
+import { InfiniteStoryFeed } from "@/components/infinite-story-feed";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
-import { StoryFeed } from "@/components/story-feed";
-import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
+import { getPublishedStoriesPage } from "@/lib/services/stories/get-published-stories-page";
 import { MOODS, MOOD_LABELS, type Mood } from "@/lib/content/taxonomy";
+import { absoluteUrl, SITE_NAME, SITE_KEYWORDS } from "@/lib/seo";
+import {
+  breadcrumbList,
+  serializeJsonLd,
+  storyItemList,
+  WEBSITE_ID,
+} from "@/lib/utils/json-ld";
+
+const STORIES_DESCRIPTION =
+  "Browse every story written after 2am — sorted by the feeling that brought you here.";
 
 export const metadata: Metadata = {
   title: "All Stories",
-  description:
-    "Browse every story written after 2am — sorted by the feeling that brought you here.",
+  description: STORIES_DESCRIPTION,
+  keywords: [
+    ...SITE_KEYWORDS,
+    "all stories",
+    "browse stories",
+    ...MOODS.map((m) => `${MOOD_LABELS[m].toLowerCase()} stories`),
+  ],
   alternates: { canonical: "/stories" },
+  openGraph: {
+    title: `All Stories | ${SITE_NAME}`,
+    description: STORIES_DESCRIPTION,
+    type: "website",
+    url: absoluteUrl("/stories"),
+    siteName: SITE_NAME,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `All Stories | ${SITE_NAME}`,
+    description: STORIES_DESCRIPTION,
+  },
 };
 
 interface PageProps {
@@ -62,13 +89,32 @@ async function StoriesList({ searchParams }: PageProps) {
   const activeMood =
     requested && MOODS.includes(requested) ? requested : undefined;
 
-  const all = await getAllPublishedStories();
-  const stories = activeMood
-    ? all.filter((story) => story.mood === activeMood)
-    : all;
+  const { stories, total } = await getPublishedStoriesPage(0, activeMood);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: activeMood ? `${MOOD_LABELS[activeMood]} Stories` : "All Stories",
+        description: STORIES_DESCRIPTION,
+        url: absoluteUrl("/stories"),
+        isPartOf: { "@id": WEBSITE_ID },
+        mainEntity: storyItemList(stories),
+      },
+      breadcrumbList([
+        { name: "Home", path: "/" },
+        { name: "Stories", path: "/stories" },
+      ]),
+    ],
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
       {/* Mood filter */}
       <div className="mb-12 flex flex-wrap items-center justify-center gap-2">
         <FilterChip href="/stories" active={!activeMood}>
@@ -85,8 +131,11 @@ async function StoriesList({ searchParams }: PageProps) {
         ))}
       </div>
 
-      <StoryFeed
-        stories={stories}
+      <InfiniteStoryFeed
+        key={activeMood ?? "all"}
+        initialStories={stories}
+        total={total}
+        mood={activeMood?.toLowerCase()}
         emptyMessage="Nothing here yet for this feeling."
       />
     </>
