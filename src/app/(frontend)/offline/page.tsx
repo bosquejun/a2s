@@ -17,6 +17,12 @@ export default function OfflinePage() {
         The stories are still out there in the dark. Reconnect and they&rsquo;ll
         come back.
       </p>
+      {/*
+        Intentionally a plain anchor, not next/link: this is the offline
+        fallback, so "Try again" must do a full document navigation to retry
+        the network — client-side routing/prefetch would defeat that.
+      */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a
         href="/"
         className="rounded-full border border-border/40 px-6 py-3 text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:border-indigo-400/30 hover:text-foreground/80"
