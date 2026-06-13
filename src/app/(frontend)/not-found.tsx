@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="max-w-md text-center space-y-8 animate-fade-in">
         <div className="space-y-3">
           <p className="text-[11px] uppercase tracking-[0.4em] text-slate-600">
-            After 2AM
+            After 2AM Stories
           </p>
           <h1 className="font-serif italic text-4xl md:text-5xl text-slate-100">
             This whisper got lost.

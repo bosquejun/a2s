@@ -16,7 +16,7 @@ export function SiteFooter() {
         >
           <MoonMark className="h-3.5 w-3.5" />
           <span className="font-serif italic text-sm tracking-wide">
-            After 2AM
+            After 2AM Stories
           </span>
         </Link>
 

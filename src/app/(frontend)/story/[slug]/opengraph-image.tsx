@@ -65,7 +65,7 @@ export default async function Image({
 
   const fonts = await loadOgFonts(
     `${title}${hook}${story.author ?? ""}…·`,
-    `${eyebrow} AFTER 2AM min read 0123456789·`
+    `${eyebrow} AFTER 2AM STORIES min read 0123456789·`
   );
 
   return new ImageResponse(
@@ -186,7 +186,7 @@ export default async function Image({
               letterSpacing: "0.32em",
             }}
           >
-            After 2AM
+            After 2AM Stories
           </div>
         </div>
       </div>

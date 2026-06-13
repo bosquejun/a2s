@@ -104,7 +104,7 @@ export async function loadOgFonts(
   ].filter(Boolean) as OgFont[];
 }
 
-const BRAND = "After 2AM";
+const BRAND = "After 2AM Stories";
 const TAGLINE = "Midnight whispers & late-night confessions";
 
 /**
@@ -147,7 +147,7 @@ export async function siteOgImage() {
             style={{
               fontFamily: "Newsreader",
               fontStyle: "italic",
-              fontSize: "108px",
+              fontSize: "84px",
               color: OG_COLORS.title,
               lineHeight: 1.05,
             }}
