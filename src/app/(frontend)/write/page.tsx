@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { featureFlags } from "@/lib/feature-flags";
 import { WritePage } from "@/components/write-page";
 
 export const metadata: Metadata = {
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function WriteRoute() {
+  if (!featureFlags.whisper) {
+    notFound();
+  }
+
   return <WritePage />;
 }

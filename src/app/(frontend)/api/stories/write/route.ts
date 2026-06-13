@@ -1,3 +1,4 @@
+import { featureFlags } from "@/lib/feature-flags";
 import { getPayloadClient } from "@/lib/payload";
 import { redis } from "@/lib/redis";
 import { triggerWorkflow } from "@/lib/workflow-client/client";
@@ -17,6 +18,10 @@ const ratelimit = new Ratelimit({
 });
 
 export async function POST(request: Request) {
+  if (!featureFlags.whisper) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

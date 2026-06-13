@@ -6,6 +6,7 @@ import {
   MOOD_WHISPERS,
   MOODS,
 } from "@/lib/content/taxonomy";
+import { featureFlags } from "@/lib/feature-flags";
 import { MoonStar, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -90,18 +91,20 @@ export function LandingPage() {
           className="pt-2 sm:pt-3 animate-fade-up"
           style={{ animationDelay: "640ms" }}
         >
-          <Link
-            href="/write"
-            className="group inline-flex items-center justify-center gap-2.5 sm:gap-3 px-6 sm:px-7 py-3 rounded-full border border-border/40 bg-background/40 hover:border-indigo-400/30 hover:bg-card/40 transition-all duration-500 touch-manipulation"
-          >
-            <PenLine
-              size={13}
-              className="sm:w-[14px] sm:h-[14px] text-muted-foreground/50 group-hover:text-indigo-300 transition-colors"
-            />
-            <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
-              Whisper a story
-            </span>
-          </Link>
+          {featureFlags.whisper && (
+            <Link
+              href="/write"
+              className="group inline-flex items-center justify-center gap-2.5 sm:gap-3 px-6 sm:px-7 py-3 rounded-full border border-border/40 bg-background/40 hover:border-indigo-400/30 hover:bg-card/40 transition-all duration-500 touch-manipulation"
+            >
+              <PenLine
+                size={13}
+                className="sm:w-[14px] sm:h-[14px] text-muted-foreground/50 group-hover:text-indigo-300 transition-colors"
+              />
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
+                Whisper a story
+              </span>
+            </Link>
+          )}
           <p
             className="mt-8 font-serif italic text-xs text-muted-foreground/40 animate-fade-in"
             style={{ animationDelay: "900ms" }}

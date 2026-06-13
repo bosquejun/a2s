@@ -1,6 +1,7 @@
 "use client";
 
 import { useBrownNoise } from "@/hooks/use-brown-noise";
+import { featureFlags } from "@/lib/feature-flags";
 import { Mood } from "@/lib/content/taxonomy";
 import { Story } from "@/lib/types";
 import {
@@ -252,13 +253,15 @@ export function StoryReader({ story }: StoryReaderProps) {
               ) : null}
             </button>
 
-            <Link
-              href="/write"
-              className="p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
-              title="Whisper a Story"
-            >
-              <PenLine size={16} className="sm:w-[18px] sm:h-[18px]" />
-            </Link>
+            {featureFlags.whisper && (
+              <Link
+                href="/write"
+                className="p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
+                title="Whisper a Story"
+              >
+                <PenLine size={16} className="sm:w-[18px] sm:h-[18px]" />
+              </Link>
+            )}
 
             <button
               type="button"

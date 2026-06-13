@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { featureFlags } from "@/lib/feature-flags";
 
 export default function NotFound() {
   return (
@@ -25,12 +26,14 @@ export default function NotFound() {
           >
             Back to stories
           </Link>
-          <Link
-            href="/write"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-slate-900 bg-indigo-600/90 text-[11px] uppercase tracking-[0.3em] text-slate-50 hover:bg-indigo-500 transition-all"
-          >
-            Whisper your own
-          </Link>
+          {featureFlags.whisper && (
+            <Link
+              href="/write"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-slate-900 bg-indigo-600/90 text-[11px] uppercase tracking-[0.3em] text-slate-50 hover:bg-indigo-500 transition-all"
+            >
+              Whisper your own
+            </Link>
+          )}
         </div>
       </div>
 
