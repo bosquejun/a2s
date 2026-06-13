@@ -21,7 +21,7 @@ interface PageProps {
 
 export default function StoriesPage({ searchParams }: PageProps) {
   return (
-    <div className="relative min-h-screen bg-background text-foreground font-sans">
+    <div className="relative min-h-screen text-foreground font-sans">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <header className="mb-12 flex flex-col items-center gap-6 text-center">
           <Link
