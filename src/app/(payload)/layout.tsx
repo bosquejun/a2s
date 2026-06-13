@@ -6,6 +6,12 @@ import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import React from "react";
 
 import { importMap } from "./admin/importMap.js";
+// Payload's admin styling normally loads by compiling @payloadcms/ui SCSS on
+// the fly, but Turbopack (Next 16 default) doesn't collect those deep
+// node_modules SCSS imports, so the admin renders unstyled. Import Payload's
+// complete precompiled admin stylesheet (views + ui + base) instead. Must come
+// before custom.scss so local overrides win.
+import "@payloadcms/next/css";
 import "./custom.scss";
 
 type Args = {
