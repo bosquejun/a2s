@@ -64,6 +64,13 @@ New routes under `src/app/(frontend)/api/stories/[slug]/`:
 
 - **`POST view`** → `UPDATE stories SET view_count = COALESCE(view_count,0) + 1 WHERE slug = $1 AND _status = 'published'`.
   Fire-and-forget, returns `204`. Rate-limited by hashed IP to curb refresh/bot spam.
+  **Environment guard:** the increment only runs when the deploy is production
+  (`process.env.VERCEL_ENV === "production"`, falling back to
+  `process.env.NODE_ENV === "production"` when `VERCEL_ENV` is unset). Otherwise the
+  route returns `204` without writing. This prevents local dev and Vercel **preview**
+  loads from inflating real counts — important because `.env` points at the prod DB.
+  (`NODE_ENV` alone is `"production"` on preview deploys too, so `VERCEL_ENV` is the
+  precise gate.)
 - **`GET stats`** → `{ views }`, **uncached** (live read for display overlay).
 
 Reuse the `@upstash/ratelimit` pattern already in
@@ -116,7 +123,11 @@ Admin ────── reads/sorts view_count column
 - **⚠️ Prod DB schema change.** Per project memory, `.env DATABASE_URL` points at the
   **production** database. Adding `viewCount` is a schema change. Execute via a
   reviewed Payload migration, run deliberately against prod — do **not** rely on an
-  accidental dev push. Confirm before applying.
+  accidental dev push. Confirm before applying. (The env guard below does **not**
+  cover this — it only gates writes, not schema.)
+- **⚠️ Count pollution from non-prod loads.** Because `.env` points at prod, local dev
+  and preview page loads would otherwise inflate real `view_count`. Mitigated by the
+  `VERCEL_ENV`/`NODE_ENV` guard on the `POST view` route (see Write path).
 - **Write volume.** Raw-per-load views = one Postgres write per page view. Fine at
   current scale; revisit (Redis buffer + flush) if traffic grows.
 
