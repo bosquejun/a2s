@@ -2,9 +2,14 @@ import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleto
 import { StoryReader } from "@/components/story-reader";
 import type { Category } from "@/lib/content/taxonomy";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
+import { getStoryNeighbors } from "@/lib/services/stories/get-story-neighbors";
 import { Story } from "@/lib/types";
-import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/seo";
-import { serializeJsonLd } from "@/lib/utils/json-ld";
+import { absoluteUrl, SITE_NAME } from "@/lib/seo";
+import {
+  breadcrumbList,
+  ORGANIZATION_ID,
+  serializeJsonLd,
+} from "@/lib/utils/json-ld";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -77,6 +82,13 @@ export default async function StoryPage({ params }: PageProps) {
     notFound();
   }
 
+  const { related, next } = await getStoryNeighbors(
+    story.slug,
+    story.mood,
+    story.categories,
+    story.tags
+  );
+
   const storyUrl = absoluteUrl(`/story/${story.slug}`);
 
   const jsonLd = {
@@ -86,42 +98,31 @@ export default async function StoryPage({ params }: PageProps) {
         "@type": "Article",
         headline: story.title,
         description: story.hook || story.excerpt || "",
-        image: `${storyUrl}/opengraph-image`,
+        image: {
+          "@type": "ImageObject",
+          url: `${storyUrl}/opengraph-image`,
+          width: 1200,
+          height: 630,
+        },
         author: story.author
           ? { "@type": "Person", name: story.author }
           : { "@type": "Organization", name: SITE_NAME },
         articleSection: story.categories[0] ?? undefined,
         keywords: story.tags.join(", "),
         wordCount: story.wordCount || undefined,
+        timeRequired: story.readTime ? `PT${story.readTime}M` : undefined,
+        isAccessibleForFree: true,
         inLanguage: "en-US",
         mainEntityOfPage: { "@type": "WebPage", "@id": storyUrl },
         datePublished: story.publishedAt ?? undefined,
         dateModified: story.updatedAt ?? story.publishedAt ?? undefined,
-        publisher: { "@id": `${SITE_URL}/#organization` },
+        publisher: { "@id": ORGANIZATION_ID },
       },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: SITE_URL,
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Stories",
-            item: absoluteUrl("/stories"),
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: story.title,
-            item: storyUrl,
-          },
-        ],
-      },
+      breadcrumbList([
+        { name: "Home", path: "/" },
+        { name: "Stories", path: "/stories" },
+        { name: story.title, path: `/story/${story.slug}` },
+      ]),
     ],
   };
 
@@ -132,7 +133,7 @@ export default async function StoryPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Suspense fallback={<StoryReaderSkeleton />}>
-        <StoryReader story={story} />
+        <StoryReader story={story} related={related} next={next} />
       </Suspense>
     </>
   );
