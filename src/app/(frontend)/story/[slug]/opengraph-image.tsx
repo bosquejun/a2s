@@ -192,27 +192,27 @@ export default async function Image({
             </div>
           )}
 
-          {/* Title */}
+          {/* Title — small label; the hook is the hero */}
           <div
             style={{
               fontFamily: "Newsreader",
-              fontSize: title.length > 38 ? "56px" : "68px",
+              fontSize: "26px",
               fontStyle: "italic",
-              color: COLORS.title,
-              lineHeight: 1.15,
+              color: COLORS.hook,
+              lineHeight: 1.2,
             }}
           >
             {title}
           </div>
 
-          {/* Hook — set off by a thin accent rule */}
+          {/* Hook — the hero line, set off by a thin accent rule */}
           {hook && (
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "26px",
+                gap: "32px",
               }}
             >
               <div
@@ -227,11 +227,16 @@ export default async function Image({
               <div
                 style={{
                   fontFamily: "Newsreader",
-                  fontSize: "30px",
+                  fontSize:
+                    hook.length > 100
+                      ? "46px"
+                      : hook.length > 64
+                        ? "54px"
+                        : "62px",
                   fontStyle: "italic",
-                  color: COLORS.hook,
-                  lineHeight: 1.5,
-                  maxWidth: "820px",
+                  color: COLORS.title,
+                  lineHeight: 1.3,
+                  maxWidth: "920px",
                 }}
               >
                 {hook}
