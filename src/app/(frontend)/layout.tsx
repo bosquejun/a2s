@@ -1,3 +1,4 @@
+import { ServiceWorkerRegister } from "@/components/sw-register";
 import { Toaster } from "@/components/ui/sonner";
 import { serializeJsonLd } from "@/lib/utils/json-ld";
 import {
@@ -49,6 +50,12 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
   applicationName: SITE_NAME,
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "After 2AM",
+    statusBarStyle: "black-translucent",
+  },
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
@@ -137,6 +144,7 @@ export default function RootLayout({
       <body className={`${geistMono.variable} antialiased`}>
         {children}
         <Toaster />
+        <ServiceWorkerRegister />
         <Analytics />
       </body>
     </html>
