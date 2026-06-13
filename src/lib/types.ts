@@ -20,6 +20,7 @@ export interface Story {
   intensity: number;
   readTime: number;
   wordCount: number;
+  viewCount: number;
   publishedAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -41,6 +42,7 @@ export interface StorySummary {
   categories: Category[];
   tags: string[];
   readTime: number;
+  viewCount: number;
   publishedAt?: string | null;
   updatedAt?: string | null;
 }

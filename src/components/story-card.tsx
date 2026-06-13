@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { Clock, Eye } from "lucide-react";
 import { CATEGORY_LABELS, MOOD_LABELS } from "@/lib/content/taxonomy";
 import type { StorySummary } from "@/lib/types";
 
@@ -51,6 +51,12 @@ export function StoryCard({ story }: { story: StorySummary }) {
           <Clock size={11} className="opacity-60" />
           {story.readTime} min
         </span>
+        {story.viewCount > 0 && (
+          <span className="flex items-center gap-1.5">
+            <Eye size={11} className="opacity-60" />
+            {story.viewCount.toLocaleString()}
+          </span>
+        )}
         {date && <span>{date}</span>}
       </div>
     </Link>

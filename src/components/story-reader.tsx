@@ -1,6 +1,7 @@
 "use client";
 
 import { useBrownNoise } from "@/hooks/use-brown-noise";
+import { StoryStats } from "@/components/story-stats";
 import { featureFlags } from "@/lib/feature-flags";
 import { Mood, MOOD_LABELS } from "@/lib/content/taxonomy";
 import { Story, StorySummary } from "@/lib/types";
@@ -161,6 +162,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
                   </div>
                 </>
               )}
+              <StoryStats slug={story.slug} initialViews={story.viewCount} />
             </div>
 
             {/* Elegant divider */}
