@@ -176,76 +176,37 @@ export default async function Image({
             textAlign: "center",
           }}
         >
-          {/* Eyebrow: mood · category */}
-          {eyebrow && (
-            <div
-              style={{
-                fontFamily: "Nunito Sans",
-                fontSize: "16px",
-                color: COLORS.accent,
-                textTransform: "uppercase",
-                letterSpacing: "0.32em",
-                fontWeight: 500,
-              }}
-            >
-              {eyebrow}
-            </div>
-          )}
-
-          {/* Title — small label; the hook is the hero */}
+          {/* Hook is the sole hero, set off by a thin accent rule. Title and
+              mood/category are demoted to the footer so nothing competes. */}
+          <div
+            style={{
+              width: "72px",
+              height: "2px",
+              backgroundColor: COLORS.accent,
+              opacity: 0.5,
+              display: "flex",
+            }}
+          />
           <div
             style={{
               fontFamily: "Newsreader",
-              fontSize: "26px",
+              fontSize:
+                (hook || title).length > 100
+                  ? "52px"
+                  : (hook || title).length > 64
+                    ? "60px"
+                    : "70px",
               fontStyle: "italic",
-              color: COLORS.hook,
-              lineHeight: 1.2,
+              color: COLORS.title,
+              lineHeight: 1.28,
+              maxWidth: "980px",
             }}
           >
-            {title}
+            {hook || title}
           </div>
-
-          {/* Hook — the hero line, set off by a thin accent rule */}
-          {hook && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "32px",
-              }}
-            >
-              <div
-                style={{
-                  width: "72px",
-                  height: "2px",
-                  backgroundColor: COLORS.accent,
-                  opacity: 0.5,
-                  display: "flex",
-                }}
-              />
-              <div
-                style={{
-                  fontFamily: "Newsreader",
-                  fontSize:
-                    hook.length > 100
-                      ? "46px"
-                      : hook.length > 64
-                        ? "54px"
-                        : "62px",
-                  fontStyle: "italic",
-                  color: COLORS.title,
-                  lineHeight: 1.3,
-                  maxWidth: "920px",
-                }}
-              >
-                {hook}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Footer: author · read time (left), wordmark (right) */}
+        {/* Footer: demoted title + meta (left), wordmark (right) — all faint */}
         <div
           style={{
             position: "absolute",
@@ -254,32 +215,51 @@ export default async function Image({
             right: "90px",
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "flex-end",
             justifyContent: "space-between",
-            fontFamily: "Nunito Sans",
             zIndex: 1,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "14px",
-              fontSize: "18px",
-              color: COLORS.faint,
-            }}
-          >
-            {story.author && (
-              <span style={{ fontStyle: "italic", fontFamily: "Newsreader" }}>
-                {story.author}
-              </span>
-            )}
-            {story.author && story.readTime > 0 && <span>·</span>}
-            {story.readTime > 0 && <span>{story.readTime} min read</span>}
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{
+                fontFamily: "Newsreader",
+                fontStyle: "italic",
+                fontSize: "22px",
+                color: COLORS.hook,
+              }}
+            >
+              {title}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+                fontFamily: "Nunito Sans",
+                fontSize: "15px",
+                color: COLORS.faint,
+              }}
+            >
+              {eyebrow && (
+                <span
+                  style={{ textTransform: "uppercase", letterSpacing: "0.22em" }}
+                >
+                  {eyebrow}
+                </span>
+              )}
+              {eyebrow && story.author && <span>·</span>}
+              {story.author && <span>{story.author}</span>}
+              {(eyebrow || story.author) && story.readTime > 0 && (
+                <span>·</span>
+              )}
+              {story.readTime > 0 && <span>{story.readTime} min read</span>}
+            </div>
           </div>
           <div
             style={{
+              fontFamily: "Nunito Sans",
               fontSize: "15px",
               color: COLORS.faint,
               textTransform: "uppercase",
