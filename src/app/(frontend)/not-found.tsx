@@ -21,7 +21,7 @@ export default function NotFound() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
           <Link
-            href="/"
+            href="/stories"
             className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-slate-800 bg-slate-900/50 text-[11px] uppercase tracking-[0.3em] text-slate-200 hover:border-indigo-500/40 hover:bg-slate-900/80 transition-all"
           >
             Back to stories
