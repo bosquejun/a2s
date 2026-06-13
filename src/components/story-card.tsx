@@ -19,31 +19,31 @@ export function StoryCard({ story }: { story: StorySummary }) {
   return (
     <Link
       href={`/story/${story.slug}`}
-      className="group relative flex flex-col gap-4 rounded-2xl border border-slate-900 bg-slate-900/20 p-6 sm:p-7 transition-all duration-300 hover:border-indigo-500/30 hover:bg-slate-900/40"
+      className="group relative flex flex-col gap-4 rounded-2xl border border-border/50 bg-card/30 p-6 sm:p-7 backdrop-blur-sm transition-all duration-300 hover:border-indigo-400/30 hover:bg-card/60 hover:shadow-[0_0_40px_-12px_rgba(129,140,248,0.25)]"
     >
-      <div className="flex items-center gap-2.5 text-[9px] uppercase tracking-[0.25em] text-slate-500">
+      <div className="flex items-center gap-2.5 text-[9px] uppercase tracking-[0.25em] text-muted-foreground">
         <span className="text-indigo-300/80">{MOOD_LABELS[story.mood]}</span>
         {primaryCategory && (
           <>
-            <span className="h-1 w-1 rounded-full bg-slate-700" />
+            <span className="h-1 w-1 rounded-full bg-border" />
             <span>{CATEGORY_LABELS[primaryCategory]}</span>
           </>
         )}
       </div>
 
-      <h3 className="font-serif text-xl sm:text-2xl italic leading-snug text-slate-100 transition-colors group-hover:text-white">
+      <h3 className="font-serif text-xl sm:text-2xl italic leading-snug text-foreground/90 transition-colors group-hover:text-foreground">
         {story.title}
       </h3>
 
       {story.excerpt && (
-        <p className="line-clamp-3 text-sm leading-relaxed text-slate-400/90">
+        <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
           {story.excerpt}
         </p>
       )}
 
-      <div className="mt-auto flex flex-wrap items-center gap-3 pt-2 text-[10px] uppercase tracking-[0.2em] text-slate-600">
+      <div className="mt-auto flex flex-wrap items-center gap-3 pt-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">
         {story.author && (
-          <span className="font-serif italic text-slate-500 normal-case tracking-normal">
+          <span className="font-serif italic text-muted-foreground normal-case tracking-normal">
             {story.author}
           </span>
         )}

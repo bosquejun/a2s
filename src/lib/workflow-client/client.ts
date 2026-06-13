@@ -3,9 +3,14 @@ import { Client } from "@upstash/workflow";
 
 const client = new Client({});
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL
-  ? process.env.NEXT_PUBLIC_SITE_URL
-  : `http://localhost:3000`;
+// Workflow callbacks must reach this deployment from QStash, so prefer the
+// configured site URL, then Vercel's production domain, before assuming
+// local development.
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
 
 const ENDPOINTS = {
   writeStory: "api/stories",

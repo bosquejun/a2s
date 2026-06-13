@@ -5,6 +5,7 @@ import { getAllPublishedStories } from "@/lib/services/stories/get-all-published
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { Story } from "@/lib/types";
 import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/seo";
+import { serializeJsonLd } from "@/lib/utils/json-ld";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -137,7 +138,7 @@ export default async function StoryPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Suspense fallback={<StoryReaderSkeleton />}>
         <StoryReader story={story} />

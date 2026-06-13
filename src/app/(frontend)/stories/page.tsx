@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { MOODS, MOOD_LABELS, type Mood } from "@/lib/content/taxonomy";
@@ -28,7 +29,7 @@ export default async function StoriesPage({ searchParams }: PageProps) {
     : all;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500/30">
+    <div className="relative min-h-screen bg-background text-foreground font-sans">
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <header className="mb-12 flex flex-col items-center gap-6 text-center">
           <Link
@@ -68,6 +69,9 @@ export default async function StoriesPage({ searchParams }: PageProps) {
           emptyMessage="Nothing here yet for this feeling."
         />
       </div>
+
+      <SiteFooter />
+      <div className="grain-overlay" aria-hidden="true" />
     </div>
   );
 }

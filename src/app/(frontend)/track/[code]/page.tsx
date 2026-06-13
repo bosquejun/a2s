@@ -59,7 +59,8 @@ const statusConfig: Record<
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/40",
     textColor: "text-emerald-400",
-    description: "Your whisper has been approved and published.",
+    description:
+      "Your whisper has been approved. It will appear here once an editor publishes it.",
   },
   REJECTED: {
     label: "Rejected",
@@ -106,8 +107,12 @@ function TrackPageContent() {
         const data = await response.json();
         setStoryRequest(data);
 
-        // Stop polling if status is final (not PENDING)
-        if (data.status !== "PENDING" && intervalId) {
+        // Keep polling while pending, or while approved but awaiting an
+        // editor to publish (the story link appears once it's live).
+        const stillWaiting =
+          data.status === "PENDING" ||
+          (data.status === "APPROVED" && !data.story);
+        if (!stillWaiting && intervalId) {
           clearInterval(intervalId);
           intervalId = null;
         }
@@ -136,7 +141,7 @@ function TrackPageContent() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
           <div className="text-slate-500 text-center">Loading...</div>
         </div>
@@ -146,7 +151,7 @@ function TrackPageContent() {
 
   if (error || !storyRequest) {
     return (
-      <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+      <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
         <div className="max-w-3xl mx-auto space-y-12">
           <Alert variant="destructive">
             <XCircle className="size-3.5" />
@@ -164,7 +169,7 @@ function TrackPageContent() {
   const StatusIcon = config.icon;
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
+    <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-6 sm:pt-8 pb-24 sm:pb-32 px-4 sm:px-6 animate-fade-in">
       <div className="max-w-3xl mx-auto space-y-8 sm:space-y-12">
         <header className="flex items-center justify-between py-3 sm:py-4 border-b border-slate-900">
           <Link
@@ -255,7 +260,7 @@ export default function TrackPage() {
   return (
     <Suspense
       fallback={
-        <div className="fixed inset-0 bg-slate-950 z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
+        <div className="fixed inset-0 bg-background z-50 overflow-y-auto pt-8 pb-32 px-6 animate-fade-in">
           <div className="max-w-3xl mx-auto space-y-12">
             <div className="text-slate-500 text-center">Loading...</div>
           </div>

@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
+import { MOODS } from "@/lib/content/taxonomy";
 import { absoluteUrl, SITE_URL } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -26,6 +27,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  const moodRoutes: MetadataRoute.Sitemap = MOODS.map((mood) => ({
+    url: absoluteUrl(`/mood/${mood.toLowerCase()}`),
+    lastModified: new Date(),
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  }));
+
   const storyRoutes: MetadataRoute.Sitemap = stories.map((story) => ({
     url: absoluteUrl(`/story/${story.slug}`),
     lastModified: story.updatedAt || story.publishedAt || new Date(),
@@ -33,5 +41,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...storyRoutes];
+  return [...staticRoutes, ...moodRoutes, ...storyRoutes];
 }

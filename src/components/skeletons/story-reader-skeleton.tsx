@@ -1,6 +1,6 @@
 export function StoryReaderSkeleton() {
   return (
-    <div className="flex flex-col w-full h-screen max-h-screen relative overflow-hidden bg-slate-950 animate-fade-in">
+    <div className="flex flex-col w-full h-screen max-h-screen relative overflow-hidden bg-background animate-fade-in">
       {/* Progress bar skeleton */}
       <div className="fixed top-0 left-0 w-full h-[3px] z-50 bg-slate-900/50">
         <div className="h-full bg-slate-800/50 w-0" />

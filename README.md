@@ -55,3 +55,59 @@ and haunting narratives. Built with **Next.js 16** and **Payload CMS 3**
 - `pnpm payload` — Payload CLI (migrations, types, etc.)
 - `pnpm generate:types` — regenerate `payload-types.ts`
 - `pnpm lint` / `pnpm format`
+
+## Security
+
+The app ships with a hardened default posture:
+
+- **Security headers** (`next.config.ts`): baseline headers
+  (`X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS in
+  production) are sent on every route; the public site additionally gets a
+  Content-Security-Policy and `X-Frame-Options: DENY`. The Payload admin
+  (`/admin`, `/payload-api`) is excluded from the strict CSP so its own
+  inline assets keep working.
+- **Story HTML sanitization**: Lexical content is converted to HTML in one
+  place (`src/lib/content/normalize.ts`) and always passed through the
+  allowlist sanitizer (`src/lib/utils/sanitize-story-html.ts`) on the server,
+  so tampered rows or prompt-injected agent output cannot become stored XSS.
+- **JSON-LD escaping**: structured data is serialized with
+  `src/lib/utils/json-ld.ts`, which escapes `<` so `</script>` sequences in
+  content cannot break out of the script tag.
+- **Anonymous identity**: `a2s_anon_id` is issued by `src/proxy.ts` as an
+  `HttpOnly`, `SameSite=Lax` (and `Secure` in production) cookie and is used
+  for submission rate limiting (1/day via Upstash). Cookieless clients fall
+  back to per-IP limiting.
+- **Generation campaigns are operator-only**: `POST /api/stories/start`
+  requires `Authorization: Bearer <secret>` where the secret is
+  `STORY_GENERATION_SECRET` (or `CRON_SECRET` for Vercel Cron). Unset means
+  the endpoint is disabled.
+- **Workflow endpoints** (`/api/stories`, `/api/stories/generate`) are
+  protected by Upstash QStash request signing (`QSTASH_CURRENT_SIGNING_KEY` /
+  `QSTASH_NEXT_SIGNING_KEY`).
+- **Track codes** are unguessable capability tokens (~59 bits of entropy).
+- **No third-party media on the public site**: the night ambience is brown
+  noise synthesized locally with the Web Audio API, so `media-src` stays
+  `'self'`.
+
+## Automated content generation
+
+Two AI pipelines keep the site alive, both running as Upstash Workflows
+(QStash-signed callbacks):
+
+- **Scheduled generation** — `vercel.json` defines a daily cron
+  (`0 2 * * *`, after 2AM, naturally) that calls `GET /api/stories/start`
+  with `Authorization: Bearer $CRON_SECRET`. Each run picks a random
+  mood × category, the NightWriter agent writes the story, and it is
+  created in Payload as **published** (slug deduplication is automatic).
+  Operators can also `POST /api/stories/start` with an optional
+  `{ mood, category }` body to fan out a full campaign (up to 30 workflows).
+- **Reader submissions** — `POST /api/stories/write` stores the whisper and
+  triggers the NightEditor agent, which approves or rejects it. Approved
+  stories are created as **drafts** for a human to publish from `/admin`;
+  the `/track/[code]` page shows progress and links the story once live.
+
+Requirements: `CRON_SECRET` (or `STORY_GENERATION_SECRET`) set in the
+environment, plus the QStash, OpenRouter, and database variables from
+`.env.example`. `NEXT_PUBLIC_SITE_URL` should point at the deployed URL so
+QStash can call the workflow endpoints back (on Vercel it falls back to
+`VERCEL_PROJECT_PRODUCTION_URL` automatically).

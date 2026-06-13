@@ -15,7 +15,7 @@ export function Header() {
           </Link>
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 text-xs sm:text-sm font-medium">
             <Link
-              href="/"
+              href="/stories"
               className="transition-colors hover:text-foreground/80 text-foreground/60 touch-manipulation"
             >
               Stories
@@ -30,7 +30,7 @@ export function Header() {
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2 min-w-0">
           <nav className="flex items-center gap-2">
-            <Link href="/create" className="touch-manipulation">
+            <Link href="/write" className="touch-manipulation">
               <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-3 sm:px-4">
                 <span className="hidden sm:inline">Write a Story</span>
                 <span className="sm:hidden">Write</span>

@@ -1,10 +1,12 @@
+import { serializeJsonLd } from "@/lib/utils/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { AmbientSound } from "@/components/ambient-sound";
 import { LandingPage } from "@/components/landing-page";
 import { NightGate } from "@/components/night-gate";
 import { RecentStories } from "@/components/recent-stories";
+import { SiteFooter } from "@/components/site-footer";
 import { LandingSkeleton } from "@/components/skeletons/landing-skeleton";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
@@ -69,28 +71,44 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(collectionPageSchema),
+          __html: serializeJsonLd(collectionPageSchema),
         }}
       />
       <NightGate>
-        <div className="relative min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500/30">
+        <div className="relative min-h-screen bg-background text-foreground font-sans">
           {/* Hero — mood entry */}
-          <section className="flex min-h-[88vh] flex-col items-center justify-center px-4 py-20">
+          <section className="relative flex min-h-[88vh] flex-col items-center justify-center px-4 py-20">
             <Suspense fallback={<LandingSkeleton />}>
               <LandingPage />
             </Suspense>
+
+            {/* Scroll cue — the feed lives below the fold */}
+            <a
+              href="#lately"
+              className="group absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-muted-foreground/80 animate-fade-in"
+              style={{ animationDelay: "1400ms" }}
+            >
+              <span className="font-serif italic text-xs">or just read</span>
+              <ChevronDown
+                size={14}
+                className="animate-bounce [animation-duration:2.5s]"
+              />
+            </a>
           </section>
 
           {/* Recent whispers feed */}
-          <section className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-32 sm:px-6">
+          <section
+            id="lately"
+            className="relative z-10 mx-auto w-full max-w-6xl scroll-mt-10 px-4 pb-20 sm:px-6"
+          >
             <div className="mb-10 flex flex-col items-center gap-3 text-center">
-              <span className="text-[9px] uppercase tracking-[0.5em] text-slate-700">
+              <span className="text-[9px] uppercase tracking-[0.5em] text-muted-foreground/50">
                 Lately
               </span>
-              <h2 className="font-serif text-2xl italic text-slate-300 sm:text-3xl">
+              <h2 className="font-serif text-2xl italic text-foreground/90 sm:text-3xl">
                 Recent whispers
               </h2>
-              <div className="h-px w-16 bg-gradient-to-r from-transparent via-slate-800/60 to-transparent" />
+              <div className="h-px w-16 bg-gradient-to-r from-transparent via-border/80 to-transparent" />
             </div>
 
             <Suspense
@@ -108,7 +126,7 @@ export default function Home() {
             <div className="mt-12 flex justify-center">
               <Link
                 href="/stories"
-                className="group inline-flex items-center gap-2 rounded-full border border-slate-900 px-6 py-3 text-[10px] uppercase tracking-[0.3em] text-slate-500 transition-all hover:border-indigo-500/30 hover:text-slate-200"
+                className="group inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/30 px-6 py-3 text-[10px] uppercase tracking-[0.3em] text-muted-foreground transition-all hover:border-indigo-400/30 hover:text-foreground"
               >
                 Browse all stories
                 <ArrowRight
@@ -119,10 +137,16 @@ export default function Home() {
             </div>
           </section>
 
+          <SiteFooter />
+
           <AmbientSound />
 
-          <div className="pointer-events-none fixed left-[-10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-indigo-500/5 blur-[120px]" />
-          <div className="pointer-events-none fixed bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-slate-500/5 blur-[120px]" />
+          <div className="grain-overlay" aria-hidden="true" />
+          <div className="pointer-events-none fixed left-[-10%] top-[-12%] h-[45%] w-[45%] rounded-full bg-indigo-500/8 blur-[130px] animate-drift" />
+          <div
+            className="pointer-events-none fixed bottom-[-12%] right-[-10%] h-[45%] w-[45%] rounded-full bg-violet-500/6 blur-[130px] animate-drift"
+            style={{ animationDelay: "-9s" }}
+          />
         </div>
       </NightGate>
     </>
