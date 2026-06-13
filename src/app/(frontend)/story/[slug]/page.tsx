@@ -1,7 +1,6 @@
 import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleton";
 import { StoryReader } from "@/components/story-reader";
 import type { Category } from "@/lib/content/taxonomy";
-import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { Story } from "@/lib/types";
 import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/seo";
@@ -14,14 +13,6 @@ interface PageProps {
   params: Promise<{
     slug: string;
   }>;
-}
-
-export async function generateStaticParams() {
-  const posts = await getAllPublishedStories(100);
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
 }
 
 function buildStoryMetadata(story: Story): Metadata {
