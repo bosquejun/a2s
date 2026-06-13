@@ -7,7 +7,8 @@ import {
   MOODS,
 } from "@/lib/content/taxonomy";
 import { featureFlags } from "@/lib/feature-flags";
-import { MoonStar, PenLine } from "lucide-react";
+import { PenLine } from "lucide-react";
+import { MoonMark } from "@/components/moon-mark";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -53,7 +54,7 @@ export function LandingPage() {
       <div className="space-y-10 sm:space-y-14 w-full">
         <div className="space-y-4 sm:space-y-5 animate-fade-up">
           <div className="flex items-center justify-center gap-2 text-muted-foreground/50">
-            <MoonStar size={12} aria-hidden="true" />
+            <MoonMark className="h-3 w-3" />
             <span className="text-[10px] font-mono uppercase tracking-[0.35em] tabular-nums min-h-[1em]">
               {time ? `it's ${time}` : " "}
             </span>
