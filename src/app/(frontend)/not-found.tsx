@@ -3,7 +3,7 @@ import { featureFlags } from "@/lib/feature-flags";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background text-slate-200 flex flex-col items-center justify-center px-6 py-16">
+    <div className="min-h-screen text-slate-200 flex flex-col items-center justify-center px-6 py-16">
       <div className="max-w-md text-center space-y-8 animate-fade-in">
         <div className="space-y-3">
           <p className="text-[11px] uppercase tracking-[0.4em] text-slate-600">

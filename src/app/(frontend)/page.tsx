@@ -75,7 +75,7 @@ export default function Home() {
         }}
       />
       <NightGate>
-        <div className="relative min-h-screen bg-background text-foreground font-sans">
+        <div className="relative min-h-screen text-foreground font-sans">
           {/* Hero — mood entry */}
           <section className="relative flex min-h-[88vh] flex-col items-center justify-center px-4 py-20">
             <Suspense fallback={<LandingSkeleton />}>

@@ -66,7 +66,7 @@ export default async function MoodPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-      <div className="relative min-h-screen bg-background text-foreground font-sans">
+      <div className="relative min-h-screen text-foreground font-sans">
         <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <header className="mb-12 flex flex-col items-center gap-5 text-center animate-fade-up">
             <Link
