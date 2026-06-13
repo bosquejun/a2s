@@ -115,6 +115,17 @@ export const Stories: CollectionConfig = {
       admin: { description: "Moderation notes (AI or human)." },
     },
     {
+      name: "viewCount",
+      type: "number",
+      defaultValue: 0,
+      index: true,
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: "Total views (auto, updated outside the admin).",
+      },
+    },
+    {
       name: "publishedAt",
       type: "date",
       admin: {

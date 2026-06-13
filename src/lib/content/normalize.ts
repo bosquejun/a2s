@@ -22,6 +22,7 @@ export type StoryDoc = {
   intensity?: number | null;
   readTime?: number | null;
   wordCount?: number | null;
+  viewCount?: number | null;
   tags?: Array<string | number | { name?: string }> | null;
   publishedAt?: string | null;
   createdAt?: string | null;
@@ -75,6 +76,7 @@ export function normalizeStory(doc: StoryDoc): Story {
     intensity: doc.intensity ?? 3,
     readTime: doc.readTime ?? 1,
     wordCount: doc.wordCount ?? 0,
+    viewCount: doc.viewCount ?? 0,
     publishedAt: doc.publishedAt ?? null,
     createdAt: doc.createdAt ?? null,
     updatedAt: doc.updatedAt ?? null,
@@ -98,6 +100,7 @@ export function normalizeStorySummary(doc: StoryDoc): StorySummary {
     categories: (doc.categories ?? []) as Category[],
     tags: tagNames(doc.tags),
     readTime: doc.readTime ?? 1,
+    viewCount: doc.viewCount ?? 0,
     publishedAt: doc.publishedAt ?? null,
     updatedAt: doc.updatedAt ?? null,
   };
