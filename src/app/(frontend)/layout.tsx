@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "After 2AM",
+    title: "After 2AM Stories",
     statusBarStyle: "black-translucent",
   },
   authors: [{ name: SITE_NAME }],
