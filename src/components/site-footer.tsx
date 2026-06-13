@@ -1,6 +1,6 @@
-import { MoonStar } from "lucide-react";
 import Link from "next/link";
 import { featureFlags } from "@/lib/feature-flags";
+import { MoonMark } from "@/components/moon-mark";
 
 /**
  * Quiet footer nav for the browsable pages (home, archive, mood, about).
@@ -14,7 +14,7 @@ export function SiteFooter() {
           href="/"
           className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground/80"
         >
-          <MoonStar size={13} aria-hidden="true" />
+          <MoonMark className="h-3.5 w-3.5" />
           <span className="font-serif italic text-sm tracking-wide">
             After 2AM
           </span>

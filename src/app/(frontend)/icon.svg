@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="After 2AM mark">
+  <defs>
+    <mask id="moonM"><circle cx="64" cy="72" r="42" fill="#fff"/><circle cx="82" cy="58" r="36" fill="#000"/></mask>
+  </defs>
+  <rect width="140" height="140" rx="30" fill="#0b0b13"/>
+  <circle cx="64" cy="72" r="42" fill="#8b8cf8" mask="url(#moonM)"/>
+</svg>
