@@ -1,5 +1,6 @@
 import { MoonStar } from "lucide-react";
 import Link from "next/link";
+import { featureFlags } from "@/lib/feature-flags";
 
 /**
  * Quiet footer nav for the browsable pages (home, archive, mood, about).
@@ -32,12 +33,14 @@ export function SiteFooter() {
           >
             About
           </Link>
-          <Link
-            href="/write"
-            className="transition-colors hover:text-indigo-300"
-          >
-            Whisper a story
-          </Link>
+          {featureFlags.whisper && (
+            <Link
+              href="/write"
+              className="transition-colors hover:text-indigo-300"
+            >
+              Whisper a story
+            </Link>
+          )}
         </nav>
 
         <p className="font-serif italic text-xs text-muted-foreground/40">

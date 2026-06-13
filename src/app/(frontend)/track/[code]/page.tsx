@@ -9,8 +9,9 @@ import {
     XCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { featureFlags } from "@/lib/feature-flags";
 
 type StoryRequestStatus = "PENDING" | "REJECTED" | "APPROVED" | "FAILED";
 
@@ -257,6 +258,10 @@ function TrackPageContent() {
 }
 
 export default function TrackPage() {
+  if (!featureFlags.whisper) {
+    notFound();
+  }
+
   return (
     <Suspense
       fallback={

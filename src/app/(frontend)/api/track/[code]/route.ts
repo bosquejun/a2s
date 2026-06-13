@@ -1,3 +1,4 @@
+import { featureFlags } from "@/lib/feature-flags";
 import { getPayloadClient } from "@/lib/payload";
 import { NextResponse } from "next/server";
 
@@ -13,6 +14,10 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  if (!featureFlags.whisper) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const { code } = await params;
 
   try {
