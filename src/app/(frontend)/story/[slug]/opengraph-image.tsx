@@ -1,75 +1,16 @@
 import { ImageResponse } from "next/og";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
+import {
+  loadOgFonts,
+  OG_COLORS,
+  OG_CONTENT_TYPE,
+  OG_SIZE,
+  OgBackdrop,
+} from "@/lib/og/og-kit";
 
 export const alt = "After 2AM Story";
-export const size = {
-  width: 1200,
-  height: 630,
-};
-
-export const contentType = "image/png";
-
-// Site palette (oklch tokens converted to hex — Satori can't parse oklch).
-const COLORS = {
-  base: "#0b0b13", // --background ~oklch(0.155 0.022 285)
-  title: "#ECECF1", // --foreground
-  hook: "#A6A6B7", // --muted-foreground
-  accent: "#8b8cf8", // --primary (indigo/violet)
-  faint: "#54546a",
-};
-
-/**
- * Load a Google Font, subset to just the glyphs we render (via `&text=`), so
- * the OG image matches the site's fonts cheaply. `axis` is the css2 axis spec
- * (e.g. "ital,wght@1,500" or "wght@500"). Returns null on failure so the image
- * still renders with Satori's default font.
- */
-async function loadGoogleFont(
-  family: string,
-  axis: string,
-  text: string
-): Promise<ArrayBuffer | null> {
-  try {
-    const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
-      `${family}:${axis}`
-    )}&text=${encodeURIComponent(text)}`;
-    const css = await (
-      await fetch(url, {
-        headers: {
-          // A real browser UA makes Google return a ttf/otf src (Satori-compatible).
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        },
-      })
-    ).text();
-    const match = css.match(
-      /src: url\((https:\/\/[^)]+)\) format\('(?:opentype|truetype)'\)/
-    );
-    if (!match) return null;
-    return await (await fetch(match[1])).arrayBuffer();
-  } catch {
-    return null;
-  }
-}
-
-/** Shared dark, violet-tinted backdrop with soft glows + edge vignette. */
-function Backdrop() {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        backgroundColor: COLORS.base,
-        backgroundImage:
-          "radial-gradient(900px circle at 18% 22%, rgba(99,102,241,0.20) 0%, transparent 55%)," +
-          "radial-gradient(900px circle at 85% 88%, rgba(139,92,246,0.16) 0%, transparent 55%)," +
-          "radial-gradient(1200px circle at 50% 50%, transparent 60%, rgba(0,0,0,0.55) 100%)",
-        display: "flex",
-      }}
-    />
-  );
-}
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
 
 export default async function Image({
   params,
@@ -93,12 +34,12 @@ export default async function Image({
             fontFamily: "serif",
           }}
         >
-          <Backdrop />
+          <OgBackdrop />
           <div
             style={{
               fontSize: "52px",
               fontStyle: "italic",
-              color: COLORS.title,
+              color: OG_COLORS.title,
               zIndex: 1,
             }}
           >
@@ -106,7 +47,7 @@ export default async function Image({
           </div>
         </div>
       ),
-      { ...size }
+      { ...OG_SIZE }
     );
   }
 
@@ -122,31 +63,10 @@ export default async function Image({
     .filter(Boolean)
     .join("  ·  ");
 
-  const serifText = `${title}${hook}${story.author ?? ""}…·`;
-  const sansText = `${eyebrow} AFTER 2AM min read 0123456789·`;
-  const [serifFont, sansFont] = await Promise.all([
-    loadGoogleFont("Newsreader", "ital,wght@1,500", serifText),
-    loadGoogleFont("Nunito Sans", "wght@500", sansText),
-  ]);
-  const fonts = [
-    serifFont && {
-      name: "Newsreader",
-      data: serifFont,
-      style: "italic" as const,
-      weight: 500 as const,
-    },
-    sansFont && {
-      name: "Nunito Sans",
-      data: sansFont,
-      style: "normal" as const,
-      weight: 500 as const,
-    },
-  ].filter(Boolean) as {
-    name: string;
-    data: ArrayBuffer;
-    style: "italic" | "normal";
-    weight: 500;
-  }[];
+  const fonts = await loadOgFonts(
+    `${title}${hook}${story.author ?? ""}…·`,
+    `${eyebrow} AFTER 2AM min read 0123456789·`
+  );
 
   return new ImageResponse(
     (
@@ -162,7 +82,7 @@ export default async function Image({
           padding: "90px",
         }}
       >
-        <Backdrop />
+        <OgBackdrop />
 
         <div
           style={{
@@ -182,7 +102,7 @@ export default async function Image({
             style={{
               width: "72px",
               height: "2px",
-              backgroundColor: COLORS.accent,
+              backgroundColor: OG_COLORS.accent,
               opacity: 0.5,
               display: "flex",
             }}
@@ -197,7 +117,7 @@ export default async function Image({
                     ? "60px"
                     : "70px",
               fontStyle: "italic",
-              color: COLORS.title,
+              color: OG_COLORS.title,
               lineHeight: 1.28,
               maxWidth: "980px",
             }}
@@ -226,7 +146,7 @@ export default async function Image({
                 fontFamily: "Newsreader",
                 fontStyle: "italic",
                 fontSize: "22px",
-                color: COLORS.hook,
+                color: OG_COLORS.muted,
               }}
             >
               {title}
@@ -239,7 +159,7 @@ export default async function Image({
                 gap: "10px",
                 fontFamily: "Nunito Sans",
                 fontSize: "15px",
-                color: COLORS.faint,
+                color: OG_COLORS.faint,
               }}
             >
               {eyebrow && (
@@ -261,7 +181,7 @@ export default async function Image({
             style={{
               fontFamily: "Nunito Sans",
               fontSize: "15px",
-              color: COLORS.faint,
+              color: OG_COLORS.faint,
               textTransform: "uppercase",
               letterSpacing: "0.32em",
             }}
@@ -272,7 +192,7 @@ export default async function Image({
       </div>
     ),
     {
-      ...size,
+      ...OG_SIZE,
       ...(fonts.length ? { fonts } : {}),
     }
   );
