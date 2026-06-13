@@ -24,6 +24,12 @@ function buildStoryMetadata(story: Story): Metadata {
   const description = story.excerpt ?? story.seo?.description ?? "";
   const url = absoluteUrl(`/story/${story.slug}`);
   const title = story.seo?.title || story.title;
+  const ogImage = {
+    url: `${url}/og`,
+    width: 1200,
+    height: 630,
+    alt: title,
+  };
 
   return {
     title,
@@ -48,11 +54,13 @@ function buildStoryMetadata(story: Story): Metadata {
       authors: story.author ? [story.author] : undefined,
       section: story.categories[0]?.toLowerCase(),
       tags: story.tags,
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description: story.seo?.description || description,
+      images: [ogImage],
     },
     alternates: {
       canonical: url,
@@ -100,7 +108,7 @@ export default async function StoryPage({ params }: PageProps) {
         description: story.hook || story.excerpt || "",
         image: {
           "@type": "ImageObject",
-          url: `${storyUrl}/opengraph-image`,
+          url: `${storyUrl}/og`,
           width: 1200,
           height: 630,
         },
