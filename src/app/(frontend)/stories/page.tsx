@@ -145,12 +145,16 @@ async function StoriesList({ searchParams }: PageProps) {
 function StoriesListFallback() {
   return (
     <>
+      {/* Mood filter chips */}
       <div className="mb-12 flex flex-wrap items-center justify-center gap-2">
-        <span className="rounded-full border border-slate-900 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-slate-600">
-          Loading…
-        </span>
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-[1.875rem] w-20 rounded-full border border-slate-900 bg-slate-900/40 animate-pulse"
+          />
+        ))}
       </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <StoryCardSkeleton key={i} />
         ))}
