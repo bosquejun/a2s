@@ -14,6 +14,7 @@ const BASE_URL =
 
 const ENDPOINTS = {
   writeStory: "api/stories",
+  socialPublish: "api/social/publish",
 };
 
 export const triggerWorkflow = async <T>(

@@ -6,6 +6,7 @@ import {
 } from "../../lib/content/taxonomy";
 import { enrichStory } from "../hooks/enrich-story";
 import { revalidateStory, revalidateStoryDelete } from "../hooks/revalidate";
+import { socialPublish } from "../hooks/social-publish";
 
 export const Stories: CollectionConfig = {
   slug: "stories",
@@ -29,7 +30,7 @@ export const Stories: CollectionConfig = {
   },
   hooks: {
     beforeChange: [enrichStory],
-    afterChange: [revalidateStory],
+    afterChange: [revalidateStory, socialPublish],
     afterDelete: [revalidateStoryDelete],
   },
   fields: [
