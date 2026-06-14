@@ -69,21 +69,21 @@ export function StoryReaderSkeleton() {
 
       {/* Fixed bottom control dock */}
       <div className="fixed bottom-0 left-0 w-full p-3 sm:p-4 md:p-6 lg:p-10 pointer-events-none z-50">
-        <div className="py-2 max-w-5xl mx-auto flex flex-col gap-2.5 sm:gap-3 sm:flex-row sm:items-center sm:justify-between pointer-events-auto">
-          {/* Left: circular controls + noise toggle */}
-          <div className="flex items-center justify-center sm:justify-start flex-wrap gap-2 sm:gap-2.5">
+        <div className="py-2 max-w-5xl mx-auto flex flex-col gap-2.5 sm:gap-3 pointer-events-auto">
+          {/* Secondary controls — stretched labeled pills */}
+          <div className="flex w-full items-center gap-2 sm:gap-2.5">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="h-11 w-11 rounded-full border border-border/50 bg-card/40 animate-pulse"
+                className="h-11 flex-1 rounded-full border border-border/50 bg-card/40 animate-pulse"
                 style={{ animationDelay: `${i * 100}ms` }}
               />
             ))}
-            <div className="hidden md:block h-11 w-36 rounded-full border border-border/50 bg-card/40 animate-pulse" />
+            <div className="hidden md:block h-11 flex-1 rounded-full border border-border/50 bg-card/40 animate-pulse" />
           </div>
 
-          {/* Right: primary CTA */}
-          <div className="h-11 sm:h-12 w-full sm:w-44 rounded-full bg-indigo-600/30 animate-pulse" />
+          {/* Primary CTA — full width */}
+          <div className="h-12 w-full rounded-full bg-indigo-600/30 animate-pulse" />
         </div>
       </div>
 
