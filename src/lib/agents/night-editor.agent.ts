@@ -1,3 +1,11 @@
+import {
+  A2AM_AUTHOR_RULES,
+  A2AM_HOOK_RULES,
+  A2AM_RELATABILITY,
+  A2AM_TAGS_AND_SEO_RULES,
+  A2AM_TITLE_RULES,
+  A2AM_VOICE_CORE,
+} from "@/lib/content/voice";
 import { Category, Mood } from "@/lib/content/taxonomy";
 import { nightEditorAgentOutputSchema } from "@/validations/story.validation";
 import { openrouter } from "@openrouter/ai-sdk-provider";
@@ -13,22 +21,27 @@ export const nightEditorAgent = new ToolLoopAgent({
 
 export const createUserPrompt = (data: { content: string }) => {
   return `
-  Evaluate the following story for the “after 2am stories” website.
+Evaluate the following reader "whisper" for the After 2AM Stories website.
 
 CORE RULES
-- Preserve the author’s voice.
-- Do NOT invent events, symbols, or imagery.
-- All metadata must be directly grounded in the story text.
+- This is the reader's own confession. PRESERVE the author's voice and words —
+  you are an editor, not a rewriter. Do NOT invent events, symbols, or imagery,
+  and do NOT add details the body doesn't already contain.
+- All metadata you generate must be directly grounded in the story text.
+
+THE SITE'S VOICE (the bar this whisper is measured against, and the register
+your generated title/hook/author should match):
+${A2AM_VOICE_CORE}
+
+${A2AM_RELATABILITY}
+
+A whisper does not need to be polished, but it should read as a real, grounded
+after-2am thought — honest, specific, restrained. Judge approval against that.
 
 TASKS:
 
-1. Generate a TITLE:
-   - Max 6 words
-   - Must be specific and concrete
-   - Must reference a real detail, action, or recurring thought in the story
-   - Must NOT summarize the entire story
-   - Must NOT introduce new imagery, characters, or metaphors
-   - Should feel like a quiet label, not a headline
+1. Generate a TITLE.
+${A2AM_TITLE_RULES}
 
 2. Assign ONE mood from:
    ${Object.values(Mood).join(", ")}
@@ -36,9 +49,10 @@ TASKS:
 3. Assign up to 2 categories from:
    ${Object.values(Category).join(", ")}
 
-4. Generate 3–5 lowercase tags:
-   - Derived only from ideas present in the text
-   - No generic tags like “story” or “thoughts”
+4. Generate tags and SEO.
+${A2AM_TAGS_AND_SEO_RULES}
+   Also produce an SEO slug: lowercase, kebab-case, derived from the TITLE,
+   filler words removed.
 
 5. Assign an intensity level from 1 to 5:
    1 = cozy / calming
@@ -49,58 +63,26 @@ TASKS:
 
 6. Decide if the story is approved for publishing.
 
-SEO METADATA (quiet, grounded, non-clickbait):
+7. Format the story to HTML:
+   - Convert the body to HTML with <p> tags for paragraphs and <br /> for line
+     breaks. Preserve the author's wording and rhythm; do not rewrite it.
+   - Fill in the htmlBody field.
 
-7. Generate an SEO title (max 60 characters):
-   - Based on the story’s core situation
-   - Calm, descriptive, specific
-   - No sensational language
+8. Generate an excerpt (≤100 characters): no spoilers, no emojis; reads like an
+   invitation, not a hook.
 
-8. Generate an SEO description (120–160 characters):
-   - No spoilers
-   - No emojis
-   - Reads like an invitation, not a hook
+9. Generate a HOOK.
+${A2AM_HOOK_RULES}
 
-9. Generate an SEO slug:
-   - lowercase
-   - kebab-case
-   - derived from the TITLE
-   - remove filler words where possible
-
-10. Format the story to HTML:
-   - Convert content body to HTML with <p> tags for paragraphs and <br /> tags for line breaks
-   - Fill in htmlBody field with the HTML formatted body
-
-11. Generate excerpt:
-   - 100 characters
-   - No spoilers
-   - No emojis
-   - Reads like an invitation, not a hook
-
-12b. Generate hook:
-   - Max 120 characters
-   - A single, punchy line used on social share images
-   - Grounded in a real detail from the story
-   - Quietly compelling, never clickbait
-   - No spoilers, no emojis
-
-12. Generate author:
-   - Fully anonymous, never a real identity
-   - Must feel like a person online, not a concept or location
-   - Quiet, low‑key, human presence
-   - After‑2am mood: tired, reflective, understated
-   - Username‑style
-   - Lowercase only
-   - 1–2 short words
-   - No numbers, emojis, or decorative symbols
-   - Optional: one dot or one underscore only
+10. Generate an AUTHOR pseudonym.
+${A2AM_AUTHOR_RULES}
 
 If the story is NOT approved:
 - Set approved to false
 - Provide a short, gentle note
 - Suggest ONE safe rewrite direction
 - Do NOT mention policy or rules
-- Do NOT complete data in the JSON output schema
+- Do NOT complete the rest of the JSON output schema
 
 STORY:
 """

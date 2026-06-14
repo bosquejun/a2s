@@ -21,7 +21,9 @@ interface PageProps {
 }
 
 function buildStoryMetadata(story: Story): Metadata {
-  const description = story.excerpt ?? story.seo?.description ?? "";
+  // Prefer the SEO description (120–160 chars, written as the SERP snippet)
+  // over the shorter excerpt so Google has a fuller, more clickable snippet.
+  const description = story.seo?.description || story.excerpt || "";
   const url = absoluteUrl(`/story/${story.slug}`);
   const title = story.seo?.title || story.title;
   const ogImage = {
@@ -45,7 +47,7 @@ function buildStoryMetadata(story: Story): Metadata {
     ],
     openGraph: {
       title,
-      description: story.seo?.description || description,
+      description,
       type: "article",
       url,
       siteName: SITE_NAME,
@@ -59,7 +61,7 @@ function buildStoryMetadata(story: Story): Metadata {
     twitter: {
       card: "summary_large_image",
       title,
-      description: story.seo?.description || description,
+      description,
       images: [ogImage],
     },
     alternates: {
