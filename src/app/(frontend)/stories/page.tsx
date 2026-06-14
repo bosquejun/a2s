@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { InfiniteStoryFeed } from "@/components/infinite-story-feed";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
-import { getPublishedStoriesPage } from "@/lib/services/stories/get-published-stories-page";
-import { MOODS, MOOD_LABELS, type Mood } from "@/lib/content/taxonomy";
+import {
+  getPublishedStoriesPage,
+  resolveStoryFilter,
+} from "@/lib/services/stories/get-published-stories-page";
+import {
+  CATEGORY_LABELS,
+  MOODS,
+  MOOD_LABELS,
+} from "@/lib/content/taxonomy";
 import { absoluteUrl, SITE_NAME, SITE_KEYWORDS } from "@/lib/seo";
 import {
   breadcrumbList,
@@ -43,7 +50,7 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ mood?: string }>;
+  searchParams: Promise<{ mood?: string; category?: string; tag?: string }>;
 }
 
 export default function StoriesPage({ searchParams }: PageProps) {
@@ -84,19 +91,31 @@ export default function StoriesPage({ searchParams }: PageProps) {
  * Components while this dynamic section streams.
  */
 async function StoriesList({ searchParams }: PageProps) {
-  const { mood } = await searchParams;
-  const requested = mood?.toUpperCase() as Mood | undefined;
-  const activeMood =
-    requested && MOODS.includes(requested) ? requested : undefined;
+  const filter = resolveStoryFilter(await searchParams);
+  const { mood: activeMood, category: activeCategory, tag: activeTag } = filter;
 
-  const { stories, total } = await getPublishedStoriesPage(0, activeMood);
+  const { stories, total } = await getPublishedStoriesPage(0, filter);
+
+  // A tag/category filter is a "follow this thread" view reached from a story;
+  // a mood filter is the primary browse axis with its own chip row.
+  const threadLabel = activeTag
+    ? `Tagged "${activeTag}"`
+    : activeCategory
+      ? `${CATEGORY_LABELS[activeCategory]} stories`
+      : null;
+
+  const collectionName = threadLabel
+    ? threadLabel
+    : activeMood
+      ? `${MOOD_LABELS[activeMood]} Stories`
+      : "All Stories";
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "CollectionPage",
-        name: activeMood ? `${MOOD_LABELS[activeMood]} Stories` : "All Stories",
+        name: collectionName,
         description: STORIES_DESCRIPTION,
         url: absoluteUrl("/stories"),
         isPartOf: { "@id": WEBSITE_ID },
@@ -115,27 +134,45 @@ async function StoriesList({ searchParams }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-      {/* Mood filter */}
-      <div className="mb-12 flex flex-wrap items-center justify-center gap-2">
-        <FilterChip href="/stories" active={!activeMood}>
-          All
-        </FilterChip>
-        {MOODS.map((m) => (
-          <FilterChip
-            key={m}
-            href={`/stories?mood=${m.toLowerCase()}`}
-            active={activeMood === m}
+      {threadLabel ? (
+        // Following a tag/category thread — show the active filter with a clear.
+        <div className="mb-12 flex justify-center">
+          <Link
+            href="/stories"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-indigo-300 transition-all hover:border-indigo-400/60"
           >
-            {MOOD_LABELS[m]}
+            <span>{threadLabel}</span>
+            <X
+              size={12}
+              className="opacity-70 transition-opacity group-hover:opacity-100"
+            />
+          </Link>
+        </div>
+      ) : (
+        // Default / mood browse — the mood chip row.
+        <div className="mb-12 flex flex-wrap items-center justify-center gap-2">
+          <FilterChip href="/stories" active={!activeMood}>
+            All
           </FilterChip>
-        ))}
-      </div>
+          {MOODS.map((m) => (
+            <FilterChip
+              key={m}
+              href={`/stories?mood=${m.toLowerCase()}`}
+              active={activeMood === m}
+            >
+              {MOOD_LABELS[m]}
+            </FilterChip>
+          ))}
+        </div>
+      )}
 
       <InfiniteStoryFeed
-        key={activeMood ?? "all"}
+        key={activeTag ?? activeCategory ?? activeMood ?? "all"}
         initialStories={stories}
         total={total}
         mood={activeMood?.toLowerCase()}
+        category={activeCategory?.toLowerCase()}
+        tag={activeTag}
         emptyMessage="Nothing here yet for this feeling."
       />
     </>

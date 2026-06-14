@@ -1,9 +1,17 @@
-import type { Mood } from "@/lib/content/taxonomy";
 import type { StorySummary } from "@/lib/types";
 import { getAllPublishedStories } from "./get-all-published-stories";
+import {
+  matchesStoryFilter,
+  STORIES_PAGE_SIZE,
+  type StoryFilter,
+} from "./story-filter";
 
-/** Stories shown per infinite-scroll batch on the stories hub. */
-export const STORIES_PAGE_SIZE = 12;
+export {
+  resolveStoryFilter,
+  STORIES_PAGE_SIZE,
+  type RawStoryFilter,
+  type StoryFilter,
+} from "./story-filter";
 
 export interface StoriesPage {
   stories: StorySummary[];
@@ -13,15 +21,15 @@ export interface StoriesPage {
 
 /**
  * Returns one batch of published stories starting at `offset`, optionally
- * filtered by mood. Slices the cached full list, so paging is cheap and every
- * batch is served from the same `getAllPublishedStories` cache entry.
+ * filtered by mood, category, or tag. Slices the cached full list, so paging is
+ * cheap and every batch is served from the same `getAllPublishedStories` cache.
  */
 export async function getPublishedStoriesPage(
   offset: number,
-  mood?: Mood
+  filter: StoryFilter = {}
 ): Promise<StoriesPage> {
   const all = await getAllPublishedStories();
-  const filtered = mood ? all.filter((story) => story.mood === mood) : all;
+  const filtered = all.filter((story) => matchesStoryFilter(story, filter));
 
   return {
     stories: filtered.slice(offset, offset + STORIES_PAGE_SIZE),
