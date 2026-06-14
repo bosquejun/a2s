@@ -1,6 +1,7 @@
 "use client";
 
 import { useBrownNoise } from "@/hooks/use-brown-noise";
+import { useReadHistory } from "@/hooks/use-read-history";
 import { StoryStats } from "@/components/story-stats";
 import { featureFlags } from "@/lib/feature-flags";
 import { Mood, MOOD_LABELS } from "@/lib/content/taxonomy";
@@ -9,6 +10,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Calendar,
+  Check,
   Clock,
   Hash,
   PenLine,
@@ -41,6 +43,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
   const { isEnabled: isNoiseEnabled, toggle: toggleNoise } = useBrownNoise(
     "after2am_reader_noise"
   );
+  const { history, markRead, hydrated } = useReadHistory();
   const [isSharing, setIsSharing] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const excludedParam = searchParams.get("exclude") ?? "";
@@ -55,6 +58,12 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
       setScrollProgress(progress);
     }
   };
+
+  // Remember this story so the continuation loop stops serving it back. Runs
+  // per slug, so each story the reader opens drops out of "Next"/"Surprise me".
+  useEffect(() => {
+    markRead(story.slug);
+  }, [story.slug, markRead]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -91,12 +100,39 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
     }
   };
 
+  // Everything the next hop should skip: this story, anything carried in the
+  // URL from prior hops, and the reader's saved history. Drives both the
+  // "Surprise me" route and the diverted "Next story" CTA.
   const excludedSlugs = useMemo(() => {
     const uniqueSlugs = Array.from(
-      new Set([story.slug, ...(excludedParam.split(",") ?? [])])
+      new Set(
+        [story.slug, ...excludedParam.split(","), ...history].filter(Boolean)
+      )
     );
     return uniqueSlugs.join(",");
-  }, [story.slug, excludedParam]);
+  }, [story.slug, excludedParam, history]);
+
+  const encodedExclude = encodeURIComponent(excludedSlugs);
+  const randomHref = `/mood/${baseMood.toLowerCase()}/random?exclude=${encodedExclude}`;
+
+  // The deterministic "Next story" can point at something already read (the
+  // mood list wraps). Once hydrated, divert those to a fresh random pick so the
+  // loop never repeats; otherwise keep the SSR-friendly linear link.
+  const readSet = useMemo(() => new Set(history), [history]);
+  const nextIsRead = hydrated && next ? readSet.has(next.slug) : false;
+  const nextHref =
+    next && !nextIsRead
+      ? `/story/${next.slug}?mood=${baseMood.toLowerCase()}&exclude=${encodedExclude}`
+      : randomHref;
+
+  // Float unread "More like this" cards to the top so the freshest suggestions
+  // lead, while still showing read ones (marked) rather than emptying out.
+  const orderedRelated = useMemo(() => {
+    if (!hydrated) return related;
+    const unread = related.filter((item) => !readSet.has(item.slug));
+    const read = related.filter((item) => readSet.has(item.slug));
+    return [...unread, ...read];
+  }, [related, readSet, hydrated]);
 
   return (
     <div className="flex flex-col w-full h-screen max-h-screen relative overflow-hidden bg-background animate-fade-in">
@@ -232,11 +268,15 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
                 </span>
               </div>
               <div className="flex flex-col gap-3">
-                {related.map((item) => (
+                {orderedRelated.map((item) => {
+                  const isRead = hydrated && readSet.has(item.slug);
+                  return (
                   <Link
                     key={item.id}
                     href={`/story/${item.slug}`}
-                    className="group flex flex-col gap-1.5 rounded-2xl border border-border/40 bg-card/30 px-5 py-4 backdrop-blur-sm transition-all hover:border-indigo-400/30 hover:bg-card/60"
+                    className={`group flex flex-col gap-1.5 rounded-2xl border border-border/40 bg-card/30 px-5 py-4 backdrop-blur-sm transition-all hover:border-indigo-400/30 hover:bg-card/60 ${
+                      isRead ? "opacity-60 hover:opacity-100" : ""
+                    }`}
                   >
                     <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.25em] text-muted-foreground/60">
                       <span className="text-indigo-300/70">
@@ -247,6 +287,15 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
                         <Clock size={10} className="opacity-60" />
                         {item.readTime} min
                       </span>
+                      {isRead && (
+                        <>
+                          <span className="h-1 w-1 rounded-full bg-border" />
+                          <span className="flex items-center gap-1 text-muted-foreground/50">
+                            <Check size={10} className="opacity-70" />
+                            Read
+                          </span>
+                        </>
+                      )}
                     </div>
                     <h3 className="font-serif text-lg italic leading-snug text-foreground/85 transition-colors group-hover:text-foreground">
                       {item.title}
@@ -257,7 +306,8 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
                       </p>
                     )}
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             </section>
           )}
@@ -305,7 +355,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
 
             {next && (
               <Link
-                href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
+                href={randomHref}
                 className="flex flex-1 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group touch-manipulation"
                 title="Surprise me — a random story in this mood"
               >
@@ -356,7 +406,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
           {/* Primary CTA — full width */}
           {next ? (
             <Link
-              href={`/story/${next.slug}?mood=${baseMood.toLowerCase()}`}
+              href={nextHref}
               className="w-full flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group touch-manipulation text-center"
             >
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
@@ -369,7 +419,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
             </Link>
           ) : (
             <Link
-              href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
+              href={randomHref}
               className="w-full flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group touch-manipulation text-center"
             >
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
