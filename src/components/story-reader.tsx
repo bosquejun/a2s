@@ -2,6 +2,7 @@
 
 import { useBrownNoise } from "@/hooks/use-brown-noise";
 import { useReadHistory } from "@/hooks/use-read-history";
+import { tagToSlug } from "@/lib/content/tags";
 import { StoryStats } from "@/components/story-stats";
 import { featureFlags } from "@/lib/feature-flags";
 import { Mood, MOOD_LABELS } from "@/lib/content/taxonomy";
@@ -156,7 +157,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
               {story.categories.map((category) => (
                 <Link
                   key={category}
-                  href={`/stories?category=${category.toLowerCase()}`}
+                  href={`/category/${category.toLowerCase()}`}
                   title={`More ${category.toLowerCase()} stories`}
                   className="px-4 py-2 rounded-full bg-gradient-to-br from-indigo-500/15 to-purple-500/10 border border-indigo-500/30 backdrop-blur-sm shadow-[0_2px_8px_rgba(99,102,241,0.1)] hover:border-indigo-500/40 transition-colors flex justify-center items-center"
                 >
@@ -248,7 +249,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
                   {story.tags.map((tag) => (
                     <Link
                       key={tag}
-                      href={`/stories?tag=${encodeURIComponent(tag)}`}
+                      href={`/tag/${tagToSlug(tag)}`}
                       title={`More stories tagged ${tag}`}
                       className="px-3 py-1.5 rounded-full bg-card/60 border border-border/50 backdrop-blur-sm hover:border-border hover:bg-card transition-all duration-200"
                     >

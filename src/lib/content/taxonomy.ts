@@ -97,6 +97,29 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   SURREAL: "Surreal",
 };
 
+/** Whispered subtitles paired with each category on its archive page. */
+export const CATEGORY_TAGLINES: Record<Category, string> = {
+  HORROR: "for the brave",
+  CONFESSION: "for the honest",
+  ROMANCE: "for the tender",
+  EXISTENTIAL: "for the searching",
+  SURREAL: "for the dreaming",
+};
+
+/** Longer descriptions for category archive pages and their metadata. */
+export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
+  HORROR:
+    "Dark, haunting narratives with teeth — for the nights you want to be scared.",
+  CONFESSION:
+    "Secrets told to the dark — the things people only admit after 2am.",
+  ROMANCE:
+    "Love, longing, and the people we can't put down — tender and aching.",
+  EXISTENTIAL:
+    "Slow, searching stories about meaning, time, and feeling small at night.",
+  SURREAL:
+    "Dreamlike, off-kilter tales where the ordinary rules of the night bend.",
+};
+
 /** Intensity scale shared by the writer/editor agents and the admin UI. */
 export const INTENSITY_LABELS: Record<number, string> = {
   1: "cozy / calming",

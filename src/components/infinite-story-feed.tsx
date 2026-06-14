@@ -13,10 +13,6 @@ interface InfiniteStoryFeedProps {
   total: number;
   /** Active mood filter (lowercase slug), forwarded to the server action. */
   mood?: string;
-  /** Active category filter (lowercase slug), forwarded to the server action. */
-  category?: string;
-  /** Active tag filter (raw value), forwarded to the server action. */
-  tag?: string;
   emptyMessage?: string;
 }
 
@@ -30,8 +26,6 @@ export function InfiniteStoryFeed({
   initialStories,
   total,
   mood,
-  category,
-  tag,
   emptyMessage = "No stories yet. The night is still young.",
 }: InfiniteStoryFeedProps) {
   const [stories, setStories] = useState(initialStories);
@@ -49,15 +43,13 @@ export function InfiniteStoryFeed({
     try {
       const { stories: next } = await loadMoreStories(stories.length, {
         mood,
-        category,
-        tag,
       });
       setStories((prev) => [...prev, ...next]);
     } finally {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [stories.length, mood, category, tag]);
+  }, [stories.length, mood]);
 
   useEffect(() => {
     if (!hasMore) return;
