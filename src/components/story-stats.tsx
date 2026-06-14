@@ -48,8 +48,6 @@ export function StoryStats({ slug, initialViews }: StoryStatsProps) {
     return () => controller.abort();
   }, [slug]);
 
-  if (views <= 0) return null;
-
   return (
     <>
       <div className="h-3 w-px bg-border/70" />

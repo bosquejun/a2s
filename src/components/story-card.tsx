@@ -51,12 +51,10 @@ export function StoryCard({ story }: { story: StorySummary }) {
           <Clock size={11} className="opacity-60" />
           {story.readTime} min
         </span>
-        {story.viewCount > 0 && (
-          <span className="flex items-center gap-1.5">
-            <Eye size={11} className="opacity-60" />
-            {story.viewCount.toLocaleString()}
-          </span>
-        )}
+        <span className="flex items-center gap-1.5">
+          <Eye size={11} className="opacity-60" />
+          {story.viewCount.toLocaleString()}
+        </span>
         {date && <span>{date}</span>}
       </div>
     </Link>
