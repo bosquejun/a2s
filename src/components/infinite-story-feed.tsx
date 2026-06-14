@@ -41,7 +41,9 @@ export function InfiniteStoryFeed({
     loadingRef.current = true;
     setLoading(true);
     try {
-      const { stories: next } = await loadMoreStories(stories.length, mood);
+      const { stories: next } = await loadMoreStories(stories.length, {
+        mood,
+      });
       setStories((prev) => [...prev, ...next]);
     } finally {
       loadingRef.current = false;

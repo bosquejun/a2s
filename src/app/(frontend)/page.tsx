@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { AmbientSound } from "@/components/ambient-sound";
 import { LandingPage } from "@/components/landing-page";
+import { MostReadStories } from "@/components/most-read-stories";
 import { NightGate } from "@/components/night-gate";
 import { RecentStories } from "@/components/recent-stories";
 import { SiteFooter } from "@/components/site-footer";
@@ -136,6 +137,11 @@ export default function Home() {
               </Link>
             </div>
           </section>
+
+          {/* Most read — a serendipity lane; self-hides until there's signal */}
+          <Suspense fallback={null}>
+            <MostReadStories limit={3} />
+          </Suspense>
 
           <SiteFooter />
 

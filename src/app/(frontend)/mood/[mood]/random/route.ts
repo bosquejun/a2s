@@ -1,5 +1,8 @@
 import { Mood, MOODS } from "@/lib/content/taxonomy";
-import { getRandomStoryByMood } from "@/lib/services/stories/get-random-story-by-mood";
+import {
+  getRandomStory,
+  getRandomStoryByMood,
+} from "@/lib/services/stories/get-random-story-by-mood";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -20,10 +23,16 @@ export async function GET(
   }
 
   try {
-    const story = await getRandomStoryByMood(mood, exclude);
+    // Prefer an unread story in the chosen mood; once that mood is exhausted,
+    // keep the reader moving with an unread story from any mood before finally
+    // dead-ending at the archive. The `exclude` list carries their read history.
+    const story =
+      (await getRandomStoryByMood(mood, exclude)) ??
+      (await getRandomStory(exclude));
 
     if (!story) {
-      // Nothing published for this mood yet — fall back to its archive.
+      // Nothing left to serve (everything read, or nothing published yet) —
+      // fall back to the mood archive.
       return NextResponse.redirect(
         new URL(`/mood/${mood.toLowerCase()}`, request.url),
         { status: 302 }

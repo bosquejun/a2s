@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { InfiniteStoryFeed } from "@/components/infinite-story-feed";
 import { StoryCardSkeleton } from "@/components/skeletons/story-card-skeleton";
-import { getPublishedStoriesPage } from "@/lib/services/stories/get-published-stories-page";
-import { MOODS, MOOD_LABELS, type Mood } from "@/lib/content/taxonomy";
+import {
+  getPublishedStoriesPage,
+  resolveStoryFilter,
+} from "@/lib/services/stories/get-published-stories-page";
+import { tagToSlug } from "@/lib/content/tags";
+import { MOODS, MOOD_LABELS } from "@/lib/content/taxonomy";
 import { absoluteUrl, SITE_NAME, SITE_KEYWORDS } from "@/lib/seo";
 import {
   breadcrumbList,
@@ -43,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ mood?: string }>;
+  searchParams: Promise<{ mood?: string; category?: string; tag?: string }>;
 }
 
 export default function StoriesPage({ searchParams }: PageProps) {
@@ -84,12 +89,15 @@ export default function StoriesPage({ searchParams }: PageProps) {
  * Components while this dynamic section streams.
  */
 async function StoriesList({ searchParams }: PageProps) {
-  const { mood } = await searchParams;
-  const requested = mood?.toUpperCase() as Mood | undefined;
-  const activeMood =
-    requested && MOODS.includes(requested) ? requested : undefined;
+  const filter = resolveStoryFilter(await searchParams);
 
-  const { stories, total } = await getPublishedStoriesPage(0, activeMood);
+  // Tag/category browsing has its own canonical, indexable pages — funnel any
+  // legacy ?tag=/?category= query URLs there so there's a single home per axis.
+  if (filter.tag) redirect(`/tag/${tagToSlug(filter.tag)}`);
+  if (filter.category) redirect(`/category/${filter.category.toLowerCase()}`);
+
+  const activeMood = filter.mood;
+  const { stories, total } = await getPublishedStoriesPage(0, filter);
 
   const jsonLd = {
     "@context": "https://schema.org",
