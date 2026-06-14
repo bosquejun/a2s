@@ -155,7 +155,7 @@ No numbers/emojis; optional single dot or underscore only.
   "categories": ["1–3 of the allowed category values"],
   "tags": ["1–5 lowercase tags"],
   "intensity": 1,
-  "author": "string, 1–100 chars (e.g. Anon or a quiet pseudonym)",
+  "author": "string, 1–100 chars — anonymous lowercase username per AUTHOR rules, e.g. quiet.hours (never literally \"Anon\")",
   "htmlBody": "<p>HTML-formatted story body</p>",
   "readTime": 1,
   "wordCount": 140,
