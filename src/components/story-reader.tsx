@@ -265,23 +265,27 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
       </div>
 
       <div className="fixed bottom-0 left-0 w-full p-3 sm:p-4 md:p-6 lg:p-10 pointer-events-none z-50 safe-area-inset-bottom">
-        <div className="py-2 max-w-5xl mx-auto flex flex-col gap-2.5 sm:gap-3 sm:flex-row sm:items-center sm:justify-between pointer-events-auto">
-          <div className="flex items-center justify-center sm:justify-start flex-wrap gap-2 sm:gap-2.5">
+        <div className="py-2 max-w-5xl mx-auto flex flex-col gap-2.5 sm:gap-3 pointer-events-auto">
+          {/* Secondary controls — labeled pills stretched across the full width */}
+          <div className="flex w-full items-center gap-2 sm:gap-2.5">
             <Link
               href="/"
-              className="p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
+              className="flex flex-1 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group touch-manipulation"
               title="Return Home"
             >
               <ArrowLeft
                 size={16}
-                className="sm:w-[18px] sm:h-[18px] group-hover:-translate-x-0.5 transition-transform"
+                className="shrink-0 group-hover:-translate-x-0.5 transition-transform"
               />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-semibold">
+                Home
+              </span>
             </Link>
 
             <button
               type="button"
               onClick={handleShare}
-              className={`p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border transition-all group relative shrink-0 touch-manipulation ${
+              className={`flex flex-1 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-full bg-card/40 backdrop-blur-xl border transition-all group touch-manipulation ${
                 isSharing
                   ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.15)]"
                   : "border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/20"
@@ -290,37 +294,41 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
             >
               <Share2
                 size={16}
-                className={`sm:w-[18px] sm:h-[18px] ${
+                className={`shrink-0 ${
                   isSharing ? "scale-90" : "group-hover:scale-110"
                 } transition-all duration-300 ease-out`}
               />
-              {isSharing ? (
-                <span className="absolute -top-11 sm:-top-12 left-1/2 -translate-x-1/2 px-2.5 sm:px-3 py-1 bg-emerald-500 text-white text-[9px] sm:text-[10px] uppercase tracking-widest rounded shadow-lg animate-fade-in whitespace-nowrap z-50">
-                  Link Copied
-                </span>
-              ) : null}
+              <span className="text-[10px] uppercase tracking-[0.2em] font-semibold">
+                {isSharing ? "Copied" : "Share"}
+              </span>
             </button>
 
             {next && (
               <Link
                 href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
-                className="p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
+                className="flex flex-1 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group touch-manipulation"
                 title="Surprise me — a random story in this mood"
               >
                 <Shuffle
                   size={16}
-                  className="sm:w-[18px] sm:h-[18px] group-hover:rotate-12 transition-transform"
+                  className="shrink-0 group-hover:rotate-12 transition-transform"
                 />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold">
+                  Random
+                </span>
               </Link>
             )}
 
             {featureFlags.whisper && (
               <Link
                 href="/write"
-                className="p-2.5 sm:p-3 md:p-4 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group shrink-0 touch-manipulation"
+                className="flex flex-1 items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-full bg-card/40 backdrop-blur-xl border border-border/50 text-muted-foreground hover:text-indigo-300 hover:border-indigo-500/30 transition-all group touch-manipulation"
                 title="Whisper a Story"
               >
-                <PenLine size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <PenLine size={16} className="shrink-0" />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold">
+                  Write
+                </span>
               </Link>
             )}
 
@@ -328,27 +336,28 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
               type="button"
               onClick={toggleNoise}
               aria-pressed={isNoiseEnabled}
-              className={`hidden md:flex items-center space-x-2 px-4 py-3 rounded-full backdrop-blur-xl border transition-all duration-700 shrink-0 ${
+              className={`hidden md:flex flex-1 items-center justify-center gap-2 px-4 py-3 rounded-full backdrop-blur-xl border transition-all duration-700 ${
                 isNoiseEnabled
                   ? "border-indigo-500/30 text-indigo-300 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.08)]"
                   : "border-border/50 text-muted-foreground/60 hover:text-muted-foreground bg-card/40"
               }`}
             >
               {isNoiseEnabled ? (
-                <Volume2 size={18} className="animate-pulse" />
+                <Volume2 size={18} className="shrink-0 animate-pulse" />
               ) : (
-                <VolumeX size={18} />
+                <VolumeX size={18} className="shrink-0" />
               )}
-              <span className="text-[10px] uppercase tracking-[0.3em] font-semibold">
+              <span className="text-[10px] uppercase tracking-[0.3em] font-semibold whitespace-nowrap">
                 {isNoiseEnabled ? "Noise Active" : "Noise Muted"}
               </span>
             </button>
           </div>
 
+          {/* Primary CTA — full width */}
           {next ? (
             <Link
               href={`/story/${next.slug}?mood=${baseMood.toLowerCase()}`}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
+              className="w-full flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group touch-manipulation text-center"
             >
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
                 Next story
@@ -361,7 +370,7 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
           ) : (
             <Link
               href={`/mood/${baseMood.toLowerCase()}/random?exclude=${encodeURIComponent(excludedSlugs)}`}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group shrink-0 touch-manipulation text-center"
+              className="w-full flex items-center justify-center space-x-2 sm:space-x-3 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 rounded-full bg-indigo-600 text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] transition-all transform active:scale-95 group touch-manipulation text-center"
             >
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] font-bold whitespace-nowrap">
                 Surprise me
