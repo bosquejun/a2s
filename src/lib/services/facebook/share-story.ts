@@ -14,7 +14,7 @@ import { clearConnection, getConnection } from "./connection";
  */
 function storyUrl(slug: string): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}/stories/${slug}`;
+  return `${base.replace(/\/$/, "")}/story/${slug}`;
 }
 
 export interface ShareResult {
