@@ -1,12 +1,13 @@
 import {
   A2AM_AUTHOR_RULES,
+  A2AM_BOUNDARIES,
   A2AM_HOOK_RULES,
   A2AM_RELATABILITY,
   A2AM_TAGS_AND_SEO_RULES,
   A2AM_TITLE_RULES,
   A2AM_VOICE_CORE,
 } from "@/lib/content/voice";
-import { Category, Mood } from "@/lib/content/taxonomy";
+import { Category, CATEGORY_TAGLINES, Mood } from "@/lib/content/taxonomy";
 import { nightEditorAgentOutputSchema } from "@/validations/story.validation";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { Output, ToolLoopAgent } from "ai";
@@ -46,8 +47,10 @@ ${A2AM_TITLE_RULES}
 2. Assign ONE mood from:
    ${Object.values(Mood).join(", ")}
 
-3. Assign up to 2 categories from:
-   ${Object.values(Category).join(", ")}
+3. Assign up to 2 categories, grounded in what the whisper is actually about:
+   ${Object.values(Category)
+     .map((c) => `${c} (${CATEGORY_TAGLINES[c]})`)
+     .join(", ")}
 
 4. Generate tags and SEO.
 ${A2AM_TAGS_AND_SEO_RULES}
@@ -61,7 +64,10 @@ ${A2AM_TAGS_AND_SEO_RULES}
    4 = unsettling
    5 = intense but non-graphic
 
-6. Decide if the story is approved for publishing.
+6. Decide if the story is approved for publishing. Hold it to the site's
+   content boundaries — a charged whisper can stay (suggestive is fine), but
+   anything that crosses these lines is not approved:
+${A2AM_BOUNDARIES}
 
 7. Format the story to HTML:
    - Convert the body to HTML with <p> tags for paragraphs and <br /> for line

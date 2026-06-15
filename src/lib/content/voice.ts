@@ -37,22 +37,57 @@ VOICE — write like a real person typing at 2am, not like an author.
  */
 export const A2AM_RELATABILITY = `
 RELATABILITY — make it feel like the reader's own 2am.
-- Every story must contain at least ONE hyper-specific, concrete detail of
-  modern life — the kind that makes a reader stop and think "this is me." A
-  precise small thing beats any grand statement. Specificity reads as true;
-  abstraction reads as machine-written.
-- Draw texture from the real emotional vocabulary of being young and online
-  late at night (use sparingly, never as a checklist, never all at once):
-  a message left on read; the typing bubble that appears and disappears; the
-  "active 2h ago"; the contact you can't bring yourself to delete; a draft
-  rewritten four times and never sent; doomscrolling past someone's story; the
-  gap between the version of you online and the one in the dark; muting instead
-  of unfollowing; a screenshot of an old conversation; the 3am job application;
-  the quiet of a group chat that used to be loud.
+- Every story must contain at least ONE hyper-specific, concrete detail — the
+  kind that makes a reader stop and think "this is me." A precise small thing
+  beats any grand statement. Specificity reads as true; abstraction reads as
+  machine-written. The detail should come from the story's own world (an office
+  drawer, a sibling's voicemail, the smell of someone's jacket), not a default
+  phone screen pasted onto every piece.
+- Digital-loneliness texture is ONE palette — strong for solitary, longing, and
+  confession stories, but do not force a phone into every story. Draw from it
+  sparingly, never as a checklist, never all at once: a message left on read;
+  the typing bubble that appears and disappears; the "active 2h ago"; the
+  contact you can't bring yourself to delete; a draft rewritten four times and
+  never sent; doomscrolling past someone's story; the gap between the version of
+  you online and the one in the dark; muting instead of unfollowing; a
+  screenshot of an old conversation; the 3am job application; the quiet of a
+  group chat that used to be loud. Other categories carry their own textures
+  (see RANGE).
 - Reference the feeling, not the brand. Name behaviours and textures, not
   trend-words or app names that will date in a year. It should still read true
   in five years.
 - No slang cosplay. Don't perform "Gen Z voice." Authentic beats current.
+`.trim();
+
+/**
+ * The range layer. The single biggest lever against sameness — it pushes
+ * stories out of the one default scene (alone in bed, scrolling, missing an ex)
+ * and gives each category a distinct flavor and texture.
+ */
+export const A2AM_RANGE = `
+RANGE — vary the world, not just the mood.
+- The biggest failure mode is sameness: every story a person alone in bed at
+  2am, scrolling a phone, missing an ex. That is ONE story. Do not default to
+  it. Vary the situation, the cast, and the room.
+- Move stories out of the bedroom. Use the late shift, the office after everyone
+  has gone, a family kitchen, a car in a parking lot, a bar at closing, a
+  hospital corridor, a stairwell, a wedding you couldn't sleep after.
+- Vary who else is in it. Not every story is about a romantic ex. Write
+  coworkers, siblings, parents, old friends, a stranger, a boss, the person in
+  the next bed — or genuinely no one.
+- Let the chosen category set the flavor, and lean into what makes each
+  distinct:
+  · HORROR — grounded dread; the ordinary thing that's slightly, quietly wrong.
+  · CONFESSION — the admission you'd never say with the lights on.
+  · ROMANCE — tenderness and longing; the ache of caring about someone.
+  · EXISTENTIAL — meaning, time, smallness; the 3am "why."
+  · SURREAL — the night bending just slightly out of true.
+  · WORKPLACE — office confessions: the coworker thing, the email you shouldn't
+    have sent, the favoritism, quitting in your head on the night shift.
+  · DESIRE — charged, sensual tension and wanting (stay within BOUNDARIES).
+  · SPITE — grudges, pettiness, the unhinged little revenge you'd never act on.
+  · TIES — family and friendship bonds: estranged siblings, fading friends, the
+    family group chat, the friend you quietly outgrew.
 `.trim();
 
 /** What the story itself is and how it's shaped. */
@@ -73,6 +108,26 @@ THE STORY
   graphic.
 - Length: roughly 120–320 words. Short enough to read on a phone in one sitting,
   long enough to land.
+`.trim();
+
+/**
+ * Content boundaries. Lets DESIRE run hot while keeping every category within a
+ * tasteful, platform-safe line — heat and dread come from restraint, not detail.
+ */
+export const A2AM_BOUNDARIES = `
+BOUNDARIES — heat and dread without crossing the line.
+- DESIRE and any charged story stay suggestive, never explicit. Live in the
+  tension: longing, implication, the moment before or the morning after. A hand
+  that stays a second too long; the text you reread; what almost happened; what
+  you can't stop thinking about. Imply, fade out, stop short. Never describe
+  sexual acts or anatomy. The heat comes from restraint and specificity, not
+  from detail.
+- HORROR and SPITE stay grounded and non-graphic. No gore, no described
+  violence, no cruelty for its own sake. The unease is psychological.
+- Hard lines, every category: nothing sexual involving minors, nothing
+  involving non-consent, and no real, identifiable people. Intensity scales how
+  far the restraint bends (see the intensity levels) but never unlocks graphic
+  content.
 `.trim();
 
 /** Title rules — a quiet label, never a headline. */
@@ -126,7 +181,9 @@ SEO (quiet, grounded, non-clickbait):
 export const A2AM_VOICE_SPEC = [
   A2AM_VOICE_CORE,
   A2AM_RELATABILITY,
+  A2AM_RANGE,
   A2AM_STORY_RULES,
+  A2AM_BOUNDARIES,
   A2AM_TITLE_RULES,
   A2AM_HOOK_RULES,
   A2AM_AUTHOR_RULES,

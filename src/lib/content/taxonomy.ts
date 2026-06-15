@@ -27,6 +27,10 @@ export const CATEGORIES = [
   "ROMANCE",
   "EXISTENTIAL",
   "SURREAL",
+  "WORKPLACE",
+  "DESIRE",
+  "SPITE",
+  "TIES",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -95,6 +99,10 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   ROMANCE: "Romance",
   EXISTENTIAL: "Existential",
   SURREAL: "Surreal",
+  WORKPLACE: "Workplace",
+  DESIRE: "Desire",
+  SPITE: "Spite",
+  TIES: "Ties",
 };
 
 /** Whispered subtitles paired with each category on its archive page. */
@@ -104,6 +112,10 @@ export const CATEGORY_TAGLINES: Record<Category, string> = {
   ROMANCE: "for the tender",
   EXISTENTIAL: "for the searching",
   SURREAL: "for the dreaming",
+  WORKPLACE: "for the clocked-in",
+  DESIRE: "for the wanting",
+  SPITE: "for the unforgiving",
+  TIES: "for the bonded",
 };
 
 /** Longer descriptions for category archive pages and their metadata. */
@@ -118,6 +130,14 @@ export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
     "Slow, searching stories about meaning, time, and feeling small at night.",
   SURREAL:
     "Dreamlike, off-kilter tales where the ordinary rules of the night bend.",
+  WORKPLACE:
+    "Office confessions and the quiet wars of work — the things we only admit once the building's empty.",
+  DESIRE:
+    "Charged, kept-awake-by-someone stories — longing and tension drawn out, suggested, never spelled out.",
+  SPITE:
+    "Grudges, pettiness, and the unhinged little revenge fantasies that only surface long after midnight.",
+  TIES:
+    "Family, old friends, and the people we grew apart from — the bonds that aren't romance but still keep us up.",
 };
 
 /** Intensity scale shared by the writer/editor agents and the admin UI. */
