@@ -21,7 +21,7 @@ function fakePayload(overrides = {}) {
     findByID: vi.fn().mockResolvedValue(story),
     update: vi.fn().mockResolvedValue({}),
     ...overrides,
-  } as never;
+  } as unknown as import("payload").Payload;
 }
 
 const connected = {

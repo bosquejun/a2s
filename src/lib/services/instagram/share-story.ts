@@ -68,7 +68,11 @@ export async function shareStoryToInstagram(
       igUserId: connection.instagramUserId,
       pageAccessToken: connection.pageAccessToken,
       imageUrl: igImageUrl(story.slug),
-      caption: buildInstagramCaption(story),
+      caption: buildInstagramCaption({
+        hook: typeof story.hook === "string" ? story.hook : null,
+        excerpt: typeof story.excerpt === "string" ? story.excerpt : null,
+        title: String(story.title ?? ""),
+      }),
     });
     const postId = await publishMedia({
       igUserId: connection.instagramUserId,
