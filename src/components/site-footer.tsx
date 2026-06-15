@@ -33,6 +33,18 @@ export function SiteFooter() {
           >
             About
           </Link>
+          <Link
+            href="/privacy"
+            className="transition-colors hover:text-foreground/80"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="transition-colors hover:text-foreground/80"
+          >
+            Terms
+          </Link>
           {featureFlags.whisper && (
             <Link
               href="/write"
