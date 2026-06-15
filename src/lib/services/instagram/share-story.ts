@@ -4,21 +4,31 @@ import type { Payload } from "payload";
 
 import { FacebookGraphError } from "@/lib/services/facebook/client";
 import { clearConnection, getConnection } from "@/lib/services/facebook/connection";
+import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
 import { createMediaContainer, publishMedia } from "./client";
 
 const LINK_IN_BIO = "Read the full story — link in bio 🔗";
 
+/** Instagram favours more hashtags for discovery than Facebook. */
+const INSTAGRAM_HASHTAG_LIMIT = 10;
+
 /**
  * Instagram captions cannot contain clickable links, so the caption leads with
- * the story's social hook (or excerpt/title) and points readers to the bio.
+ * the story's social hook (or excerpt/title), points readers to the bio, and
+ * closes with taxonomy-derived hashtags for discovery.
  */
-export function buildInstagramCaption(story: {
-  hook?: string | null;
-  excerpt?: string | null;
-  title: string;
-}): string {
+export function buildInstagramCaption(
+  story: {
+    hook?: string | null;
+    excerpt?: string | null;
+    title: string;
+  },
+  hashtags?: string
+): string {
   const lead = story.hook || story.excerpt || story.title;
-  return `${lead}\n\n${LINK_IN_BIO}`;
+  const parts = [lead, LINK_IN_BIO];
+  if (hashtags) parts.push(hashtags);
+  return parts.join("\n\n");
 }
 
 function igImageUrl(slug: string): string {
@@ -44,7 +54,7 @@ export async function shareStoryToInstagram(
   const story = await payload.findByID({
     collection: "stories",
     id: storyId,
-    depth: 0,
+    depth: 1,
     overrideAccess: true,
   });
   if (!story) throw new Error("Story not found");
@@ -68,11 +78,20 @@ export async function shareStoryToInstagram(
       igUserId: connection.instagramUserId,
       pageAccessToken: connection.pageAccessToken,
       imageUrl: igImageUrl(story.slug),
-      caption: buildInstagramCaption({
-        hook: typeof story.hook === "string" ? story.hook : null,
-        excerpt: typeof story.excerpt === "string" ? story.excerpt : null,
-        title: String(story.title ?? ""),
-      }),
+      caption: buildInstagramCaption(
+        {
+          hook: typeof story.hook === "string" ? story.hook : null,
+          excerpt: typeof story.excerpt === "string" ? story.excerpt : null,
+          title: String(story.title ?? ""),
+        },
+        buildHashtags(
+          {
+            categories: extractNames(story.categories),
+            tags: extractNames(story.tags),
+          },
+          INSTAGRAM_HASHTAG_LIMIT
+        )
+      ),
     });
     const postId = await publishMedia({
       igUserId: connection.instagramUserId,

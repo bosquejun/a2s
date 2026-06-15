@@ -2,8 +2,12 @@ import "server-only";
 
 import type { Payload } from "payload";
 
+import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
 import { FacebookGraphError, postToPage } from "./client";
 import { clearConnection, getConnection } from "./connection";
+
+/** Hashtags carry less discovery weight on Facebook, so keep the set tight. */
+const FACEBOOK_HASHTAG_LIMIT = 4;
 
 /**
  * Shared by the manual "Share to Facebook" button and the auto-post hook. Posts
@@ -29,7 +33,7 @@ export async function shareStory(
   const story = await payload.findByID({
     collection: "stories",
     id: storyId,
-    depth: 0,
+    depth: 1,
     overrideAccess: true,
   });
   if (!story) throw new Error("Story not found");
@@ -42,7 +46,15 @@ export async function shareStory(
     throw new Error("No Facebook Page is connected.");
   }
 
-  const message = story.hook || story.excerpt || story.title;
+  const lead = story.hook || story.excerpt || story.title;
+  const hashtags = buildHashtags(
+    {
+      categories: extractNames(story.categories),
+      tags: extractNames(story.tags),
+    },
+    FACEBOOK_HASHTAG_LIMIT
+  );
+  const message = hashtags ? `${lead}\n\n${hashtags}` : lead;
 
   try {
     const postId = await postToPage({
