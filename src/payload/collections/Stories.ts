@@ -6,6 +6,7 @@ import {
 } from "../../lib/content/taxonomy";
 import { enrichStory } from "../hooks/enrich-story";
 import { publishToFacebook } from "../hooks/publish-to-facebook";
+import { publishToInstagram } from "../hooks/publish-to-instagram";
 import { revalidateStory, revalidateStoryDelete } from "../hooks/revalidate";
 
 export const Stories: CollectionConfig = {
@@ -30,7 +31,7 @@ export const Stories: CollectionConfig = {
   },
   hooks: {
     beforeChange: [enrichStory],
-    afterChange: [revalidateStory, publishToFacebook],
+    afterChange: [revalidateStory, publishToFacebook, publishToInstagram],
     afterDelete: [revalidateStoryDelete],
   },
   fields: [
@@ -165,6 +166,35 @@ export const Stories: CollectionConfig = {
         position: "sidebar",
         components: {
           Field: "/components/admin/FacebookShareButton#FacebookShareButton",
+        },
+      },
+    },
+    {
+      name: "autoPostToInstagram",
+      type: "checkbox",
+      defaultValue: true,
+      admin: {
+        position: "sidebar",
+        description: "Post to the connected Instagram account when published.",
+      },
+    },
+    {
+      name: "instagramPostId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: "Set automatically after the story is posted to Instagram.",
+      },
+    },
+    {
+      name: "shareToInstagram",
+      type: "ui",
+      admin: {
+        position: "sidebar",
+        components: {
+          Field:
+            "/components/admin/InstagramShareButton#InstagramShareButton",
         },
       },
     },
