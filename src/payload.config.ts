@@ -36,6 +36,7 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URL || "" },
+    migrationDir: path.resolve(dirname, "migrations"),
   }),
   sharp,
   // Payload's REST/GraphQL live under /payload-api so they don't collide with
