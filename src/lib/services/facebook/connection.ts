@@ -3,6 +3,7 @@ import "server-only";
 import type { Payload } from "payload";
 
 import { decryptToken, encryptToken } from "./crypto";
+import { getInstagramUserId } from "@/lib/services/instagram/client";
 
 /**
  * Read/write helpers for the stored Facebook connection (the `facebook-connection`
@@ -21,6 +22,7 @@ export interface StoredConnection {
   userName: string | null;
   pageAccessToken: string | null; // decrypted
   connectedAt: string | null;
+  instagramUserId: string | null;
 }
 
 export async function getConnection(payload: Payload): Promise<StoredConnection> {
@@ -37,6 +39,7 @@ export async function getConnection(payload: Payload): Promise<StoredConnection>
     userName: global?.userName ?? null,
     pageAccessToken: decryptToken(global?.pageAccessToken ?? null),
     connectedAt: global?.connectedAt ?? null,
+    instagramUserId: global?.instagramUserId ?? null,
   };
 }
 
@@ -49,6 +52,13 @@ export async function saveConnection(
     pageAccessToken: string;
   }
 ): Promise<void> {
+  let instagramUserId: string | null = null;
+  try {
+    instagramUserId = await getInstagramUserId(data.pageId, data.pageAccessToken);
+  } catch {
+    instagramUserId = null;
+  }
+
   await payload.updateGlobal({
     slug: GLOBAL_SLUG,
     overrideAccess: true,
@@ -59,6 +69,7 @@ export async function saveConnection(
       userName: data.userName ?? null,
       pageAccessToken: encryptToken(data.pageAccessToken),
       userAccessToken: null,
+      instagramUserId,
       connectedAt: new Date().toISOString(),
     },
   });
@@ -75,6 +86,7 @@ export async function clearConnection(payload: Payload): Promise<void> {
       userName: null,
       pageAccessToken: null,
       userAccessToken: null,
+      instagramUserId: null,
       connectedAt: null,
     },
   });
