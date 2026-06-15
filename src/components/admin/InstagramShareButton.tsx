@@ -30,18 +30,10 @@ export function InstagramShareButton() {
   }
 
   if (postId) {
-    return (
-      <div>
-        <p style={{ marginBottom: "0.25rem" }}>✓ Shared to Instagram</p>
-        <a
-          href={`https://www.instagram.com/p/${postId}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          View post
-        </a>
-      </div>
-    );
+    // The publish call returns an Instagram media id, not the URL shortcode, so
+    // there is no reliable public permalink to build from it here. Show the
+    // confirmation only rather than a link that would 404.
+    return <p>✓ Shared to Instagram</p>;
   }
 
   async function share() {
