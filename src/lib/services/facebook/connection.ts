@@ -55,7 +55,26 @@ export async function saveConnection(
   let instagramUserId: string | null = null;
   try {
     instagramUserId = await getInstagramUserId(data.pageId, data.pageAccessToken);
-  } catch {
+    if (!instagramUserId) {
+      payload.logger.warn(
+        { pageId: data.pageId },
+        "[instagram] no instagram_business_account linked to Page on connect — " +
+          "ensure the Instagram account is Business/Creator, linked to this Page, " +
+          "and that instagram_basic was granted"
+      );
+    } else {
+      payload.logger.info(
+        { pageId: data.pageId, instagramUserId },
+        "[instagram] discovered linked Instagram account on connect"
+      );
+    }
+  } catch (err) {
+    // Discovery must never break the Facebook connection, but log why it failed
+    // so a missing scope / Graph error is debuggable rather than a silent null.
+    payload.logger.error(
+      { err, pageId: data.pageId },
+      "[instagram] failed to discover linked Instagram account on connect"
+    );
     instagramUserId = null;
   }
 
