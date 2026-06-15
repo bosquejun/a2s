@@ -44,6 +44,15 @@ export const FacebookConnection: GlobalConfig = {
       admin: { readOnly: true },
     },
     {
+      name: "instagramUserId",
+      type: "text",
+      admin: {
+        readOnly: true,
+        description:
+          "Instagram business account linked to the connected Page (auto-detected).",
+      },
+    },
+    {
       name: "userName",
       type: "text",
       admin: {

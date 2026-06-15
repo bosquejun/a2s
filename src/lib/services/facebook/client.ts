@@ -15,6 +15,8 @@ export const FACEBOOK_SCOPES = [
   "pages_show_list",
   "pages_manage_posts",
   "pages_read_engagement",
+  "instagram_basic",
+  "instagram_content_publish",
 ];
 
 export class FacebookGraphError extends Error {
