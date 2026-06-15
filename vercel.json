@@ -1,1 +1,3 @@
-{}
+{
+  "buildCommand": "pnpm payload migrate && pnpm build"
+}

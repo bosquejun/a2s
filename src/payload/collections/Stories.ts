@@ -5,6 +5,7 @@ import {
   toSelectOptions,
 } from "../../lib/content/taxonomy";
 import { enrichStory } from "../hooks/enrich-story";
+import { publishToFacebook } from "../hooks/publish-to-facebook";
 import { revalidateStory, revalidateStoryDelete } from "../hooks/revalidate";
 
 export const Stories: CollectionConfig = {
@@ -29,7 +30,7 @@ export const Stories: CollectionConfig = {
   },
   hooks: {
     beforeChange: [enrichStory],
-    afterChange: [revalidateStory],
+    afterChange: [revalidateStory, publishToFacebook],
     afterDelete: [revalidateStoryDelete],
   },
   fields: [
@@ -138,6 +139,34 @@ export const Stories: CollectionConfig = {
       type: "relationship",
       relationTo: "story-requests",
       admin: { position: "sidebar", readOnly: true },
+    },
+    {
+      name: "autoPostToFacebook",
+      type: "checkbox",
+      defaultValue: true,
+      admin: {
+        position: "sidebar",
+        description: "Post to the connected Facebook Page when published.",
+      },
+    },
+    {
+      name: "facebookPostId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: "Set automatically after the story is posted to Facebook.",
+      },
+    },
+    {
+      name: "shareToFacebook",
+      type: "ui",
+      admin: {
+        position: "sidebar",
+        components: {
+          Field: "/components/admin/FacebookShareButton#FacebookShareButton",
+        },
+      },
     },
   ],
 };
