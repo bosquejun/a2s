@@ -1,6 +1,7 @@
 import { StoryReaderSkeleton } from "@/components/skeletons/story-reader-skeleton";
 import { StoryReader } from "@/components/story-reader";
 import type { Category } from "@/lib/content/taxonomy";
+import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { getStoryNeighbors } from "@/lib/services/stories/get-story-neighbors";
 import { Story } from "@/lib/types";
@@ -68,6 +69,22 @@ function buildStoryMetadata(story: Story): Metadata {
       canonical: url,
     },
   };
+}
+
+// Cap how many story pages get prerendered at build time. Newest stories are
+// prerendered to static HTML (instant, CDN-served); any beyond the cap — and
+// stories published later — render on demand the first time, then cache.
+// Defaults to 200; set STORY_PRERENDER_LIMIT=0 to prerender every published story.
+const parsedLimit = Number(process.env.STORY_PRERENDER_LIMIT ?? 200);
+// Fall back to the default on a non-numeric value so a typo doesn't silently
+// prerender the entire catalog. Only an explicit 0 means "all".
+const STORY_PRERENDER_LIMIT = Number.isFinite(parsedLimit) ? parsedLimit : 200;
+
+export async function generateStaticParams() {
+  const stories = await getAllPublishedStories(
+    STORY_PRERENDER_LIMIT > 0 ? STORY_PRERENDER_LIMIT : undefined
+  );
+  return stories.map((story) => ({ slug: story.slug }));
 }
 
 export async function generateMetadata({
