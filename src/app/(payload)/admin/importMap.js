@@ -31,6 +31,8 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 import { FacebookConnectButton as FacebookConnectButton_facebook } from '../../../components/admin/FacebookConnectButton'
 import { FacebookShareButton as FacebookShareButton_facebook } from '../../../components/admin/FacebookShareButton'
 import { InstagramShareButton as InstagramShareButton_instagram } from '../../../components/admin/InstagramShareButton'
+import { XConnectButton as XConnectButton_x } from '../../../components/admin/XConnectButton'
+import { XShareButton as XShareButton_x } from '../../../components/admin/XShareButton'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -66,5 +68,7 @@ export const importMap = {
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "/components/admin/FacebookConnectButton#FacebookConnectButton": FacebookConnectButton_facebook,
   "/components/admin/FacebookShareButton#FacebookShareButton": FacebookShareButton_facebook,
-  "/components/admin/InstagramShareButton#InstagramShareButton": InstagramShareButton_instagram
+  "/components/admin/InstagramShareButton#InstagramShareButton": InstagramShareButton_instagram,
+  "/components/admin/XConnectButton#XConnectButton": XConnectButton_x,
+  "/components/admin/XShareButton#XShareButton": XShareButton_x
 }

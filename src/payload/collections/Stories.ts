@@ -7,6 +7,7 @@ import {
 import { enrichStory } from "../hooks/enrich-story";
 import { publishToFacebook } from "../hooks/publish-to-facebook";
 import { publishToInstagram } from "../hooks/publish-to-instagram";
+import { publishToX } from "../hooks/publish-to-x";
 import { revalidateStory, revalidateStoryDelete } from "../hooks/revalidate";
 
 export const Stories: CollectionConfig = {
@@ -31,7 +32,12 @@ export const Stories: CollectionConfig = {
   },
   hooks: {
     beforeChange: [enrichStory],
-    afterChange: [revalidateStory, publishToFacebook, publishToInstagram],
+    afterChange: [
+      revalidateStory,
+      publishToFacebook,
+      publishToInstagram,
+      publishToX,
+    ],
     afterDelete: [revalidateStoryDelete],
   },
   fields: [
@@ -184,7 +190,8 @@ export const Stories: CollectionConfig = {
       admin: {
         position: "sidebar",
         readOnly: true,
-        description: "Set automatically after the story is posted to Instagram.",
+        description:
+          "Set automatically after the story is posted to Instagram.",
       },
     },
     {
@@ -193,8 +200,35 @@ export const Stories: CollectionConfig = {
       admin: {
         position: "sidebar",
         components: {
-          Field:
-            "/components/admin/InstagramShareButton#InstagramShareButton",
+          Field: "/components/admin/InstagramShareButton#InstagramShareButton",
+        },
+      },
+    },
+    {
+      name: "autoPostToX",
+      type: "checkbox",
+      defaultValue: true,
+      admin: {
+        position: "sidebar",
+        description: "Post to the connected X account when published.",
+      },
+    },
+    {
+      name: "xPostId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: "Set automatically after the story is posted to X.",
+      },
+    },
+    {
+      name: "shareToX",
+      type: "ui",
+      admin: {
+        position: "sidebar",
+        components: {
+          Field: "/components/admin/XShareButton#XShareButton",
         },
       },
     },
