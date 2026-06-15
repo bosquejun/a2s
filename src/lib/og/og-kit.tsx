@@ -133,7 +133,6 @@ export async function storyOgImage(story: Story | null) {
               fontSize: "52px",
               fontStyle: "italic",
               color: OG_COLORS.title,
-              zIndex: 1,
             }}
           >
             {BRAND}
@@ -179,7 +178,6 @@ export async function storyOgImage(story: Story | null) {
             alignItems: "center",
             justifyContent: "center",
             gap: "30px",
-            zIndex: 1,
             maxWidth: "940px",
             textAlign: "center",
           }}
@@ -225,7 +223,6 @@ export async function storyOgImage(story: Story | null) {
             flexDirection: "row",
             alignItems: "flex-end",
             justifyContent: "space-between",
-            zIndex: 1,
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -328,7 +325,6 @@ export async function pageOgImage({
             flexDirection: "column",
             alignItems: "center",
             gap: "30px",
-            zIndex: 1,
             textAlign: "center",
             maxWidth: "960px",
           }}
@@ -390,7 +386,6 @@ export async function pageOgImage({
             color: OG_COLORS.faint,
             textTransform: "uppercase",
             letterSpacing: "0.32em",
-            zIndex: 1,
           }}
         >
           {DOMAIN}
@@ -436,7 +431,6 @@ export async function siteOgImage() {
             flexDirection: "column",
             alignItems: "center",
             gap: "34px",
-            zIndex: 1,
             textAlign: "center",
           }}
         >
@@ -482,7 +476,6 @@ export async function siteOgImage() {
             color: OG_COLORS.faint,
             textTransform: "uppercase",
             letterSpacing: "0.32em",
-            zIndex: 1,
           }}
         >
           after2amstories.com
