@@ -14,6 +14,9 @@ export default function robots(): MetadataRoute.Robots {
           "/track/",
           "/write",
           "/create",
+          // Serendipity endpoint: a no-store 302 to a random story. Crawling it
+          // wastes budget and risks treating the redirect as duplicate content.
+          "/mood/*/random",
         ],
       },
     ],
