@@ -36,8 +36,11 @@ the endpoint rejects anything off-shape.
 3. **Choose 3–5 distinct combinations.** Pick mood × category pairs that are
    *not* heavily represented in the recent list (step 1), weighted toward what
    performs (step 2). Vary intensity across the batch. Vary the *entry point*
-   too (see voice rules) so the batch doesn't all open the same way. Avoid
-   repeating recent titles or premises.
+   and *the world* too (see the **Range** voice rules) so the batch doesn't all
+   open the same way or take place in the same room — push beyond the lonely
+   person scrolling in bed. Reach across the full category set, including
+   `WORKPLACE`, `DESIRE`, `SPITE`, and `TIES`, not just horror/confession.
+   Avoid repeating recent titles or premises.
 
 4. **Write each story** following the voice rules and output schema below.
 
@@ -59,7 +62,7 @@ the endpoint rejects anything off-shape.
 
 **mood** (exactly one): `CANT_SLEEP`, `DARK`, `MISS_SOMEONE`, `EMPTY`, `REFLECTIVE`, `UNSETTLING`
 
-**categories** (1–3 of): `HORROR`, `CONFESSION`, `ROMANCE`, `EXISTENTIAL`, `SURREAL`
+**categories** (1–3 of): `HORROR`, `CONFESSION`, `ROMANCE`, `EXISTENTIAL`, `SURREAL`, `WORKPLACE`, `DESIRE`, `SPITE`, `TIES`
 
 **intensity** (1–5):
 - 1 = cozy / calming
@@ -99,6 +102,31 @@ the endpoint rejects anything off-shape.
 - Reference the feeling, not the brand. Name behaviours and textures, not
   trend-words or app names that will date in a year. No slang cosplay — don't
   perform "Gen Z voice." Authentic beats current.
+- Digital-loneliness texture is ONE palette — strong for solitary/longing/
+  confession stories, but don't force a phone into every story. Other categories
+  carry their own textures (see **Range**).
+
+**Range — vary the world, not just the mood.**
+- The biggest failure mode is sameness: every story a person alone in bed at
+  2am, scrolling a phone, missing an ex. That is ONE story. Don't default to it.
+  Vary the situation, the cast, and the room across the batch.
+- Move stories out of the bedroom: the late shift, the office after everyone's
+  gone, a family kitchen, a car in a parking lot, a bar at closing, a hospital
+  corridor, a stairwell, a wedding you couldn't sleep after.
+- Vary who else is in it: coworkers, siblings, parents, old friends, a stranger,
+  a boss, the person in the next bed — or genuinely no one. Not always an ex.
+- Let the category set the flavor:
+  - `HORROR` — grounded dread; the ordinary thing that's quietly wrong.
+  - `CONFESSION` — the admission you'd never say with the lights on.
+  - `ROMANCE` — tenderness and longing; the ache of caring about someone.
+  - `EXISTENTIAL` — meaning, time, smallness; the 3am "why."
+  - `SURREAL` — the night bending just slightly out of true.
+  - `WORKPLACE` — office confessions: the coworker thing, the email you
+    shouldn't have sent, favoritism, quitting in your head on the night shift.
+  - `DESIRE` — charged, sensual tension and wanting (stay within **Boundaries**).
+  - `SPITE` — grudges, pettiness, the unhinged little revenge you'd never act on.
+  - `TIES` — family and friendship: estranged siblings, fading friends, the
+    family group chat, the friend you quietly outgrew.
 
 **The STORY:**
 - Takes place after 2am, or in its emotional aftermath. The register is
@@ -115,6 +143,18 @@ the endpoint rejects anything off-shape.
 - Apply the chosen intensity level honestly. Restraint scales with it; never go
   graphic.
 - Length: roughly 120–320 words.
+
+**Boundaries — heat and dread without crossing the line.**
+- `DESIRE` and any charged story stay suggestive, never explicit. Live in the
+  tension: longing, implication, the moment before or the morning after. A hand
+  that stays a second too long; the text you reread; what almost happened. Imply,
+  fade out, stop short. Never describe sexual acts or anatomy — the heat comes
+  from restraint and specificity, not detail.
+- `HORROR` and `SPITE` stay grounded and non-graphic. No gore, no described
+  violence, no cruelty for its own sake. The unease is psychological.
+- Hard lines, every category: nothing sexual involving minors, nothing involving
+  non-consent, no real identifiable people. Intensity bends the restraint but
+  never unlocks graphic content.
 
 **The TITLE:**
 - Max 6 words. Specific and concrete.
