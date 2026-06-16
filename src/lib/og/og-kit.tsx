@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { CATEGORY_ACCENTS } from "@/lib/content/taxonomy";
 import type { Story } from "@/lib/types";
 
 /**
@@ -18,8 +19,23 @@ export const OG_COLORS = {
   faint: "#54546a",
 };
 
-/** Dark, violet-tinted backdrop with soft glows + edge vignette. */
-export function OgBackdrop() {
+/** Convert a `#rrggbb` hex string into an `rgba(...)` string at the given alpha. */
+function rgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * Dark, glow-tinted backdrop with soft corner glows + edge vignette. Defaults to
+ * the brand violet; pass `accent` (a `#rrggbb` hex) to tint the glows per
+ * section, e.g. for a category card.
+ */
+export function OgBackdrop({ accent }: { accent?: string } = {}) {
+  const glow1 = accent ? rgba(accent, 0.22) : "rgba(99,102,241,0.20)";
+  const glow2 = accent ? rgba(accent, 0.15) : "rgba(139,92,246,0.16)";
   return (
     <div
       style={{
@@ -28,8 +44,8 @@ export function OgBackdrop() {
         height: "100%",
         backgroundColor: OG_COLORS.base,
         backgroundImage:
-          "radial-gradient(900px circle at 18% 22%, rgba(99,102,241,0.20) 0%, transparent 55%)," +
-          "radial-gradient(900px circle at 85% 88%, rgba(139,92,246,0.16) 0%, transparent 55%)," +
+          `radial-gradient(900px circle at 18% 22%, ${glow1} 0%, transparent 55%),` +
+          `radial-gradient(900px circle at 85% 88%, ${glow2} 0%, transparent 55%),` +
           "radial-gradient(1200px circle at 50% 50%, transparent 60%, rgba(0,0,0,0.55) 100%)",
         display: "flex",
       }}
@@ -149,6 +165,11 @@ export async function storyOgImage(story: Story | null) {
   const rawHook = story.hook || story.excerpt || "";
   const hook = rawHook.length > 140 ? rawHook.substring(0, 137) + "…" : rawHook;
   const eyebrow = [story.mood, story.categories[0]].filter(Boolean).join("  ·  ");
+  // Tint the card to the story's primary category, so a horror piece glows
+  // crimson and a romance one glows rose. Falls back to the brand violet.
+  const accent = story.categories[0]
+    ? CATEGORY_ACCENTS[story.categories[0]]
+    : undefined;
 
   const fonts = await loadOgFonts(
     `${title}${hook}${story.author ?? ""}…·`,
@@ -169,7 +190,7 @@ export async function storyOgImage(story: Story | null) {
           padding: "90px",
         }}
       >
-        <OgBackdrop />
+        <OgBackdrop accent={accent} />
 
         <div
           style={{
@@ -188,8 +209,8 @@ export async function storyOgImage(story: Story | null) {
             style={{
               width: "72px",
               height: "2px",
-              backgroundColor: OG_COLORS.accent,
-              opacity: 0.5,
+              backgroundColor: accent ?? OG_COLORS.accent,
+              opacity: accent ? 0.7 : 0.5,
               display: "flex",
             }}
           />
@@ -291,10 +312,13 @@ export async function pageOgImage({
   title,
   subtitle,
   eyebrow = BRAND,
+  accent,
 }: {
   title: string;
   subtitle?: string;
   eyebrow?: string;
+  /** Optional `#rrggbb` accent that tints the backdrop glow and the rule. */
+  accent?: string;
 }) {
   const fonts = await loadOgFonts(
     title,
@@ -317,7 +341,7 @@ export async function pageOgImage({
           padding: "90px",
         }}
       >
-        <OgBackdrop />
+        <OgBackdrop accent={accent} />
 
         <div
           style={{
@@ -355,8 +379,8 @@ export async function pageOgImage({
             style={{
               width: "80px",
               height: "2px",
-              backgroundColor: OG_COLORS.accent,
-              opacity: 0.5,
+              backgroundColor: accent ?? OG_COLORS.accent,
+              opacity: accent ? 0.7 : 0.5,
               display: "flex",
             }}
           />

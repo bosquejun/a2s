@@ -140,6 +140,24 @@ export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
     "Family, old friends, and the people we grew apart from — the bonds that aren't romance but still keep us up.",
 };
 
+/**
+ * Accent color per category (hex). Used to tint the category archive page glow
+ * and its Open Graph card. Chosen to spread across the hue wheel while staying
+ * legible as a soft glow on the site's near-black background. CONFESSION keeps
+ * the brand violet so the original core category still reads as "default."
+ */
+export const CATEGORY_ACCENTS: Record<Category, string> = {
+  HORROR: "#ef4d56", // crimson
+  CONFESSION: "#a78bfa", // violet (brand)
+  ROMANCE: "#f48ab0", // rose
+  EXISTENTIAL: "#7c9cf8", // slate blue
+  SURREAL: "#4fd1c5", // teal
+  WORKPLACE: "#e0a84e", // amber / desk lamp
+  DESIRE: "#db5a93", // deep magenta
+  SPITE: "#8fc34e", // venom green
+  TIES: "#e2855a", // warm terracotta
+};
+
 /** Intensity scale shared by the writer/editor agents and the admin UI. */
 export const INTENSITY_LABELS: Record<number, string> = {
   1: "cozy / calming",
