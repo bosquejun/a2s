@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
 import {
   CATEGORIES,
+  CATEGORY_ACCENTS,
   CATEGORY_DESCRIPTIONS,
   CATEGORY_LABELS,
   CATEGORY_TAGLINES,
@@ -78,6 +79,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const stories = await getStoriesByCategory(category);
   const label = CATEGORY_LABELS[category];
   const slug = category.toLowerCase();
+  const accent = CATEGORY_ACCENTS[category];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -117,7 +119,10 @@ export default async function CategoryPage({ params }: PageProps) {
             <h1 className="font-serif text-3xl italic text-foreground/90 text-glow sm:text-4xl md:text-5xl">
               {label}
             </h1>
-            <p className="font-serif italic text-sm text-muted-foreground/60">
+            <p
+              className="font-serif italic text-sm"
+              style={{ color: accent, opacity: 0.75 }}
+            >
               {CATEGORY_TAGLINES[category]}
             </p>
             <p className="max-w-md text-sm text-muted-foreground">
@@ -134,7 +139,10 @@ export default async function CategoryPage({ params }: PageProps) {
         <SiteFooter />
 
         <div className="grain-overlay" aria-hidden="true" />
-        <div className="pointer-events-none fixed left-[-10%] top-[-12%] h-[45%] w-[45%] rounded-full bg-indigo-500/8 blur-[130px] animate-drift" />
+        <div
+          className="pointer-events-none fixed left-[-10%] top-[-12%] h-[45%] w-[45%] rounded-full blur-[130px] animate-drift"
+          style={{ backgroundColor: `${accent}14` }}
+        />
       </div>
     </>
   );
