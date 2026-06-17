@@ -62,7 +62,10 @@ async function ensureTags(
  */
 export async function ingestStory(
   input: StoryIngestInput,
-  { publish }: { publish: boolean }
+  {
+    publish,
+    scheduleSocialForNightWindow = false,
+  }: { publish: boolean; scheduleSocialForNightWindow?: boolean }
 ) {
   const payload = await getPayloadClient();
 
@@ -72,6 +75,11 @@ export async function ingestStory(
   const story = await payload.create({
     collection: "stories",
     draft: !publish,
+    // Flag routine-published stories so the publish hook defers their social
+    // posts to the 2–4am window instead of posting immediately.
+    context: scheduleSocialForNightWindow
+      ? { scheduleSocialForNightWindow: true }
+      : undefined,
     data: {
       title: input.title,
       author: input.author,
