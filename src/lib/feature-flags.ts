@@ -15,4 +15,11 @@ export const featureFlags = {
    * Disabled by default; set NEXT_PUBLIC_FEATURE_WHISPER=true to enable.
    */
   whisper: readFlag(process.env.NEXT_PUBLIC_FEATURE_WHISPER),
+  /**
+   * Posting stories to X (Twitter). Disabled by default because X deprecated
+   * free posting (pay-per-use only — every post costs credits), so we keep it
+   * off until the developer account is funded. Set
+   * NEXT_PUBLIC_FEATURE_X_POSTING=true to re-enable auto-post and manual share.
+   */
+  xPosting: readFlag(process.env.NEXT_PUBLIC_FEATURE_X_POSTING),
 } as const;

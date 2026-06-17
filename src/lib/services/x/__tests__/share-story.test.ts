@@ -44,6 +44,7 @@ const connected = {
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.NEXT_PUBLIC_SITE_URL = "https://after2amstories.com";
+  process.env.NEXT_PUBLIC_FEATURE_X_POSTING = "true";
 });
 
 describe("shareStory (X)", () => {
@@ -88,6 +89,12 @@ describe("shareStory (X)", () => {
     expect(postTweet).toHaveBeenCalledWith(
       expect.objectContaining({ accessToken: "AT2" })
     );
+  });
+
+  it("throws when X posting is disabled", async () => {
+    delete process.env.NEXT_PUBLIC_FEATURE_X_POSTING;
+    await expect(shareStory(fakePayload(), 1)).rejects.toThrow(/disabled/);
+    expect(postTweet).not.toHaveBeenCalled();
   });
 
   it("short-circuits when already shared", async () => {

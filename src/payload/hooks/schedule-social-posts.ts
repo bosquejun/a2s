@@ -3,6 +3,7 @@ import type { CollectionAfterChangeHook } from "payload";
 import { shareStory as shareStoryToFacebook } from "@/lib/services/facebook/share-story";
 import { shareStoryToInstagram } from "@/lib/services/instagram/share-story";
 import { shareStory as shareStoryToX } from "@/lib/services/x/share-story";
+import { featureFlags } from "@/lib/feature-flags";
 import { jitterDelayMs, nextNightWindowPostAt } from "@/lib/services/social/schedule";
 import { triggerWorkflow } from "@/lib/workflow-client/client";
 
@@ -42,7 +43,8 @@ export const scheduleSocialPosts: CollectionAfterChangeHook = ({
   if (doc.autoPostToFacebook && !doc.facebookPostId) platforms.push("facebook");
   if (doc.autoPostToInstagram && !doc.instagramPostId)
     platforms.push("instagram");
-  if (doc.autoPostToX && !doc.xPostId) platforms.push("x");
+  if (featureFlags.xPosting && doc.autoPostToX && !doc.xPostId)
+    platforms.push("x");
   if (platforms.length === 0) return doc;
 
   if (context?.scheduleSocialForNightWindow) {
