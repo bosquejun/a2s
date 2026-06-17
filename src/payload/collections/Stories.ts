@@ -5,10 +5,8 @@ import {
   toSelectOptions,
 } from "../../lib/content/taxonomy";
 import { enrichStory } from "../hooks/enrich-story";
-import { publishToFacebook } from "../hooks/publish-to-facebook";
-import { publishToInstagram } from "../hooks/publish-to-instagram";
-import { publishToX } from "../hooks/publish-to-x";
 import { revalidateStory, revalidateStoryDelete } from "../hooks/revalidate";
+import { scheduleSocialPosts } from "../hooks/schedule-social-posts";
 
 export const Stories: CollectionConfig = {
   slug: "stories",
@@ -32,12 +30,7 @@ export const Stories: CollectionConfig = {
   },
   hooks: {
     beforeChange: [enrichStory],
-    afterChange: [
-      revalidateStory,
-      publishToFacebook,
-      publishToInstagram,
-      publishToX,
-    ],
+    afterChange: [revalidateStory, scheduleSocialPosts],
     afterDelete: [revalidateStoryDelete],
   },
   fields: [

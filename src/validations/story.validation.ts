@@ -36,6 +36,17 @@ export type WriteStoryWorkflowInput = z.infer<
   typeof writeStoryWorkflowInputSchema
 >;
 
+/** Payload for the deferred social-posting workflow (api/social/post). */
+export const socialPostWorkflowInputSchema = z.object({
+  storyId: z.union([z.string(), z.number()]),
+  /** ISO datetime: hold the post until this instant, then publish. */
+  postAt: z.string(),
+  platforms: z.array(z.enum(["facebook", "instagram", "x"])).min(1),
+});
+export type SocialPostWorkflowInput = z.infer<
+  typeof socialPostWorkflowInputSchema
+>;
+
 export const generateStoryWorkflowInputSchema = z.object({
   mood: z.enum(Object.values(Mood)),
   category: z.enum(Object.values(Category)),

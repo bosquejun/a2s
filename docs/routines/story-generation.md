@@ -216,6 +216,14 @@ enforced there.
 
 ## Notes
 
+- **Social posting is dripped, not bursted.** Stories published through this
+  routine do NOT post to Facebook/Instagram/X the instant they're created.
+  Instead each story is handed a single, human-uneven slot inside the
+  **2–4am Asia/Manila** window (via the social-post workflow) so a freshly
+  generated batch trickles out over the small hours instead of firing all at
+  once. All enabled platforms for a story go out together (stories are
+  staggered, not platforms). Stories published manually in the admin still
+  auto-post right away, with only a small jitter to de-sync simultaneous saves.
 - The reader-submission ("whisper") flow is separate and unaffected. It is
   reviewed by the night-editor agent, which shares the same voice spec
   (`src/lib/content/voice.ts`).

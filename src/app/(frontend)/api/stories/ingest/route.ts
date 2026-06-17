@@ -66,7 +66,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const story = await ingestStory(parsed.input, { publish: true });
+    const story = await ingestStory(parsed.input, {
+      publish: true,
+      scheduleSocialForNightWindow: true,
+    });
     return NextResponse.json(
       { id: String(story.id), slug: story.slug },
       { status: 201 }
