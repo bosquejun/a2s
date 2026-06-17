@@ -159,6 +159,16 @@ export const Stories: CollectionConfig = {
       },
     },
     {
+      name: "facebookCommentId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description:
+          "Set automatically when the story link is posted as the first comment on Facebook.",
+      },
+    },
+    {
       name: "shareToFacebook",
       type: "ui",
       admin: {
@@ -185,6 +195,16 @@ export const Stories: CollectionConfig = {
         readOnly: true,
         description:
           "Set automatically after the story is posted to Instagram.",
+      },
+    },
+    {
+      name: "instagramCommentId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description:
+          "Set automatically when the story link is posted as the first comment on Instagram.",
       },
     },
     {

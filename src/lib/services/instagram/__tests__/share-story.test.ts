@@ -6,6 +6,7 @@ vi.mock("../client", () => ({
   createCarouselContainer: vi.fn(),
   publishMedia: vi.fn(),
   waitForMediaContainer: vi.fn().mockResolvedValue(undefined),
+  commentOnMedia: vi.fn(),
 }));
 vi.mock("@/lib/services/facebook/connection", () => ({
   getConnection: vi.fn(),
@@ -14,9 +15,16 @@ vi.mock("@/lib/services/facebook/connection", () => ({
 vi.mock("@/lib/services/stories/get-story", () => ({
   getStoryBySlug: vi.fn(),
 }));
+vi.mock("@/lib/services/social/settings", () => ({
+  getLinkInCommentSettings: vi.fn().mockResolvedValue({
+    facebook: false,
+    instagram: false,
+  }),
+}));
 
 import { shareStoryToInstagram } from "../share-story";
 import {
+  commentOnMedia,
   createCarouselContainer,
   createCarouselItemContainer,
   createMediaContainer,
@@ -28,6 +36,7 @@ import {
 } from "@/lib/services/facebook/connection";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { FacebookGraphError } from "@/lib/services/facebook/client";
+import { getLinkInCommentSettings } from "@/lib/services/social/settings";
 
 const story = { id: 1, slug: "s", title: "T", hook: "H", excerpt: "E" };
 
@@ -35,6 +44,7 @@ function fakePayload(overrides = {}) {
   return {
     findByID: vi.fn().mockResolvedValue(story),
     update: vi.fn().mockResolvedValue({}),
+    logger: { error: vi.fn() },
     ...overrides,
   } as unknown as import("payload").Payload;
 }
@@ -129,6 +139,48 @@ describe("shareStoryToInstagram", () => {
     await expect(shareStoryToInstagram(fakePayload(), 1)).rejects.toThrow(
       /Instagram/
     );
+  });
+
+  it("comments the story link when the toggle is on", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (createMediaContainer as ReturnType<typeof vi.fn>).mockResolvedValue("C1");
+    (publishMedia as ReturnType<typeof vi.fn>).mockResolvedValue("M1");
+    (getLinkInCommentSettings as ReturnType<typeof vi.fn>).mockResolvedValue({
+      facebook: false,
+      instagram: true,
+    });
+    (commentOnMedia as ReturnType<typeof vi.fn>).mockResolvedValue("CMT1");
+    const payload = fakePayload();
+
+    await shareStoryToInstagram(payload, 1);
+
+    expect(commentOnMedia).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mediaId: "M1",
+        message: "https://after2amstories.com/story/s",
+      })
+    );
+    expect(payload.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { instagramCommentId: "CMT1" } })
+    );
+  });
+
+  it("does not fail the share when the comment fails", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (createMediaContainer as ReturnType<typeof vi.fn>).mockResolvedValue("C1");
+    (publishMedia as ReturnType<typeof vi.fn>).mockResolvedValue("M1");
+    (getLinkInCommentSettings as ReturnType<typeof vi.fn>).mockResolvedValue({
+      facebook: false,
+      instagram: true,
+    });
+    (commentOnMedia as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error("comment blew up")
+    );
+    const payload = fakePayload();
+
+    const result = await shareStoryToInstagram(payload, 1);
+    expect(result).toEqual({ postId: "M1" });
+    expect(payload.logger.error).toHaveBeenCalled();
   });
 
   it("clears the connection on Graph error 190", async () => {

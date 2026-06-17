@@ -15,8 +15,12 @@ export const FACEBOOK_SCOPES = [
   "pages_show_list",
   "pages_manage_posts",
   "pages_read_engagement",
+  // Comment on the Page's own posts (used for the link-in-first-comment option).
+  "pages_manage_engagement",
   "instagram_basic",
   "instagram_content_publish",
+  // Comment on the connected Instagram account's media.
+  "instagram_manage_comments",
 ];
 
 export class FacebookGraphError extends Error {
@@ -130,6 +134,33 @@ export async function postToPage(opts: {
   if (!res.ok || json?.error) {
     throw new FacebookGraphError(
       json?.error?.message ?? "Failed to publish to Facebook Page",
+      json?.error?.code
+    );
+  }
+  return json.id as string;
+}
+
+/**
+ * Add a comment (as the Page) to one of the Page's own posts. Used for the
+ * link-in-first-comment option, where the story link is kept out of the post
+ * body and dropped into the first comment instead to avoid the reach penalty
+ * Facebook applies to posts with outbound links.
+ */
+export async function commentOnPost(opts: {
+  postId: string;
+  pageAccessToken: string;
+  message: string;
+}): Promise<string> {
+  const url = new URL(`${GRAPH}/${opts.postId}/comments`);
+  const body = new URLSearchParams({
+    message: opts.message,
+    access_token: opts.pageAccessToken,
+  });
+  const res = await fetch(url, { method: "POST", body });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json?.error) {
+    throw new FacebookGraphError(
+      json?.error?.message ?? "Failed to comment on Facebook post",
       json?.error?.code
     );
   }

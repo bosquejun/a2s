@@ -3,7 +3,8 @@ import "server-only";
 import type { Payload } from "payload";
 
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
-import { FacebookGraphError, postToPage } from "./client";
+import { getLinkInCommentSettings } from "@/lib/services/social/settings";
+import { commentOnPost, FacebookGraphError, postToPage } from "./client";
 import { clearConnection, getConnection } from "./connection";
 
 /** Hashtags carry less discovery weight on Facebook, so keep the set tight. */
@@ -19,6 +20,11 @@ const FACEBOOK_HASHTAG_LIMIT = 4;
 function storyUrl(slug: string): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return `${base.replace(/\/$/, "")}/story/${slug}`;
+}
+
+/** Friendly lead for the link comment so it reads as engagement, not a bot. */
+function linkCommentText(url: string): string {
+  return `Read the full story 👉 ${url}`;
 }
 
 export interface ShareResult {
@@ -56,12 +62,17 @@ export async function shareStory(
   );
   const message = hashtags ? `${lead}\n\n${hashtags}` : lead;
 
+  const url = story.slug ? storyUrl(story.slug) : undefined;
+  const { facebook: linkInComment } = await getLinkInCommentSettings(payload);
+
   try {
     const postId = await postToPage({
       pageId: connection.pageId,
       pageAccessToken: connection.pageAccessToken,
       message,
-      link: story.slug ? storyUrl(story.slug) : undefined,
+      // When the link goes in the first comment we deliberately leave it out of
+      // the post body to dodge Facebook's outbound-link reach penalty.
+      link: linkInComment ? undefined : url,
     });
 
     await payload.update({
@@ -72,6 +83,29 @@ export async function shareStory(
       // Avoid re-triggering the auto-post hook for this internal write.
       context: { skipFacebookAutoPost: true },
     });
+
+    // Best-effort: a failed comment must not undo a successful post.
+    if (linkInComment && url && !story.facebookCommentId) {
+      try {
+        const commentId = await commentOnPost({
+          postId,
+          pageAccessToken: connection.pageAccessToken,
+          message: linkCommentText(url),
+        });
+        await payload.update({
+          collection: "stories",
+          id: storyId,
+          data: { facebookCommentId: commentId },
+          overrideAccess: true,
+          context: { skipFacebookAutoPost: true },
+        });
+      } catch (err) {
+        payload.logger.error(
+          { err, storyId },
+          "[facebook] failed to post link as first comment"
+        );
+      }
+    }
 
     return { postId };
   } catch (err) {

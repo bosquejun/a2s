@@ -8,8 +8,10 @@ import {
   getConnection,
 } from "@/lib/services/facebook/connection";
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
+import { getLinkInCommentSettings } from "@/lib/services/social/settings";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import {
+  commentOnMedia,
   createCarouselContainer,
   createCarouselItemContainer,
   createMediaContainer,
@@ -55,6 +57,10 @@ function igImageUrl(slug: string): string {
 
 function igCarouselSlideUrl(slug: string, index: number): string {
   return `${siteBase()}/story/${slug}/ig/carousel/${index}`;
+}
+
+function storyUrl(slug: string): string {
+  return `${siteBase()}/story/${slug}`;
 }
 
 export interface InstagramShareResult {
@@ -142,6 +148,32 @@ export async function shareStoryToInstagram(
       overrideAccess: true,
       context: { skipInstagramAutoPost: true },
     });
+
+    // Best-effort link-in-first-comment. Instagram comments aren't clickable,
+    // but the URL is still copy-pasteable, and a failed comment must never
+    // undo the successful post.
+    const { instagram: linkInComment } = await getLinkInCommentSettings(payload);
+    if (linkInComment && !story.instagramCommentId) {
+      try {
+        const commentId = await commentOnMedia({
+          mediaId: postId,
+          pageAccessToken: connection.pageAccessToken,
+          message: storyUrl(story.slug),
+        });
+        await payload.update({
+          collection: "stories",
+          id: storyId,
+          data: { instagramCommentId: commentId },
+          overrideAccess: true,
+          context: { skipInstagramAutoPost: true },
+        });
+      } catch (err) {
+        payload.logger.error(
+          { err, storyId },
+          "[instagram] failed to post link as first comment"
+        );
+      }
+    }
 
     return { postId };
   } catch (err) {
