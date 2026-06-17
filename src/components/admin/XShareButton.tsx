@@ -3,6 +3,8 @@
 import { Button, useDocumentInfo, useFormFields } from "@payloadcms/ui";
 import { useState } from "react";
 
+import { featureFlags } from "@/lib/feature-flags";
+
 /**
  * Sidebar button on the Story edit view. Posts the current story to the
  * connected X account on demand. Disabled until the story is published and
@@ -20,6 +22,14 @@ export function XShareButton() {
   const [busy, setBusy] = useState(false);
   const [postId, setPostId] = useState<string | undefined>(existingPostId);
   const [error, setError] = useState<string | null>(null);
+
+  if (!featureFlags.xPosting) {
+    return (
+      <p style={{ opacity: 0.7, fontSize: "0.8rem" }}>
+        X posting is currently disabled.
+      </p>
+    );
+  }
 
   if (!id) {
     return (

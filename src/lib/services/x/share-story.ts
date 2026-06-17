@@ -2,6 +2,8 @@ import "server-only";
 
 import type { Payload } from "payload";
 
+import { readFlag } from "@/lib/feature-flags";
+
 import {
   XApiError,
   postTweet,
@@ -71,6 +73,13 @@ export async function shareStory(
   payload: Payload,
   storyId: string | number
 ): Promise<ShareResult> {
+  // Read at call time (not via the cached featureFlags const) so this single
+  // chokepoint reliably blocks the manual route and any in-flight workflow,
+  // regardless of when the module was loaded.
+  if (!readFlag(process.env.NEXT_PUBLIC_FEATURE_X_POSTING)) {
+    throw new Error("X posting is currently disabled.");
+  }
+
   const story = await payload.findByID({
     collection: "stories",
     id: storyId,
