@@ -2,6 +2,8 @@ import "server-only";
 
 import { createHash, randomBytes } from "crypto";
 
+import { buildOAuth1Header, type OAuth1Credentials } from "./oauth1";
+
 /**
  * Thin wrappers around the X (Twitter) API v2 used by the browser-based account
  * connection flow. No client-side SDK is used — the connect step is a plain
@@ -153,9 +155,9 @@ export interface XUser {
   name: string;
 }
 
-export async function getMe(accessToken: string): Promise<XUser> {
+async function apiGetMe(authHeader: string): Promise<XUser> {
   const res = await fetch(`${API}/users/me`, {
-    headers: { authorization: `Bearer ${accessToken}` },
+    headers: { authorization: authHeader },
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok || json?.errors) {
@@ -173,17 +175,14 @@ export async function getMe(accessToken: string): Promise<XUser> {
   };
 }
 
-export async function postTweet(opts: {
-  accessToken: string;
-  text: string;
-}): Promise<string> {
+async function apiPostTweet(authHeader: string, text: string): Promise<string> {
   const res = await fetch(`${API}/tweets`, {
     method: "POST",
     headers: {
-      authorization: `Bearer ${opts.accessToken}`,
+      authorization: authHeader,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ text: opts.text }),
+    body: JSON.stringify({ text }),
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok || json?.errors) {
@@ -196,4 +195,33 @@ export async function postTweet(opts: {
     );
   }
   return json.data.id as string;
+}
+
+/** Read the authenticated profile using an OAuth 2.0 bearer access token. */
+export async function getMe(accessToken: string): Promise<XUser> {
+  return apiGetMe(`Bearer ${accessToken}`);
+}
+
+/** Publish a tweet using an OAuth 2.0 bearer access token. */
+export async function postTweet(opts: {
+  accessToken: string;
+  text: string;
+}): Promise<string> {
+  return apiPostTweet(`Bearer ${opts.accessToken}`, opts.text);
+}
+
+/** Read the authenticated profile using OAuth 1.0a credentials. */
+export async function getMeOAuth1(creds: OAuth1Credentials): Promise<XUser> {
+  const url = `${API}/users/me`;
+  return apiGetMe(buildOAuth1Header({ method: "GET", url, creds }));
+}
+
+/** Publish a tweet using OAuth 1.0a credentials. */
+export async function postTweetOAuth1(opts: {
+  creds: OAuth1Credentials;
+  text: string;
+}): Promise<string> {
+  const url = `${API}/tweets`;
+  const auth = buildOAuth1Header({ method: "POST", url, creds: opts.creds });
+  return apiPostTweet(auth, opts.text);
 }

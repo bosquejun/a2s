@@ -2,7 +2,12 @@ import "server-only";
 
 import type { Payload } from "payload";
 
-import { XApiError, postTweet, refreshAccessToken } from "./client";
+import {
+  XApiError,
+  postTweet,
+  postTweetOAuth1,
+  refreshAccessToken,
+} from "./client";
 import {
   clearConnection,
   getConnection,
@@ -89,8 +94,21 @@ export async function shareStory(
   );
 
   try {
-    const accessToken = await ensureAccessToken(payload, connection);
-    const postId = await postTweet({ accessToken, text });
+    const postId =
+      connection.authMethod === "oauth1"
+        ? await postTweetOAuth1({
+            creds: {
+              consumerKey: connection.consumerKey as string,
+              consumerSecret: connection.consumerSecret as string,
+              accessToken: connection.accessToken,
+              accessTokenSecret: connection.accessTokenSecret as string,
+            },
+            text,
+          })
+        : await postTweet({
+            accessToken: await ensureAccessToken(payload, connection),
+            text,
+          });
 
     await payload.update({
       collection: "stories",
