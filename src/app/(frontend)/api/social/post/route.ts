@@ -3,6 +3,7 @@ import { serve } from "@upstash/workflow/nextjs";
 import { getPayloadClient } from "@/lib/payload";
 import { shareStory as shareStoryToFacebook } from "@/lib/services/facebook/share-story";
 import { shareStoryToInstagram } from "@/lib/services/instagram/share-story";
+import { shareStoryToThreads } from "@/lib/services/threads/share-story";
 import { shareStory as shareStoryToX } from "@/lib/services/x/share-story";
 import {
   socialPostWorkflowInputSchema,
@@ -32,6 +33,8 @@ export const { POST } = serve<SocialPostWorkflowInput>(
             await shareStoryToFacebook(payload, storyId);
           } else if (platform === "instagram") {
             await shareStoryToInstagram(payload, storyId);
+          } else if (platform === "threads") {
+            await shareStoryToThreads(payload, storyId);
           } else {
             await shareStoryToX(payload, storyId);
           }
