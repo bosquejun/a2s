@@ -55,6 +55,14 @@ export const XConnection: GlobalConfig = {
         date: { pickerAppearance: "dayAndTime" },
       },
     },
+    // Which auth method backs the connection: the browser OAuth 2.0 flow
+    // ("oauth2") or manually pasted OAuth 1.0a keys ("oauth1").
+    {
+      name: "authMethod",
+      type: "text",
+      defaultValue: "oauth2",
+      admin: { hidden: true },
+    },
     // Encrypted secrets — never returned by the API, never shown in the admin.
     {
       name: "accessToken",
@@ -75,6 +83,25 @@ export const XConnection: GlobalConfig = {
     },
     {
       name: "codeVerifier",
+      type: "text",
+      access: { read: () => false },
+      admin: { hidden: true },
+    },
+    // OAuth 1.0a credentials (manual connection path), encrypted at rest.
+    {
+      name: "consumerKey",
+      type: "text",
+      access: { read: () => false },
+      admin: { hidden: true },
+    },
+    {
+      name: "consumerSecret",
+      type: "text",
+      access: { read: () => false },
+      admin: { hidden: true },
+    },
+    {
+      name: "accessTokenSecret",
       type: "text",
       access: { read: () => false },
       admin: { hidden: true },
