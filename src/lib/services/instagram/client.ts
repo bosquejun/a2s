@@ -58,6 +58,42 @@ export async function createMediaContainer(opts: {
   return json.id as string;
 }
 
+/**
+ * Carousel step 1a: stage one image as a carousel child. Returns the child's
+ * creation id, which is later passed to {@link createCarouselContainer}.
+ */
+export async function createCarouselItemContainer(opts: {
+  igUserId: string;
+  pageAccessToken: string;
+  imageUrl: string;
+}): Promise<string> {
+  const json = await graphPost(`${opts.igUserId}/media`, {
+    image_url: opts.imageUrl,
+    is_carousel_item: "true",
+    access_token: opts.pageAccessToken,
+  });
+  return json.id as string;
+}
+
+/**
+ * Carousel step 1b: stage the parent carousel from its child creation ids plus
+ * the shared caption. Returns the parent creation id to publish.
+ */
+export async function createCarouselContainer(opts: {
+  igUserId: string;
+  pageAccessToken: string;
+  children: string[];
+  caption: string;
+}): Promise<string> {
+  const json = await graphPost(`${opts.igUserId}/media`, {
+    media_type: "CAROUSEL",
+    children: opts.children.join(","),
+    caption: opts.caption,
+    access_token: opts.pageAccessToken,
+  });
+  return json.id as string;
+}
+
 /** Step 2 of publishing: publish a staged creation id, get the media id. */
 export async function publishMedia(opts: {
   igUserId: string;

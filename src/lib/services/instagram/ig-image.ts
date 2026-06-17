@@ -21,3 +21,11 @@ export async function toSquareJpeg(png: Buffer): Promise<Buffer> {
     .jpeg({ quality: 90 })
     .toBuffer();
 }
+
+/**
+ * Encode an already-square PNG (e.g. a 1080² carousel slide) as JPEG without
+ * resizing — Instagram's content API only accepts JPEG.
+ */
+export async function toJpeg(png: Buffer): Promise<Buffer> {
+  return sharp(png).jpeg({ quality: 90 }).toBuffer();
+}

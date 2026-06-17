@@ -2,6 +2,7 @@ import { serve } from "@upstash/workflow/nextjs";
 
 import { getPayloadClient } from "@/lib/payload";
 import { shareStory as shareStoryToFacebook } from "@/lib/services/facebook/share-story";
+import { randomInstagramFormat } from "@/lib/services/instagram/carousel-plan";
 import { shareStoryToInstagram } from "@/lib/services/instagram/share-story";
 import { shareStory as shareStoryToX } from "@/lib/services/x/share-story";
 import {
@@ -31,7 +32,12 @@ export const { POST } = serve<SocialPostWorkflowInput>(
           if (platform === "facebook") {
             await shareStoryToFacebook(payload, storyId);
           } else if (platform === "instagram") {
-            await shareStoryToInstagram(payload, storyId);
+            // The night-window routine varies the look: roughly half the
+            // stories go out as a multi-slide carousel, the rest as the single
+            // OG card, so the feed doesn't read as one identical template.
+            await shareStoryToInstagram(payload, storyId, {
+              format: randomInstagramFormat(),
+            });
           } else {
             await shareStoryToX(payload, storyId);
           }

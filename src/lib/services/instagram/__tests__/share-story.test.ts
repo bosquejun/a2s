@@ -2,16 +2,30 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../client", () => ({
   createMediaContainer: vi.fn(),
+  createCarouselItemContainer: vi.fn(),
+  createCarouselContainer: vi.fn(),
   publishMedia: vi.fn(),
 }));
 vi.mock("@/lib/services/facebook/connection", () => ({
   getConnection: vi.fn(),
   clearConnection: vi.fn(),
 }));
+vi.mock("@/lib/services/stories/get-story", () => ({
+  getStoryBySlug: vi.fn(),
+}));
 
 import { shareStoryToInstagram } from "../share-story";
-import { createMediaContainer, publishMedia } from "../client";
-import { clearConnection, getConnection } from "@/lib/services/facebook/connection";
+import {
+  createCarouselContainer,
+  createCarouselItemContainer,
+  createMediaContainer,
+  publishMedia,
+} from "../client";
+import {
+  clearConnection,
+  getConnection,
+} from "@/lib/services/facebook/connection";
+import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { FacebookGraphError } from "@/lib/services/facebook/client";
 
 const story = { id: 1, slug: "s", title: "T", hook: "H", excerpt: "E" };
@@ -59,6 +73,42 @@ describe("shareStoryToInstagram", () => {
         context: { skipInstagramAutoPost: true },
       })
     );
+  });
+
+  it("posts a carousel: stages each slide, assembles the parent, publishes", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (getStoryBySlug as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ...story,
+      content: "",
+      categories: [],
+      tags: [],
+    });
+    (createCarouselItemContainer as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("CH0")
+      .mockResolvedValueOnce("CH1");
+    (createCarouselContainer as ReturnType<typeof vi.fn>).mockResolvedValue(
+      "P1"
+    );
+    (publishMedia as ReturnType<typeof vi.fn>).mockResolvedValue("M2");
+    const payload = fakePayload();
+
+    const result = await shareStoryToInstagram(payload, 1, {
+      format: "carousel",
+    });
+
+    // cover + cta = 2 slides for an empty-ish body
+    expect(createCarouselItemContainer).toHaveBeenCalledTimes(2);
+    expect(createCarouselItemContainer).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        imageUrl: "https://after2amstories.com/story/s/ig/carousel/0",
+      })
+    );
+    expect(createCarouselContainer).toHaveBeenCalledWith(
+      expect.objectContaining({ children: ["CH0", "CH1"] })
+    );
+    expect(createMediaContainer).not.toHaveBeenCalled();
+    expect(result).toEqual({ postId: "M2" });
   });
 
   it("short-circuits when already shared", async () => {

@@ -157,7 +157,32 @@ Mirror existing test patterns (`vitest`):
 
 ## Out of scope (v1)
 
-- Instagram Stories / Reels / carousels.
+- Instagram Stories / Reels.
 - Auto hashtags or @mentions.
 - A dedicated Instagram-specific image template (we reuse the OG design).
 - A separate Instagram OAuth flow independent of the Facebook Page connection.
+
+## Update — carousel posts (v2)
+
+Instagram posts can now go out as a **multi-slide carousel** in addition to the
+single OG card. `shareStoryToInstagram(payload, storyId, { format })` takes a
+`format` of `"image"` (default, unchanged) or `"carousel"`.
+
+- **Slide plan** (`carousel-plan.ts`, pure/deterministic): slide 1 is the cover
+  (the OG hook card), the middle slides are the story body paginated into
+  readable chunks (`CONTENT_SLIDE_CHAR_BUDGET`, capped so the carousel never
+  exceeds Instagram's 10-item limit), and the last slide is a "read the full
+  story — link in bio" CTA. Empty body ⇒ a minimal cover + CTA (2 slides).
+- **Slide images** (`/story/[slug]/ig/carousel/[index]`): each index renders one
+  slide as a 1080×1080 JPEG. The cover reuses `storyOgImage` (letterboxed); body
+  and CTA slides are rendered natively square (`og/ig-carousel.tsx`). The route
+  and the share flow plan from the same story, so child URLs always resolve.
+- **Publishing** (`client.ts`): stage each slide as a carousel child
+  (`is_carousel_item=true`), assemble the parent (`media_type=CAROUSEL`,
+  `children=...`), then publish — reusing the existing `publishMedia` step and
+  the `instagramPostId` duplicate guard.
+- **Choosing the format:** the admin Story view exposes both "Share to
+  Instagram" and "Share as carousel" buttons (manual route accepts `format` in
+  the body). The automated night-window routine randomizes per story
+  (`randomInstagramFormat()`), so the feed doesn't read as one identical
+  template. Facebook/X are unchanged.

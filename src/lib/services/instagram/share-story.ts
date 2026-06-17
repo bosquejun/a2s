@@ -3,9 +3,21 @@ import "server-only";
 import type { Payload } from "payload";
 
 import { FacebookGraphError } from "@/lib/services/facebook/client";
-import { clearConnection, getConnection } from "@/lib/services/facebook/connection";
+import {
+  clearConnection,
+  getConnection,
+} from "@/lib/services/facebook/connection";
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
-import { createMediaContainer, publishMedia } from "./client";
+import { getStoryBySlug } from "@/lib/services/stories/get-story";
+import {
+  createCarouselContainer,
+  createCarouselItemContainer,
+  createMediaContainer,
+  publishMedia,
+} from "./client";
+import { planCarouselSlides, type InstagramPostFormat } from "./carousel-plan";
+
+export type { InstagramPostFormat } from "./carousel-plan";
 
 const LINK_IN_BIO = "Read the full story — link in bio 🔗";
 
@@ -31,14 +43,27 @@ export function buildInstagramCaption(
   return parts.join("\n\n");
 }
 
-function igImageUrl(slug: string): string {
+function siteBase(): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}/story/${slug}/ig`;
+  return base.replace(/\/$/, "");
+}
+
+function igImageUrl(slug: string): string {
+  return `${siteBase()}/story/${slug}/ig`;
+}
+
+function igCarouselSlideUrl(slug: string, index: number): string {
+  return `${siteBase()}/story/${slug}/ig/carousel/${index}`;
 }
 
 export interface InstagramShareResult {
   postId: string;
   alreadyShared?: boolean;
+}
+
+export interface InstagramShareOptions {
+  /** "image" (default) posts the single OG card; "carousel" posts the multi-slide set. */
+  format?: InstagramPostFormat;
 }
 
 /**
@@ -49,8 +74,10 @@ export interface InstagramShareResult {
  */
 export async function shareStoryToInstagram(
   payload: Payload,
-  storyId: string | number
+  storyId: string | number,
+  options: InstagramShareOptions = {}
 ): Promise<InstagramShareResult> {
+  const format: InstagramPostFormat = options.format ?? "image";
   const story = await payload.findByID({
     collection: "stories",
     id: storyId,
@@ -73,29 +100,37 @@ export async function shareStoryToInstagram(
   }
   if (!story.slug) throw new Error("Story has no slug");
 
+  const igUserId = connection.instagramUserId;
+  const pageAccessToken = connection.pageAccessToken;
+  const caption = buildInstagramCaption(
+    {
+      hook: typeof story.hook === "string" ? story.hook : null,
+      excerpt: typeof story.excerpt === "string" ? story.excerpt : null,
+      title: String(story.title ?? ""),
+    },
+    buildHashtags(
+      {
+        categories: extractNames(story.categories),
+        tags: extractNames(story.tags),
+      },
+      INSTAGRAM_HASHTAG_LIMIT
+    )
+  );
+
   try {
-    const creationId = await createMediaContainer({
-      igUserId: connection.instagramUserId,
-      pageAccessToken: connection.pageAccessToken,
-      imageUrl: igImageUrl(story.slug),
-      caption: buildInstagramCaption(
-        {
-          hook: typeof story.hook === "string" ? story.hook : null,
-          excerpt: typeof story.excerpt === "string" ? story.excerpt : null,
-          title: String(story.title ?? ""),
-        },
-        buildHashtags(
-          {
-            categories: extractNames(story.categories),
-            tags: extractNames(story.tags),
-          },
-          INSTAGRAM_HASHTAG_LIMIT
-        )
-      ),
-    });
+    const creationId =
+      format === "carousel"
+        ? await stageCarousel(igUserId, pageAccessToken, story.slug, caption)
+        : await createMediaContainer({
+            igUserId,
+            pageAccessToken,
+            imageUrl: igImageUrl(story.slug),
+            caption,
+          });
+
     const postId = await publishMedia({
-      igUserId: connection.instagramUserId,
-      pageAccessToken: connection.pageAccessToken,
+      igUserId,
+      pageAccessToken,
       creationId,
     });
 
@@ -114,4 +149,38 @@ export async function shareStoryToInstagram(
     }
     throw err;
   }
+}
+
+/**
+ * Stage every carousel slide as a child container, then assemble the parent
+ * carousel container. The slide count comes from the same plan the image route
+ * renders, so each child URL resolves to a real slide. Returns the parent
+ * creation id ready to publish.
+ */
+async function stageCarousel(
+  igUserId: string,
+  pageAccessToken: string,
+  slug: string,
+  caption: string
+): Promise<string> {
+  const normalized = await getStoryBySlug(slug);
+  if (!normalized) throw new Error("Story not found for carousel rendering");
+  const slides = planCarouselSlides(normalized);
+
+  const children: string[] = [];
+  for (let i = 0; i < slides.length; i++) {
+    const childId = await createCarouselItemContainer({
+      igUserId,
+      pageAccessToken,
+      imageUrl: igCarouselSlideUrl(slug, i),
+    });
+    children.push(childId);
+  }
+
+  return createCarouselContainer({
+    igUserId,
+    pageAccessToken,
+    children,
+    caption,
+  });
 }
