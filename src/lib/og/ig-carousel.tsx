@@ -86,7 +86,7 @@ export async function carouselContentImage({
           letterSpacing: "0.2em",
         }}
       >
-        {page} / {pageCount}
+        {`${page} / ${pageCount}`}
       </div>
     </div>,
     {

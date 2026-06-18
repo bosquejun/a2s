@@ -99,30 +99,48 @@ function splitOversized(paragraph: string, budget: number): string[] {
 }
 
 /**
- * Pack paragraphs greedily into at most `maxChunks` content slides, keeping
- * paragraph breaks intact within a slide. Content past the cap is dropped — the
- * CTA points readers to the full story regardless.
+ * Pack paragraphs greedily into at most `maxChunks` content slides. Whole
+ * paragraphs that share a slide keep their paragraph break (`\n\n`); a single
+ * paragraph too long for one slide is split into space-joined sentence groups,
+ * each its own slide, so sentences never get spurious blank lines between them.
+ * Content past the cap is dropped — the CTA points readers to the full story.
  */
 function packContent(
   paragraphs: string[],
   budget: number,
   maxChunks: number
 ): string[] {
-  const units = paragraphs.flatMap((p) => splitOversized(p, budget));
   const chunks: string[] = [];
   let cur = "";
-  for (const unit of units) {
-    const candidate = cur ? cur + "\n\n" + unit : unit;
-    if (cur && candidate.length > budget) {
+  const flush = () => {
+    if (cur) {
       chunks.push(cur);
-      if (chunks.length >= maxChunks) return chunks;
-      cur = unit;
+      cur = "";
+    }
+  };
+
+  for (const paragraph of paragraphs) {
+    if (chunks.length >= maxChunks) break;
+
+    if (paragraph.length > budget) {
+      flush();
+      for (const piece of splitOversized(paragraph, budget)) {
+        if (chunks.length >= maxChunks) break;
+        chunks.push(piece);
+      }
+      continue;
+    }
+
+    const candidate = cur ? cur + "\n\n" + paragraph : paragraph;
+    if (cur && candidate.length > budget) {
+      flush();
+      cur = paragraph;
     } else {
       cur = candidate;
     }
   }
-  if (cur && chunks.length < maxChunks) chunks.push(cur);
-  return chunks;
+  if (chunks.length < maxChunks) flush();
+  return chunks.slice(0, maxChunks);
 }
 
 /** Build the ordered slide plan for a story's Instagram carousel. */
