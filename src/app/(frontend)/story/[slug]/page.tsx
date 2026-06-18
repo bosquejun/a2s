@@ -67,6 +67,7 @@ function buildStoryMetadata(story: Story): Metadata {
     },
     alternates: {
       canonical: url,
+      languages: { "x-default": url, en: url },
     },
   };
 }

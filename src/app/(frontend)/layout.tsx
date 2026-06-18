@@ -61,6 +61,10 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   alternates: {
     canonical: "/",
+    // Single-locale (English) site: tell search engines this is the default
+    // result for any language/region so it surfaces for global English queries.
+    languages: { "x-default": "/", en: "/" },
+    types: { "application/rss+xml": "/feed.xml" },
   },
   openGraph: {
     title: SITE_TITLE,
