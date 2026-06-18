@@ -106,3 +106,63 @@ export async function publishMedia(opts: {
   });
   return json.id as string;
 }
+
+/**
+ * Read a media container's processing state. Instagram fetches each `image_url`
+ * asynchronously, so a freshly created container reports `IN_PROGRESS` until the
+ * image is downloaded and validated; `status_code` then becomes `FINISHED`,
+ * `ERROR`, or `EXPIRED`.
+ */
+export async function getContainerStatus(opts: {
+  creationId: string;
+  pageAccessToken: string;
+}): Promise<string> {
+  const url = new URL(`${GRAPH}/${opts.creationId}`);
+  url.searchParams.set("fields", "status_code");
+  url.searchParams.set("access_token", opts.pageAccessToken);
+  const res = await fetch(url, { method: "GET" });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json?.error) {
+    throw new FacebookGraphError(
+      json?.error?.message ?? "Failed to read media container status",
+      json?.error?.code
+    );
+  }
+  return (json?.status_code as string) ?? "IN_PROGRESS";
+}
+
+/**
+ * Poll a media container until it finishes processing. Publishing (or nesting a
+ * child into a carousel) before this returns `FINISHED` is what triggers
+ * Instagram's "Media ID is not available" error, so callers must await this
+ * between creating a container and using it.
+ */
+export async function waitForMediaContainer(opts: {
+  creationId: string;
+  pageAccessToken: string;
+  timeoutMs?: number;
+  intervalMs?: number;
+}): Promise<void> {
+  const timeoutMs = opts.timeoutMs ?? 60_000;
+  const intervalMs = opts.intervalMs ?? 2_000;
+  const deadline = Date.now() + timeoutMs;
+
+  for (;;) {
+    const status = await getContainerStatus({
+      creationId: opts.creationId,
+      pageAccessToken: opts.pageAccessToken,
+    });
+    if (status === "FINISHED") return;
+    if (status === "ERROR" || status === "EXPIRED") {
+      throw new FacebookGraphError(
+        `Media container ${opts.creationId} failed to process (status: ${status})`
+      );
+    }
+    if (Date.now() >= deadline) {
+      throw new FacebookGraphError(
+        `Timed out waiting for media container ${opts.creationId} to finish (status: ${status})`
+      );
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+}

@@ -5,6 +5,7 @@ vi.mock("../client", () => ({
   createCarouselItemContainer: vi.fn(),
   createCarouselContainer: vi.fn(),
   publishMedia: vi.fn(),
+  waitForMediaContainer: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock("@/lib/services/facebook/connection", () => ({
   getConnection: vi.fn(),

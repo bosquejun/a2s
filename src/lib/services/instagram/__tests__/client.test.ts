@@ -3,8 +3,10 @@ import {
   createCarouselContainer,
   createCarouselItemContainer,
   createMediaContainer,
+  getContainerStatus,
   getInstagramUserId,
   publishMedia,
+  waitForMediaContainer,
 } from "../client";
 import { FacebookGraphError } from "@/lib/services/facebook/client";
 
@@ -107,6 +109,33 @@ describe("publishMedia", () => {
     const [, init] = spy.mock.calls[0];
     const body = init?.body as URLSearchParams;
     expect(body.get("creation_id")).toBe("CONTAINER1");
+  });
+});
+
+describe("getContainerStatus", () => {
+  it("returns the status_code", async () => {
+    mockFetchOnce({ status_code: "FINISHED" });
+    const status = await getContainerStatus({
+      creationId: "C1",
+      pageAccessToken: "TOKEN",
+    });
+    expect(status).toBe("FINISHED");
+  });
+});
+
+describe("waitForMediaContainer", () => {
+  it("resolves once the container is FINISHED", async () => {
+    mockFetchOnce({ status_code: "FINISHED" });
+    await expect(
+      waitForMediaContainer({ creationId: "C1", pageAccessToken: "TOKEN" })
+    ).resolves.toBeUndefined();
+  });
+
+  it("throws when the container reports ERROR", async () => {
+    mockFetchOnce({ status_code: "ERROR" });
+    await expect(
+      waitForMediaContainer({ creationId: "C1", pageAccessToken: "TOKEN" })
+    ).rejects.toMatchObject({ name: "FacebookGraphError" });
   });
 });
 
