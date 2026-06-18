@@ -14,6 +14,7 @@ import {
   createCarouselItemContainer,
   createMediaContainer,
   publishMedia,
+  waitForMediaContainer,
 } from "./client";
 import { planCarouselSlides, type InstagramPostFormat } from "./carousel-plan";
 
@@ -156,6 +157,10 @@ export async function shareStoryToInstagram(
  * carousel container. The slide count comes from the same plan the image route
  * renders, so each child URL resolves to a real slide. Returns the parent
  * creation id ready to publish.
+ *
+ * Instagram fetches each slide image asynchronously, so we wait for every child
+ * to finish processing before nesting it, and for the parent to finish before
+ * returning — publishing too early is what triggers "Media ID is not available".
  */
 async function stageCarousel(
   igUserId: string,
@@ -174,13 +179,16 @@ async function stageCarousel(
       pageAccessToken,
       imageUrl: igCarouselSlideUrl(slug, i),
     });
+    await waitForMediaContainer({ creationId: childId, pageAccessToken });
     children.push(childId);
   }
 
-  return createCarouselContainer({
+  const parentId = await createCarouselContainer({
     igUserId,
     pageAccessToken,
     children,
     caption,
   });
+  await waitForMediaContainer({ creationId: parentId, pageAccessToken });
+  return parentId;
 }
