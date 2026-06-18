@@ -41,7 +41,7 @@ export const socialPostWorkflowInputSchema = z.object({
   storyId: z.union([z.string(), z.number()]),
   /** ISO datetime: hold the post until this instant, then publish. */
   postAt: z.string(),
-  platforms: z.array(z.enum(["facebook", "instagram", "x"])).min(1),
+  platforms: z.array(z.enum(["facebook", "instagram", "threads", "x"])).min(1),
 });
 export type SocialPostWorkflowInput = z.infer<
   typeof socialPostWorkflowInputSchema

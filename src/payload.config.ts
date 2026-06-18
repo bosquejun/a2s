@@ -15,6 +15,7 @@ import { Tags } from "./payload/collections/Tags";
 import { Users } from "./payload/collections/Users";
 import { FacebookConnection } from "./payload/globals/FacebookConnection";
 import { SiteSettings } from "./payload/globals/SiteSettings";
+import { ThreadsConnection } from "./payload/globals/ThreadsConnection";
 import { XConnection } from "./payload/globals/XConnection";
 
 const filename = fileURLToPath(import.meta.url);
@@ -29,7 +30,7 @@ export default buildConfig({
     },
   },
   collections: [Stories, StoryRequests, Tags, Media, Users],
-  globals: [SiteSettings, FacebookConnection, XConnection],
+  globals: [SiteSettings, FacebookConnection, XConnection, ThreadsConnection],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

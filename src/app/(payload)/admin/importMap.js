@@ -33,6 +33,8 @@ import { FacebookShareButton as FacebookShareButton_facebook } from '../../../co
 import { InstagramShareButton as InstagramShareButton_instagram } from '../../../components/admin/InstagramShareButton'
 import { XConnectButton as XConnectButton_x } from '../../../components/admin/XConnectButton'
 import { XShareButton as XShareButton_x } from '../../../components/admin/XShareButton'
+import { ThreadsConnectButton as ThreadsConnectButton_threads } from '../../../components/admin/ThreadsConnectButton'
+import { ThreadsShareButton as ThreadsShareButton_threads } from '../../../components/admin/ThreadsShareButton'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -70,5 +72,7 @@ export const importMap = {
   "/components/admin/FacebookShareButton#FacebookShareButton": FacebookShareButton_facebook,
   "/components/admin/InstagramShareButton#InstagramShareButton": InstagramShareButton_instagram,
   "/components/admin/XConnectButton#XConnectButton": XConnectButton_x,
-  "/components/admin/XShareButton#XShareButton": XShareButton_x
+  "/components/admin/XShareButton#XShareButton": XShareButton_x,
+  "/components/admin/ThreadsConnectButton#ThreadsConnectButton": ThreadsConnectButton_threads,
+  "/components/admin/ThreadsShareButton#ThreadsShareButton": ThreadsShareButton_threads
 }
