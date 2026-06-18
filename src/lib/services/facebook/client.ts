@@ -141,6 +141,39 @@ export async function postToPage(opts: {
 }
 
 /**
+ * Publish a single photo to a Facebook Page via the `/photos` edge. Facebook
+ * fetches the image at `imageUrl` server-side, so it must be publicly
+ * reachable. The `caption` becomes the post body — a photo post shows no link
+ * preview card, so any "read on" link belongs inline in the caption. Returns
+ * the underlying post id (`post_id`) so it lines up with `/feed` post ids and
+ * can be linked the same way.
+ */
+export async function postPhotoToPage(opts: {
+  pageId: string;
+  pageAccessToken: string;
+  imageUrl: string;
+  caption: string;
+}): Promise<string> {
+  const url = new URL(`${GRAPH}/${opts.pageId}/photos`);
+  const body = new URLSearchParams({
+    url: opts.imageUrl,
+    caption: opts.caption,
+    access_token: opts.pageAccessToken,
+  });
+  const res = await fetch(url, { method: "POST", body });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json?.error) {
+    throw new FacebookGraphError(
+      json?.error?.message ?? "Failed to publish photo to Facebook Page",
+      json?.error?.code
+    );
+  }
+  // `/photos` returns both the photo `id` and the feed `post_id`; prefer the
+  // post id so callers can build a normal facebook.com/{post_id} permalink.
+  return (json.post_id ?? json.id) as string;
+}
+
+/**
  * Add a comment (as the Page) to one of the Page's own posts. Used for the
  * link-in-first-comment option, where the story link is kept out of the post
  * body and dropped into the first comment instead to avoid the reach penalty
