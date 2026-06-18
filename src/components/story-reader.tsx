@@ -4,6 +4,7 @@ import { useBrownNoise } from "@/hooks/use-brown-noise";
 import { useReadHistory } from "@/hooks/use-read-history";
 import { tagToSlug } from "@/lib/content/tags";
 import { StoryStats } from "@/components/story-stats";
+import { ShareLinks } from "@/components/share-links";
 import { featureFlags } from "@/lib/feature-flags";
 import { Mood, MOOD_LABELS } from "@/lib/content/taxonomy";
 import { Story, StorySummary } from "@/lib/types";
@@ -233,6 +234,21 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
             <span className="h-px w-10 bg-border/60" />
             <span className="font-serif italic text-sm">fin</span>
             <span className="h-px w-10 bg-border/60" />
+          </div>
+
+          {/* Share — high-intent moment, right after the reader finishes */}
+          <div className="mt-10 flex flex-col items-center gap-3.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground/50">
+              <Share2 size={13} className="opacity-50" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-medium">
+                Share
+              </span>
+            </div>
+            <ShareLinks
+              slug={story.slug}
+              title={story.title}
+              excerpt={story.excerpt}
+            />
           </div>
 
           {/* Tags section - improved UI with badge styling */}
