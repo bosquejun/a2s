@@ -23,14 +23,18 @@ import { planCarouselSlides, type InstagramPostFormat } from "./carousel-plan";
 export type { InstagramPostFormat } from "./carousel-plan";
 
 const LINK_IN_BIO = "Read the full story — link in bio 🔗";
+const LINK_IN_COMMENTS = "Read the full story — link in comments 👇";
 
 /** Instagram favours more hashtags for discovery than Facebook. */
 const INSTAGRAM_HASHTAG_LIMIT = 10;
 
 /**
  * Instagram captions cannot contain clickable links, so the caption leads with
- * the story's social hook (or excerpt/title), points readers to the bio, and
- * closes with taxonomy-derived hashtags for discovery.
+ * the story's social hook (or excerpt/title), points readers to the story link,
+ * and closes with taxonomy-derived hashtags for discovery.
+ *
+ * When the link is auto-posted as the first comment (`linkInComment`), the CTA
+ * points there; otherwise it falls back to the profile bio link.
  */
 export function buildInstagramCaption(
   story: {
@@ -38,10 +42,12 @@ export function buildInstagramCaption(
     excerpt?: string | null;
     title: string;
   },
-  hashtags?: string
+  hashtags?: string,
+  options: { linkInComment?: boolean } = {}
 ): string {
   const lead = story.hook || story.excerpt || story.title;
-  const parts = [lead, LINK_IN_BIO];
+  const cta = options.linkInComment ? LINK_IN_COMMENTS : LINK_IN_BIO;
+  const parts = [lead, cta];
   if (hashtags) parts.push(hashtags);
   return parts.join("\n\n");
 }
@@ -109,6 +115,10 @@ export async function shareStoryToInstagram(
 
   const igUserId = connection.instagramUserId;
   const pageAccessToken = connection.pageAccessToken;
+  // Resolve the link-in-comment toggle up front so the caption CTA (and the
+  // carousel CTA slide, rendered independently by the slide route) agree on
+  // where the link lives: the first comment when enabled, the bio otherwise.
+  const { instagram: linkInComment } = await getLinkInCommentSettings(payload);
   const caption = buildInstagramCaption(
     {
       hook: typeof story.hook === "string" ? story.hook : null,
@@ -121,7 +131,8 @@ export async function shareStoryToInstagram(
         tags: extractNames(story.tags),
       },
       INSTAGRAM_HASHTAG_LIMIT
-    )
+    ),
+    { linkInComment }
   );
 
   try {
@@ -152,7 +163,6 @@ export async function shareStoryToInstagram(
     // Best-effort link-in-first-comment. Instagram comments aren't clickable,
     // but the URL is still copy-pasteable, and a failed comment must never
     // undo the successful post.
-    const { instagram: linkInComment } = await getLinkInCommentSettings(payload);
     if (linkInComment && !story.instagramCommentId) {
       try {
         const commentId = await commentOnMedia({

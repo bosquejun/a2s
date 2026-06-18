@@ -242,9 +242,12 @@ export async function carouselContentImage({
 }
 
 /** The closing slide: a "read the full story" call-to-action. */
-export async function carouselCtaImage({ accent }: { accent?: string } = {}) {
+export async function carouselCtaImage({
+  accent,
+  linkInComment,
+}: { accent?: string; linkInComment?: boolean } = {}) {
   const headline = "Read the full story";
-  const sub = "Link in bio";
+  const sub = linkInComment ? "Link in comments" : "Link in bio";
   const fonts = await loadOgFonts(
     headline,
     `${sub.toUpperCase()} ${BRAND.toUpperCase()} AFTER2AMSTORIES.COM`
