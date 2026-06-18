@@ -15,10 +15,15 @@ import type { Story } from "@/lib/types";
 /** Instagram allows 2–10 items in a carousel. */
 export const MIN_CAROUSEL_SLIDES = 2;
 export const MAX_CAROUSEL_SLIDES = 10;
-/** Cover + CTA are fixed, so the body gets at most this many slides. */
-export const MAX_CONTENT_SLIDES = MAX_CAROUSEL_SLIDES - 2;
+/**
+ * The body slides are a *teaser*, not the whole story: a few short, swipeable
+ * cards that open the story and stop on a cliffhanger, so readers keep swiping
+ * and tap through to the site. Keep the slide count low and the text per card
+ * light — content past the cap is dropped (the CTA points to the full story).
+ */
+export const MAX_CONTENT_SLIDES = 4;
 /** Rough character budget per content slide, tuned to the 1080² type sizes. */
-export const CONTENT_SLIDE_CHAR_BUDGET = 420;
+export const CONTENT_SLIDE_CHAR_BUDGET = 240;
 
 export type InstagramPostFormat = "image" | "carousel";
 

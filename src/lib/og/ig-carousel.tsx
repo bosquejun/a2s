@@ -174,7 +174,7 @@ export async function carouselContentImage({
     text,
     `${BRAND.toUpperCase()} ${page} / ${pageCount}`
   );
-  const fontSize = text.length > 320 ? 38 : text.length > 200 ? 46 : 54;
+  const fontSize = text.length > 180 ? 50 : text.length > 100 ? 60 : 70;
 
   return new ImageResponse(
     <div
