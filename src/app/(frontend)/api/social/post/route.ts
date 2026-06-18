@@ -4,6 +4,7 @@ import { getPayloadClient } from "@/lib/payload";
 import { shareStory as shareStoryToFacebook } from "@/lib/services/facebook/share-story";
 import { randomInstagramFormat } from "@/lib/services/instagram/carousel-plan";
 import { shareStoryToInstagram } from "@/lib/services/instagram/share-story";
+import { shareStoryToThreads } from "@/lib/services/threads/share-story";
 import { shareStory as shareStoryToX } from "@/lib/services/x/share-story";
 import {
   socialPostWorkflowInputSchema,
@@ -38,6 +39,8 @@ export const { POST } = serve<SocialPostWorkflowInput>(
             await shareStoryToInstagram(payload, storyId, {
               format: randomInstagramFormat(),
             });
+          } else if (platform === "threads") {
+            await shareStoryToThreads(payload, storyId);
           } else {
             await shareStoryToX(payload, storyId);
           }

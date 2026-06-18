@@ -2,12 +2,13 @@ import type { CollectionAfterChangeHook } from "payload";
 
 import { shareStory as shareStoryToFacebook } from "@/lib/services/facebook/share-story";
 import { shareStoryToInstagram } from "@/lib/services/instagram/share-story";
+import { shareStoryToThreads } from "@/lib/services/threads/share-story";
 import { shareStory as shareStoryToX } from "@/lib/services/x/share-story";
 import { featureFlags } from "@/lib/feature-flags";
 import { jitterDelayMs, nextNightWindowPostAt } from "@/lib/services/social/schedule";
 import { triggerWorkflow } from "@/lib/workflow-client/client";
 
-type Platform = "facebook" | "instagram" | "x";
+type Platform = "facebook" | "instagram" | "threads" | "x";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -43,6 +44,7 @@ export const scheduleSocialPosts: CollectionAfterChangeHook = ({
   if (doc.autoPostToFacebook && !doc.facebookPostId) platforms.push("facebook");
   if (doc.autoPostToInstagram && !doc.instagramPostId)
     platforms.push("instagram");
+  if (doc.autoPostToThreads && !doc.threadsPostId) platforms.push("threads");
   if (featureFlags.xPosting && doc.autoPostToX && !doc.xPostId)
     platforms.push("x");
   if (platforms.length === 0) return doc;
@@ -69,6 +71,7 @@ export const scheduleSocialPosts: CollectionAfterChangeHook = ({
     await sleep(delay);
     if (platform === "facebook") return shareStoryToFacebook(req.payload, doc.id);
     if (platform === "instagram") return shareStoryToInstagram(req.payload, doc.id);
+    if (platform === "threads") return shareStoryToThreads(req.payload, doc.id);
     return shareStoryToX(req.payload, doc.id);
   };
   for (const platform of platforms) {

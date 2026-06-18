@@ -225,5 +225,33 @@ export const Stories: CollectionConfig = {
         },
       },
     },
+    {
+      name: "autoPostToThreads",
+      type: "checkbox",
+      defaultValue: true,
+      admin: {
+        position: "sidebar",
+        description: "Post to the connected Threads account when published.",
+      },
+    },
+    {
+      name: "threadsPostId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        readOnly: true,
+        description: "Set automatically after the story is posted to Threads.",
+      },
+    },
+    {
+      name: "shareToThreads",
+      type: "ui",
+      admin: {
+        position: "sidebar",
+        components: {
+          Field: "/components/admin/ThreadsShareButton#ThreadsShareButton",
+        },
+      },
+    },
   ],
 };
