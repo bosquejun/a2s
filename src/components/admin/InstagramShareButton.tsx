@@ -3,10 +3,13 @@
 import { Button, useDocumentInfo, useFormFields } from "@payloadcms/ui";
 import { useState } from "react";
 
+type InstagramPostFormat = "image" | "carousel";
+
 /**
  * Sidebar button on the Story edit view. Posts the current story to the
- * connected Instagram account on demand. Disabled until the story is published
- * and replaced with a confirmation once it has already been shared.
+ * connected Instagram account on demand, as either a single OG card or a
+ * multi-slide carousel. Disabled until the story is published and replaced with
+ * a confirmation once it has already been shared.
  */
 export function InstagramShareButton() {
   const { id } = useDocumentInfo();
@@ -36,14 +39,14 @@ export function InstagramShareButton() {
     return <p>✓ Shared to Instagram</p>;
   }
 
-  async function share() {
+  async function share(format: InstagramPostFormat) {
     setBusy(true);
     setError(null);
     try {
       const res = await fetch("/api/instagram/share", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ storyId: id }),
+        body: JSON.stringify({ storyId: id, format }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -61,9 +64,20 @@ export function InstagramShareButton() {
   const disabled = busy || status !== "published";
 
   return (
-    <div>
-      <Button buttonStyle="secondary" onClick={share} disabled={disabled}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <Button
+        buttonStyle="secondary"
+        onClick={() => share("image")}
+        disabled={disabled}
+      >
         {busy ? "Sharing…" : "Share to Instagram"}
+      </Button>
+      <Button
+        buttonStyle="secondary"
+        onClick={() => share("carousel")}
+        disabled={disabled}
+      >
+        {busy ? "Sharing…" : "Share as carousel"}
       </Button>
       {status !== "published" && (
         <p style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "0.25rem" }}>

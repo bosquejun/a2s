@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  createCarouselContainer,
+  createCarouselItemContainer,
   createMediaContainer,
   getInstagramUserId,
   publishMedia,
@@ -7,13 +9,11 @@ import {
 import { FacebookGraphError } from "@/lib/services/facebook/client";
 
 function mockFetchOnce(body: unknown, ok = true, status = 200) {
-  return vi
-    .spyOn(globalThis, "fetch")
-    .mockResolvedValueOnce(
-      new Response(JSON.stringify(body), {
-        status: ok ? status : status === 200 ? 400 : status,
-      })
-    );
+  return vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+    new Response(JSON.stringify(body), {
+      status: ok ? status : status === 200 ? 400 : status,
+    })
+  );
 }
 
 afterEach(() => vi.restoreAllMocks());
@@ -58,6 +58,40 @@ describe("createMediaContainer", () => {
         caption: "hi",
       })
     ).rejects.toMatchObject({ code: 190 });
+  });
+});
+
+describe("createCarouselItemContainer", () => {
+  it("stages a carousel child with is_carousel_item", async () => {
+    const spy = mockFetchOnce({ id: "CHILD1" });
+    const id = await createCarouselItemContainer({
+      igUserId: "IG1",
+      pageAccessToken: "TOKEN",
+      imageUrl: "https://x/slide/0.jpg",
+    });
+    expect(id).toBe("CHILD1");
+    const [, init] = spy.mock.calls[0];
+    const body = init?.body as URLSearchParams;
+    expect(body.get("image_url")).toBe("https://x/slide/0.jpg");
+    expect(body.get("is_carousel_item")).toBe("true");
+  });
+});
+
+describe("createCarouselContainer", () => {
+  it("stages the parent with media_type CAROUSEL and joined children", async () => {
+    const spy = mockFetchOnce({ id: "PARENT1" });
+    const id = await createCarouselContainer({
+      igUserId: "IG1",
+      pageAccessToken: "TOKEN",
+      children: ["CHILD1", "CHILD2"],
+      caption: "hi",
+    });
+    expect(id).toBe("PARENT1");
+    const [, init] = spy.mock.calls[0];
+    const body = init?.body as URLSearchParams;
+    expect(body.get("media_type")).toBe("CAROUSEL");
+    expect(body.get("children")).toBe("CHILD1,CHILD2");
+    expect(body.get("caption")).toBe("hi");
   });
 });
 
