@@ -31,6 +31,37 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
+      name: "linkInComment",
+      type: "group",
+      label: "Link in first comment",
+      admin: {
+        description:
+          "Post the story link as the first comment instead of in the post body. " +
+          "Platforms downrank posts that carry an outbound link, so commenting the " +
+          "link can boost reach and engagement.",
+      },
+      fields: [
+        {
+          name: "facebook",
+          type: "checkbox",
+          defaultValue: false,
+          admin: {
+            description:
+              "Facebook: keep the link out of the post body and post it as the first comment instead.",
+          },
+        },
+        {
+          name: "instagram",
+          type: "checkbox",
+          defaultValue: false,
+          admin: {
+            description:
+              "Instagram: post the link as the first comment. Note: Instagram comments are not clickable.",
+          },
+        },
+      ],
+    },
+    {
       name: "nightGate",
       type: "group",
       admin: {

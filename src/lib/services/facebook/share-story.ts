@@ -3,7 +3,13 @@ import "server-only";
 import type { Payload } from "payload";
 
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
-import { FacebookGraphError, postPhotoToPage, postToPage } from "./client";
+import { getLinkInCommentSettings } from "@/lib/services/social/settings";
+import {
+  commentOnPost,
+  FacebookGraphError,
+  postPhotoToPage,
+  postToPage,
+} from "./client";
 import { clearConnection, getConnection } from "./connection";
 
 /** Hashtags carry less discovery weight on Facebook, so keep the set tight. */
@@ -21,6 +27,11 @@ function storyUrl(slug: string): string {
 /** The story's OG hook card rendered as a landscape JPEG for a Page photo post. */
 function fbImageUrl(slug: string): string {
   return `${siteBase()}/story/${slug}/fb`;
+}
+
+/** Friendly lead for the link comment so it reads as engagement, not a bot. */
+function linkCommentText(url: string): string {
+  return `Read the full story 👉 ${url}`;
 }
 
 /** "text" posts a link with an auto-preview; "photo" posts the OG hook card. */
@@ -45,8 +56,11 @@ export interface ShareOptions {
  *
  * Two formats: "photo" (default) publishes the story's OG hook card as a single
  * Page photo — the Facebook counterpart to Instagram's single-image post — and
- * "text" falls back to the older link-with-preview feed post. A photo post has
- * no link preview card, so the "read on" link is folded into the caption.
+ * "text" falls back to the older link-with-preview feed post.
+ *
+ * Orthogonally, the link-in-first-comment setting keeps the story link out of
+ * the post body (the photo caption or the feed link preview) and drops it into
+ * the first comment instead, to dodge Facebook's outbound-link reach penalty.
  */
 export async function shareStory(
   payload: Payload,
@@ -79,7 +93,7 @@ export async function shareStory(
     (options.format ?? "photo") === "photo" && story.slug ? "photo" : "text";
 
   const lead = story.hook || story.excerpt || story.title;
-  const link = story.slug ? storyUrl(story.slug) : undefined;
+  const url = story.slug ? storyUrl(story.slug) : undefined;
   const hashtags = buildHashtags(
     {
       categories: extractNames(story.categories),
@@ -87,11 +101,21 @@ export async function shareStory(
     },
     FACEBOOK_HASHTAG_LIMIT
   );
+  const { facebook: linkInComment } = await getLinkInCommentSettings(payload);
+  // When the link goes in the first comment we deliberately leave it out of the
+  // post body (caption / feed link) to dodge the outbound-link reach penalty.
+  const bodyLink = linkInComment ? undefined : url;
 
   try {
     let postId: string;
     if (format === "photo" && story.slug) {
-      const caption = [lead, link && `Read the full story: ${link}`, hashtags]
+      // A photo post has no link preview card, so when the link belongs in the
+      // body it is folded inline into the caption.
+      const caption = [
+        lead,
+        bodyLink && `Read the full story: ${bodyLink}`,
+        hashtags,
+      ]
         .filter(Boolean)
         .join("\n\n");
       postId = await postPhotoToPage({
@@ -106,7 +130,7 @@ export async function shareStory(
         pageId: connection.pageId,
         pageAccessToken: connection.pageAccessToken,
         message,
-        link,
+        link: bodyLink,
       });
     }
 
@@ -118,6 +142,29 @@ export async function shareStory(
       // Avoid re-triggering the auto-post hook for this internal write.
       context: { skipFacebookAutoPost: true },
     });
+
+    // Best-effort: a failed comment must not undo a successful post.
+    if (linkInComment && url && !story.facebookCommentId) {
+      try {
+        const commentId = await commentOnPost({
+          postId,
+          pageAccessToken: connection.pageAccessToken,
+          message: linkCommentText(url),
+        });
+        await payload.update({
+          collection: "stories",
+          id: storyId,
+          data: { facebookCommentId: commentId },
+          overrideAccess: true,
+          context: { skipFacebookAutoPost: true },
+        });
+      } catch (err) {
+        payload.logger.error(
+          { err, storyId },
+          "[facebook] failed to post link as first comment"
+        );
+      }
+    }
 
     return { postId };
   } catch (err) {
