@@ -53,6 +53,12 @@ export function SiteFooter() {
               Whisper a story
             </Link>
           )}
+          <a
+            href="/feed.xml"
+            className="transition-colors hover:text-foreground/80"
+          >
+            RSS
+          </a>
         </nav>
 
         <p className="font-serif italic text-xs text-muted-foreground/40">
