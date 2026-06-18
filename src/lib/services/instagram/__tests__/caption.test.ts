@@ -27,4 +27,20 @@ describe("buildInstagramCaption", () => {
       "H\n\nRead the full story — link in bio 🔗"
     );
   });
+
+  it("defaults to the link-in-bio CTA", () => {
+    const c = buildInstagramCaption({ hook: "H", title: "T" }, undefined, {
+      linkInComment: false,
+    });
+    expect(c).toBe("H\n\nRead the full story — link in bio 🔗");
+  });
+
+  it("points to the comments when the link is auto-commented", () => {
+    const c = buildInstagramCaption({ hook: "H", title: "T" }, "#After2AM", {
+      linkInComment: true,
+    });
+    expect(c).toBe(
+      "H\n\nRead the full story — link in comments 👇\n\n#After2AM"
+    );
+  });
 });

@@ -1,5 +1,7 @@
+import { getPayloadClient } from "@/lib/payload";
 import { renderCarouselSlideJpeg } from "@/lib/services/instagram/carousel-image";
 import { planCarouselSlides } from "@/lib/services/instagram/carousel-plan";
+import { getLinkInCommentSettings } from "@/lib/services/social/settings";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 
 /**
@@ -21,7 +23,15 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  const jpeg = await renderCarouselSlideJpeg(story, slides[i]);
+  // Only the CTA slide's wording depends on the link-in-comment toggle, so we
+  // avoid the settings read for every content slide Instagram fetches.
+  const linkInComment =
+    slides[i].kind === "cta"
+      ? (await getLinkInCommentSettings(await getPayloadClient())).instagram
+      : false;
+  const jpeg = await renderCarouselSlideJpeg(story, slides[i], {
+    linkInComment,
+  });
   return new Response(new Uint8Array(jpeg), {
     headers: {
       "content-type": "image/jpeg",

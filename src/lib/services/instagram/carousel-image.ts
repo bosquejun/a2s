@@ -18,7 +18,8 @@ import type { CarouselSlide } from "./carousel-plan";
  */
 export async function renderCarouselSlideJpeg(
   story: Story,
-  slide: CarouselSlide
+  slide: CarouselSlide,
+  options: { linkInComment?: boolean } = {}
 ): Promise<Buffer> {
   const accent = story.categories[0]
     ? CATEGORY_ACCENTS[story.categories[0]]
@@ -35,7 +36,10 @@ export async function renderCarouselSlideJpeg(
       accent,
     });
   } else {
-    image = await carouselCtaImage({ accent });
+    image = await carouselCtaImage({
+      accent,
+      linkInComment: options.linkInComment,
+    });
   }
   return toJpeg(Buffer.from(await image.arrayBuffer()));
 }
