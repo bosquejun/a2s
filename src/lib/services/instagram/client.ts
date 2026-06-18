@@ -166,3 +166,20 @@ export async function waitForMediaContainer(opts: {
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
 }
+
+/**
+ * Add a comment to a published media object. Used for the link-in-first-comment
+ * option; note that Instagram does not render links in comments as clickable,
+ * so the URL is only copy-pasteable for readers.
+ */
+export async function commentOnMedia(opts: {
+  mediaId: string;
+  pageAccessToken: string;
+  message: string;
+}): Promise<string> {
+  const json = await graphPost(`${opts.mediaId}/comments`, {
+    message: opts.message,
+    access_token: opts.pageAccessToken,
+  });
+  return json.id as string;
+}
