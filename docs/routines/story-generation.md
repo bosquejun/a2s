@@ -11,23 +11,33 @@ the endpoint rejects anything off-shape.
 > here so the two stay in sync.
 
 **Run environment provides:**
-- `{SITE}` — production base URL (e.g. `https://after2am.example.com`)
+- `SITE` — production base URL (e.g. `https://after2am.example.com`)
 - `STORY_GENERATION_SECRET` — bearer token for the ingest endpoint
+
+The mechanical steps (surveying the site, validating + publishing) are wrapped
+in a committed CLI so they don't have to be re-derived each run — see
+`scripts/story-routine/`. Both commands read `SITE` and
+`STORY_GENERATION_SECRET` from the environment. Your job is the writing in
+between (steps 3–4); the CLI handles the HTTP, retries, and the local schema
+gate.
 
 ---
 
 ## What to do each run
 
-1. **Survey recent stories (for variety).**
-   `GET {SITE}/payload-api/stories?sort=-publishedAt&limit=20&depth=0`
-   Note the recent `mood` and `categories` values and titles.
+1. **Survey the site for context.** Run:
+   `pnpm story:survey`
+   It prints compact JSON with two arrays:
+   - `recent` — the 20 newest stories (variety context). Note their `mood`,
+     `categories`, `intensity`, and titles so you don't repeat them.
+   - `mostRead` — the 15 most-read stories (engagement feedback).
 
-2. **Survey what's actually landing (engagement feedback).**
-   `GET {SITE}/payload-api/stories?sort=-viewCount&limit=15&depth=0`
-   This is the most-read set. Look across it for what is *working*:
+2. **Read the engagement signal.** From `mostRead`, look across what is
+   *working*:
    - which `mood` × `categories` pairs and `intensity` levels recur, and
    - what kinds of openings, situations, and concrete details these stories
-     share (read a few bodies, not just the metadata).
+     share — fetch a few bodies (`GET {SITE}/payload-api/stories/<slug>`) and
+     read them, not just the metadata.
    Treat this as a signal to lean into — bias the batch toward the textures and
    tones readers finish, **without** copying premises or titles. Discount any
    story whose high count looks like an outlier (e.g. one that was shared
@@ -44,17 +54,19 @@ the endpoint rejects anything off-shape.
 
 4. **Write each story** following the voice rules and output schema below.
 
-5. **Publish each story:**
-   `POST {SITE}/api/stories/ingest`
-   Headers: `Authorization: Bearer {STORY_GENERATION_SECRET}`, `Content-Type: application/json`
-   Body: the JSON object described in **Output schema**.
-   - `201` → published (record the returned `slug`)
-   - `409` → a story with that slug already exists; skip it
-   - `400` → schema/validation error; read the message, fix the body, retry once
-   - other → treat as failure, record and continue
+5. **Publish each story.** Write each finished story to its own JSON file
+   matching the **Output schema** below (one story per file), then run:
+   `pnpm story:publish story-1.json story-2.json`
+   The CLI validates every file against the *same* schema the endpoint enforces
+   (so shape errors are caught locally before any network call), then POSTs each
+   to `{SITE}/api/stories/ingest`. For each file it prints one of:
+   - `published <slug>` — created (201)
+   - `skipped <slug> — duplicate slug` — already existed (409); safe on reruns
+   - `failed … — <reason>` — schema or server error; fix and re-run that file
+   It exits non-zero if any story failed (duplicates do not count as failures).
 
-6. **Report:** list created slugs and any skipped (409) or failed stories with
-   reasons. Note which engagement signals (step 2) you leaned into this run.
+6. **Report:** relay the CLI's published/skipped/failed summary, and note which
+   engagement signals (step 2) you leaned into this run.
 
 ---
 

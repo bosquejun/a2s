@@ -13,6 +13,8 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "payload": "payload",
     "migrate": "node scripts/migrate.mjs",
+    "story:survey": "tsx scripts/story-routine/index.ts survey",
+    "story:publish": "tsx scripts/story-routine/index.ts publish",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap"
   },
