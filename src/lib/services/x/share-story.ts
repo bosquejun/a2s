@@ -3,6 +3,10 @@ import "server-only";
 import type { Payload } from "payload";
 
 import { readFlag } from "@/lib/feature-flags";
+import {
+  buildEngagementComment,
+  waitBeforeComment,
+} from "@/lib/services/social/link-comment";
 
 import {
   XApiError,
@@ -103,21 +107,30 @@ export async function shareStory(
   );
 
   try {
-    const postId =
+    // The link already lives in the tweet body, so publish once for both the
+    // main tweet and (optionally) a follow-up self-reply.
+    const publish = async (
+      tweetText: string,
+      replyToTweetId?: string
+    ): Promise<string> =>
       connection.authMethod === "oauth1"
-        ? await postTweetOAuth1({
+        ? postTweetOAuth1({
             creds: {
               consumerKey: connection.consumerKey as string,
               consumerSecret: connection.consumerSecret as string,
-              accessToken: connection.accessToken,
+              accessToken: connection.accessToken as string,
               accessTokenSecret: connection.accessTokenSecret as string,
             },
-            text,
+            text: tweetText,
+            replyToTweetId,
           })
-        : await postTweet({
+        : postTweet({
             accessToken: await ensureAccessToken(payload, connection),
-            text,
+            text: tweetText,
+            replyToTweetId,
           });
+
+    const postId = await publish(text);
 
     await payload.update({
       collection: "stories",
@@ -127,6 +140,19 @@ export async function shareStory(
       // Avoid re-triggering the auto-post hook for this internal write.
       context: { skipXAutoPost: true },
     });
+
+    // Best-effort engagement reply: the story link is already in the tweet, so
+    // a self-reply nudges interaction without repeating it. A failed reply must
+    // never undo the successful post.
+    try {
+      await waitBeforeComment();
+      await publish(buildEngagementComment(), postId);
+    } catch (err) {
+      payload.logger?.error?.(
+        { err, storyId },
+        "[x] failed to post engagement self-reply"
+      );
+    }
 
     return { postId };
   } catch (err) {

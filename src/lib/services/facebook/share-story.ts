@@ -3,6 +3,10 @@ import "server-only";
 import type { Payload } from "payload";
 
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
+import {
+  buildLinkComment,
+  waitBeforeComment,
+} from "@/lib/services/social/link-comment";
 import { getLinkInCommentSettings } from "@/lib/services/social/settings";
 import {
   commentOnPost,
@@ -27,11 +31,6 @@ function storyUrl(slug: string): string {
 /** The story's OG hook card rendered as a landscape JPEG for a Page photo post. */
 function fbImageUrl(slug: string): string {
   return `${siteBase()}/story/${slug}/fb`;
-}
-
-/** Friendly lead for the link comment so it reads as engagement, not a bot. */
-function linkCommentText(url: string): string {
-  return `Read the full story 👉 ${url}`;
 }
 
 /** "text" posts a link with an auto-preview; "photo" posts the OG hook card. */
@@ -146,10 +145,13 @@ export async function shareStory(
     // Best-effort: a failed comment must not undo a successful post.
     if (linkInComment && url && !story.facebookCommentId) {
       try {
+        // Pause briefly so the comment doesn't land the same instant as the
+        // post, which reads as automation.
+        await waitBeforeComment();
         const commentId = await commentOnPost({
           postId,
           pageAccessToken: connection.pageAccessToken,
-          message: linkCommentText(url),
+          message: buildLinkComment(url),
         });
         await payload.update({
           collection: "stories",

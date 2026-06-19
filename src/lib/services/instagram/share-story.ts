@@ -8,6 +8,10 @@ import {
   getConnection,
 } from "@/lib/services/facebook/connection";
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
+import {
+  buildLinkComment,
+  waitBeforeComment,
+} from "@/lib/services/social/link-comment";
 import { getLinkInCommentSettings } from "@/lib/services/social/settings";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import {
@@ -165,10 +169,13 @@ export async function shareStoryToInstagram(
     // undo the successful post.
     if (linkInComment && !story.instagramCommentId) {
       try {
+        // Pause briefly so the comment doesn't land the same instant as the
+        // post, which reads as automation.
+        await waitBeforeComment();
         const commentId = await commentOnMedia({
           mediaId: postId,
           pageAccessToken: connection.pageAccessToken,
-          message: storyUrl(story.slug),
+          message: buildLinkComment(storyUrl(story.slug)),
         });
         await payload.update({
           collection: "stories",

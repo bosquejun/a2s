@@ -16,6 +16,14 @@ vi.mock("../connection", () => ({
 vi.mock("@/lib/services/social/settings", () => ({
   getLinkInCommentSettings: vi.fn(),
 }));
+// Keep the real comment-variation text but skip the post→comment delay so tests
+// don't actually wait 3–5s.
+vi.mock("@/lib/services/social/link-comment", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/services/social/link-comment")
+  >("@/lib/services/social/link-comment");
+  return { ...actual, waitBeforeComment: vi.fn().mockResolvedValue(undefined) };
+});
 
 import { shareStory } from "../share-story";
 import {

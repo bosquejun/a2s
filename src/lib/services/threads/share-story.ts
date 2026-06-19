@@ -4,6 +4,10 @@ import type { Payload } from "payload";
 
 import { buildHashtags, extractNames } from "@/lib/services/social/hashtags";
 import {
+  buildEngagementComment,
+  waitBeforeComment,
+} from "@/lib/services/social/link-comment";
+import {
   ThreadsApiError,
   createTextContainer,
   publishContainer,
@@ -139,6 +143,29 @@ export async function shareStoryToThreads(
       // Avoid re-triggering the auto-post hook for this internal write.
       context: { skipThreadsAutoPost: true },
     });
+
+    // Best-effort engagement reply: the story link is already in the post body,
+    // so a self-reply nudges interaction without repeating it. A failed reply
+    // must never undo the successful post.
+    try {
+      await waitBeforeComment();
+      const replyCreationId = await createTextContainer({
+        threadsUserId: connection.threadsUserId,
+        accessToken,
+        text: buildEngagementComment(),
+        replyToId: postId,
+      });
+      await publishContainer({
+        threadsUserId: connection.threadsUserId,
+        accessToken,
+        creationId: replyCreationId,
+      });
+    } catch (err) {
+      payload.logger?.error?.(
+        { err, storyId },
+        "[threads] failed to post engagement self-reply"
+      );
+    }
 
     return { postId };
   } catch (err) {

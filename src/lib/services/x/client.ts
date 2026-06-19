@@ -175,14 +175,22 @@ async function apiGetMe(authHeader: string): Promise<XUser> {
   };
 }
 
-async function apiPostTweet(authHeader: string, text: string): Promise<string> {
+async function apiPostTweet(
+  authHeader: string,
+  text: string,
+  replyToTweetId?: string
+): Promise<string> {
   const res = await fetch(`${API}/tweets`, {
     method: "POST",
     headers: {
       authorization: authHeader,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify(
+      replyToTweetId
+        ? { text, reply: { in_reply_to_tweet_id: replyToTweetId } }
+        : { text }
+    ),
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok || json?.errors) {
@@ -206,8 +214,10 @@ export async function getMe(accessToken: string): Promise<XUser> {
 export async function postTweet(opts: {
   accessToken: string;
   text: string;
+  /** When set, the tweet is published as a reply to this tweet id. */
+  replyToTweetId?: string;
 }): Promise<string> {
-  return apiPostTweet(`Bearer ${opts.accessToken}`, opts.text);
+  return apiPostTweet(`Bearer ${opts.accessToken}`, opts.text, opts.replyToTweetId);
 }
 
 /** Read the authenticated profile using OAuth 1.0a credentials. */
@@ -220,8 +230,10 @@ export async function getMeOAuth1(creds: OAuth1Credentials): Promise<XUser> {
 export async function postTweetOAuth1(opts: {
   creds: OAuth1Credentials;
   text: string;
+  /** When set, the tweet is published as a reply to this tweet id. */
+  replyToTweetId?: string;
 }): Promise<string> {
   const url = `${API}/tweets`;
   const auth = buildOAuth1Header({ method: "POST", url, creds: opts.creds });
-  return apiPostTweet(auth, opts.text);
+  return apiPostTweet(auth, opts.text, opts.replyToTweetId);
 }
