@@ -14,6 +14,14 @@ vi.mock("../connection", () => ({
   clearConnection: vi.fn(),
   updateTokens: vi.fn(),
 }));
+// Keep the real comment-variation text but skip the post→reply delay so tests
+// don't actually wait 3–5s.
+vi.mock("@/lib/services/social/link-comment", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/services/social/link-comment")
+  >("@/lib/services/social/link-comment");
+  return { ...actual, waitBeforeComment: vi.fn().mockResolvedValue(undefined) };
+});
 
 import { shareStoryToThreads } from "../share-story";
 import {
@@ -30,6 +38,7 @@ function fakePayload(overrides = {}) {
   return {
     findByID: vi.fn().mockResolvedValue(story),
     update: vi.fn().mockResolvedValue({}),
+    logger: { error: vi.fn() },
     ...overrides,
   } as unknown as import("payload").Payload;
 }
@@ -72,6 +81,43 @@ describe("shareStoryToThreads", () => {
         context: { skipThreadsAutoPost: true },
       })
     );
+  });
+
+  it("posts a varied engagement self-reply to the published post", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (createTextContainer as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("C1")
+      .mockResolvedValueOnce("CR");
+    (publishContainer as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("P1")
+      .mockResolvedValueOnce("PR");
+    const payload = fakePayload();
+
+    await shareStoryToThreads(payload, 1);
+
+    expect(createTextContainer).toHaveBeenCalledTimes(2);
+    // The follow-up replies to the main post and carries no link (the link is
+    // already in the post body).
+    expect(createTextContainer).toHaveBeenLastCalledWith(
+      expect.objectContaining({ replyToId: "P1" })
+    );
+    const replyText = (createTextContainer as ReturnType<typeof vi.fn>).mock
+      .calls[1][0].text as string;
+    expect(replyText).not.toContain("after2amstories.com");
+  });
+
+  it("does not fail the share when the self-reply fails", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (createTextContainer as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("C1")
+      .mockRejectedValueOnce(new Error("reply blew up"));
+    (publishContainer as ReturnType<typeof vi.fn>).mockResolvedValue("P1");
+    const payload = fakePayload();
+
+    const result = await shareStoryToThreads(payload, 1);
+
+    expect(result).toEqual({ postId: "P1" });
+    expect(payload.logger.error).toHaveBeenCalled();
   });
 
   it("refreshes a near-expiry token before posting", async () => {

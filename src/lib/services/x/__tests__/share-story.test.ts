@@ -13,6 +13,14 @@ vi.mock("../connection", () => ({
   clearConnection: vi.fn(),
   updateTokens: vi.fn(),
 }));
+// Keep the real comment-variation text but skip the post→reply delay so tests
+// don't actually wait 3–5s.
+vi.mock("@/lib/services/social/link-comment", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/services/social/link-comment")
+  >("@/lib/services/social/link-comment");
+  return { ...actual, waitBeforeComment: vi.fn().mockResolvedValue(undefined) };
+});
 
 import { shareStory } from "../share-story";
 import { XApiError, postTweet, refreshAccessToken } from "../client";
@@ -24,6 +32,7 @@ function fakePayload(overrides = {}) {
   return {
     findByID: vi.fn().mockResolvedValue(story),
     update: vi.fn().mockResolvedValue({}),
+    logger: { error: vi.fn() },
     ...overrides,
   } as unknown as import("payload").Payload;
 }
@@ -68,6 +77,39 @@ describe("shareStory (X)", () => {
         context: { skipXAutoPost: true },
       })
     );
+  });
+
+  it("posts a varied engagement self-reply to the published tweet", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (postTweet as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("TWEET1")
+      .mockResolvedValueOnce("REPLY1");
+    const payload = fakePayload();
+
+    await shareStory(payload, 1);
+
+    expect(postTweet).toHaveBeenCalledTimes(2);
+    // The follow-up is a reply to the main tweet and carries no link (the link
+    // is already in the tweet body).
+    expect(postTweet).toHaveBeenLastCalledWith(
+      expect.objectContaining({ replyToTweetId: "TWEET1" })
+    );
+    const replyText = (postTweet as ReturnType<typeof vi.fn>).mock.calls[1][0]
+      .text as string;
+    expect(replyText).not.toContain("after2amstories.com");
+  });
+
+  it("does not fail the share when the self-reply fails", async () => {
+    (getConnection as ReturnType<typeof vi.fn>).mockResolvedValue(connected);
+    (postTweet as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce("TWEET1")
+      .mockRejectedValueOnce(new Error("reply blew up"));
+    const payload = fakePayload();
+
+    const result = await shareStory(payload, 1);
+
+    expect(result).toEqual({ postId: "TWEET1" });
+    expect(payload.logger.error).toHaveBeenCalled();
   });
 
   it("refreshes an expired access token before posting", async () => {

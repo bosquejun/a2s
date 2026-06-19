@@ -158,12 +158,15 @@ export async function createTextContainer(opts: {
   threadsUserId: string;
   accessToken: string;
   text: string;
+  /** When set, the container is staged as a reply to this post id. */
+  replyToId?: string;
 }): Promise<string> {
   const body = new URLSearchParams({
     media_type: "TEXT",
     text: opts.text,
     access_token: opts.accessToken,
   });
+  if (opts.replyToId) body.set("reply_to_id", opts.replyToId);
   const res = await fetch(`${GRAPH}/${opts.threadsUserId}/threads`, {
     method: "POST",
     body,

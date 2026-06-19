@@ -21,6 +21,14 @@ vi.mock("@/lib/services/social/settings", () => ({
     instagram: false,
   }),
 }));
+// Keep the real comment-variation text but skip the post→comment delay so tests
+// don't actually wait 3–5s.
+vi.mock("@/lib/services/social/link-comment", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/services/social/link-comment")
+  >("@/lib/services/social/link-comment");
+  return { ...actual, waitBeforeComment: vi.fn().mockResolvedValue(undefined) };
+});
 
 import { shareStoryToInstagram } from "../share-story";
 import {
@@ -157,7 +165,7 @@ describe("shareStoryToInstagram", () => {
     expect(commentOnMedia).toHaveBeenCalledWith(
       expect.objectContaining({
         mediaId: "M1",
-        message: "https://after2amstories.com/story/s",
+        message: expect.stringContaining("https://after2amstories.com/story/s"),
       })
     );
     expect(payload.update).toHaveBeenCalledWith(
