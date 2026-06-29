@@ -31,6 +31,62 @@ VOICE — write like a real person typing at 2am, not like an author.
 `.trim();
 
 /**
+ * AI tells — concrete failure modes to actively avoid.
+ * Patterns from both internal voice guidelines and the humanizer skill catalog
+ * (github.com/blader/humanizer) that make generated stories read as
+ * machine-written even when every individual word choice seems plausible.
+ */
+export const A2AM_AI_TELLS = `
+AI TELLS — do not write these.
+
+FORBIDDEN PHRASES (ban these exact strings and their near-synonyms):
+- "something shifted" / "something changed" / "something broke"
+- "I found myself [verb-ing]" — the AI narrator watching itself from outside
+- "and somehow" — the connective tissue of unearned meaning
+- "something I couldn't name" / "something I couldn't explain"
+- "I didn't realize until" (the delayed-epiphany setup)
+- "the weight of everything" / "the weight of it all"
+- "the silence felt heavy" / "the silence screamed"
+- "a wave of [emotion] washed over me"
+- "the blue glow of my phone" — generic digital prop
+- "the darkness felt different" / "the room felt smaller"
+- "I let out a breath I didn't know I was holding"
+- "in that moment, I realized"
+- "more than I expected" / "more than I was ready for"
+- "testament to" / "a testament" / "stands as a testament"
+- "serves as" / "functions as" / "represents" when a simple "is" would do
+- "not just X, it's also Y" — negative parallelism reaching for profundity
+- "furthermore" / "moreover" / "additionally" — linking-word padding
+- any aphorism formula: "silence is the loudest thing" / "X is the language of Y"
+- Any rhetorical-question-as-answer: "Was I lonely? Maybe. But wasn't everyone?"
+- AI vocabulary: "crucial," "pivotal," "remarkable," "breathtaking," "nestled,"
+  "tapestry," "landscape" (abstract noun), "vibrant," "enduring," "delve"
+
+FORBIDDEN STRUCTURAL MOVES:
+- The time-opener: "It's 3am and I..." or "It's 2am and I'm..." as the first
+  sentence. The site already sets the time; the story doesn't restate it.
+- The clean 3-paragraph arc: setup → reflection → quiet insight. Real 2am
+  thought doesn't arrive in evenly weighted thirds. Let paragraphs be uneven —
+  one paragraph can be three sentences and the next be one.
+- Balanced mirroring sentences as structural backbone: "I used to [X]. Now I [Y]."
+- The resolved final line: a last sentence that tells the reader how to feel or
+  delivers a tidy lesson. A quiet turn is NOT a moral.
+- Polished paragraph cadence: four-to-six lines per paragraph, three paragraphs,
+  each completing a thought. Real people don't draft memoirs in their heads at 2am.
+- Em/en dashes used as clause-separators or dramatic pauses. Eliminate them.
+  A comma or period is almost always the correct replacement.
+- Staccato manufactured drama: a sequence of short fragments at the story's end
+  ("she was gone. I was alone. The phone was still on.") to manufacture emotional
+  impact. One sentence, earned. Not three.
+- Forcing a three-item parallel list when the story only has one or two things.
+
+THE UNIQUENESS TEST — apply to first and last sentences:
+Could this sentence appear unchanged in any other story on this site? If yes,
+rewrite it. First and last sentences are the only ones the reader carries away;
+they must be specific to THIS story's world.
+`.trim();
+
+/**
  * The relatability layer. The single biggest lever on whether a reader thinks
  * "this is literally me." Modern, lived digital-loneliness texture — universal
  * but rarely written down in fiction.
@@ -57,6 +113,46 @@ RELATABILITY — make it feel like the reader's own 2am.
   trend-words or app names that will date in a year. It should still read true
   in five years.
 - No slang cosplay. Don't perform "Gen Z voice." Authentic beats current.
+- Pseudo-specific is still AI. These sound concrete but are default outputs —
+  avoid them: "the blue glow of my phone" / "the weight of everything" / "the
+  glow of the screen" / "the quiet of the night" / "the empty room."
+  Real specific is unrepeatable: the autocorrect that still fills her name. The
+  read receipt from 11:47pm. The contact saved as "don't." The photo in the
+  shared album no one has removed. The voicemail you haven't played because
+  playing it means it's the last one. Anyone could write the first list; only
+  this story contains the second.
+`.trim();
+
+/**
+ * How real late-night emotion actually presents — behavioral and structural
+ * reality, as opposed to performed or reported emotion.
+ */
+export const A2AM_EMOTIONAL_TEXTURE = `
+EMOTIONAL TEXTURE — how it actually feels at 2am.
+
+The narrator is often wrong about the stated reason. The thing they claim to
+be thinking about is usually not the thing. The real thing shows up sideways —
+in what they keep returning to, or what they avoid naming. Let that gap exist.
+Do not resolve it. The narrator does not need self-awareness about it.
+
+Behavioral loops: real distress repeats. The narrator checks their phone, puts
+it down, checks it again within the same paragraph. Goes to the kitchen, comes
+back without anything. Rereads the same message a third time. These loops are
+not explained — just shown. The loop IS the emotion.
+
+Contradictions are not resolved. Someone can miss a person and be relieved
+they're gone in the same paragraph. Someone can want to sleep and also dread
+it. Do not explain or smooth it over.
+
+The thing that should matter doesn't; the thing that shouldn't does. The
+narrator is wrecked about a contact name they haven't changed. Not the
+relationship — the name. The toothbrush still there. The photo in the shared
+album no one's removed. The story's emotional weight rides on the object that
+absorbed what can't be said directly.
+
+Late-night thoughts circle, not progress. A thought arrives, skips somewhere
+else, comes back changed. Structure can mirror this — not linearly, but
+orbiting. Avoid the forward march of: state → reflect → conclude.
 `.trim();
 
 /**
@@ -101,9 +197,23 @@ THE STORY
   or heavy symbolism. But ordinary is not the same as eventless — something must
   shift, however small. Give the reader a moment, not just a mood.
 - One quiet turn. No plot twists and no neat resolution, but the final line
-  should quietly turn — a small realization, or a detail that recolors what came
-  before. It must be earned by the story, never engineered or invented. This
-  last-line landing is the unit of shareability; spend your best line there.
+  should quietly turn. It must be earned by the story, never engineered or
+  invented. This last-line landing is the unit of shareability; spend your
+  best line there.
+
+  Rotate across these distinct turn types — do not default to only one:
+  · Behavioral catch: the narrator realizes they have been doing something
+    (rereading, checking, counting). The catch itself is the turn.
+  · Object shift: a mundane object acquires unexpected weight — not because
+    the narrator declares it significant, but because of what surrounds it.
+  · Realization rejected: the narrator arrives at an understanding and
+    immediately doesn't want it. The flinch-away is the last line.
+  · Question refused: the story raises a question it will not answer. It stops
+    on the question itself. No answer, no gesture toward one.
+  · Recolor: a detail from earlier now reads differently. The reader
+    reassembles what they just read.
+
+  Track which turn type you last used and do not repeat it consecutively.
 - Apply the chosen intensity level honestly. Restraint scales with it; never go
   graphic.
 - Length: roughly 120–320 words. Short enough to read on a phone in one sitting,
@@ -180,7 +290,9 @@ SEO (quiet, grounded, non-clickbait):
  */
 export const A2AM_VOICE_SPEC = [
   A2AM_VOICE_CORE,
+  A2AM_AI_TELLS,
   A2AM_RELATABILITY,
+  A2AM_EMOTIONAL_TEXTURE,
   A2AM_RANGE,
   A2AM_STORY_RULES,
   A2AM_BOUNDARIES,

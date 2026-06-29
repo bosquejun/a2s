@@ -1,6 +1,8 @@
 import {
+  A2AM_AI_TELLS,
   A2AM_AUTHOR_RULES,
   A2AM_BOUNDARIES,
+  A2AM_EMOTIONAL_TEXTURE,
   A2AM_HOOK_RULES,
   A2AM_RELATABILITY,
   A2AM_TAGS_AND_SEO_RULES,
@@ -34,7 +36,11 @@ THE SITE'S VOICE (the bar this whisper is measured against, and the register
 your generated title/hook/author should match):
 ${A2AM_VOICE_CORE}
 
+${A2AM_AI_TELLS}
+
 ${A2AM_RELATABILITY}
+
+${A2AM_EMOTIONAL_TEXTURE}
 
 A whisper does not need to be polished, but it should read as a real, grounded
 after-2am thought — honest, specific, restrained. Judge approval against that.

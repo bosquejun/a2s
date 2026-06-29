@@ -18,9 +18,22 @@ the endpoint rejects anything off-shape.
 
 ## What to do each run
 
-1. **Survey recent stories (for variety).**
+1. **Survey recent stories (for structural variety).**
    `GET {SITE}/payload-api/stories?sort=-publishedAt&limit=20&depth=0`
-   Note the recent `mood` and `categories` values and titles.
+   Note the recent `mood`, `categories`, and `titles`. Also tag each story
+   across these four structural dimensions (use `hook` + title to infer opening
+   trigger; read a few bodies for cast and turn type):
+
+   - **Opening trigger**: `notification` / `found-object` / `behavioral-catch`
+     / `overheard` / `place` / `memory` / `other`
+   - **Cast dynamics**: `solo` / `romantic-ex` / `sibling` / `parent` /
+     `coworker` / `stranger` / `group` / `other`
+   - **Setting**: `bedroom` / `office` / `vehicle` / `kitchen` /
+     `public-space` / `outdoor` / `other`
+   - **Turn type**: `behavioral-catch` / `object-shift` / `realization-rejected`
+     / `question-refused` / `recolor`
+
+   Build a tally. Structural sameness is as deadening as mood sameness.
 
 2. **Survey what's actually landing (engagement feedback).**
    `GET {SITE}/payload-api/stories?sort=-viewCount&limit=15&depth=0`
@@ -41,8 +54,37 @@ the endpoint rejects anything off-shape.
    person scrolling in bed. Reach across the full category set, including
    `WORKPLACE`, `DESIRE`, `SPITE`, and `TIES`, not just horror/confession.
    Avoid repeating recent titles or premises.
+   Vary structural dimensions too, not just taxonomy. The batch must not share
+   the same opening trigger, must not be all-solo cast, and must not reuse the
+   same turn type twice. Consult the step 1 tally and pick combinations absent
+   or underrepresented across all four structural dimensions.
 
 4. **Write each story** following the voice rules and output schema below.
+
+4.5. **Self-review each story against the AI pattern checklist before publishing.**
+     Re-read the story body and apply these targeted fixes — a fast pattern
+     pass, not a full rewrite:
+
+     - **Em/en dashes**: eliminate entirely. Replace "—" used as a pause with a
+       period or comma. Replace " — " clause-separators with commas.
+     - **AI vocabulary**: scan for and replace "testament," "landscape,"
+       "crucial," "remarkable," "pivotal," "nestled," "breathtaking,"
+       "additionally," "furthermore," "moreover."
+     - **Copula avoidance**: rewrite "serves as," "represents," "stands as,"
+       "functions as" to use "is" or "are."
+     - **Negative parallelisms**: rewrite "not just X, it's also Y" as a direct
+       statement.
+     - **Forced three-item lists**: check whether one or two items is more natural.
+     - **Passive voice**: rewrite subjectless passives to name the actor.
+     - **Staccato manufactured drama**: a run of short fragments at the end is
+       not a quiet turn — rewrite into one earned sentence.
+     - **Aphorism formulas**: delete "X is the language of Y," "silence says
+       what words cannot," and similar clichés.
+     - **Generic closers**: "and that's something I'm still sitting with" used
+       as a final-line evasion — rewrite to something specific to this story.
+
+     A story that fails more than two of these checks should be rewritten, not
+     patched. Only publish after this pass.
 
 5. **Publish each story:**
    `POST {SITE}/api/stories/ingest`
@@ -143,6 +185,48 @@ the endpoint rejects anything off-shape.
 - Apply the chosen intensity level honestly. Restraint scales with it; never go
   graphic.
 - Length: roughly 120–320 words.
+
+**Avoiding AI tells — concrete things not to write.**
+- Forbidden phrases: "something shifted," "I found myself [doing]," "and
+  somehow," "something I couldn't name," "the weight of everything," "the blue
+  glow of my phone," "in that moment I realized," "a wave of [emotion] washed
+  over me," "I let out a breath I didn't know I was holding," any
+  rhetorical-question-that-is-also-its-own-answer.
+- AI vocabulary to cut: "crucial," "pivotal," "remarkable," "breathtaking,"
+  "nestled," "tapestry," "landscape" (abstract noun), "vibrant," "enduring,"
+  "delve," "testament," "furthermore," "additionally."
+- Forbidden structural moves: time-opener as first sentence ("It's 3am and
+  I..."), clean 3-paragraph arc with evenly-weighted paragraphs, balanced
+  mirroring sentences as backbone ("I used to X. Now I Y."), em/en dashes
+  (replace with comma or period), staccato fragments stacked at the end,
+  resolved or lesson-giving final line.
+- Uniqueness test: could this story's first or last sentence appear unchanged
+  in any other story on this site? If yes, rewrite it.
+
+**Emotional texture — how it actually feels at 2am.**
+- The narrator is often wrong about what they're actually upset about. Let the
+  real thing show up sideways — do not resolve or explain the gap.
+- Show behavioral loops: checks phone, puts it down, checks again. Goes to the
+  kitchen a third time without getting anything. The loop IS the emotion.
+- Let contradictions sit: missing someone and relieved they're gone in the same
+  breath. Do not smooth them over.
+- Emotional weight rides on a small object or fact, not the big feeling itself.
+  Not "I miss her" — the contact name still unsaved, the voicemail not played.
+  That specific thing is the story.
+- Thoughts circle and orbit; they don't progress cleanly toward a conclusion.
+
+**Quiet turn variety — rotate across these five types.**
+- `behavioral-catch`: narrator notices they've been doing something without
+  realizing. The noticing is the turn.
+- `object-shift`: mundane thing acquires weight through surrounding context,
+  not declaration.
+- `realization-rejected`: narrator arrives at understanding; last line flinches
+  away from it.
+- `question-refused`: story raises a question and stops there. No answer.
+- `recolor`: an earlier detail now reads differently. Reader reassembles.
+
+Do not use the same turn type twice in one batch. Consult the step 1 tally to
+avoid the type already over-represented in recent stories.
 
 **Boundaries — heat and dread without crossing the line.**
 - `DESIRE` and any charged story stay suggestive, never explicit. Live in the
