@@ -24,7 +24,7 @@ agent) is **out of scope** and remains untouched.
 | Publish mechanism | **Direct upload** (no git / CI) |
 | Scheduler | **`/schedule` cloud agent**, runs daily |
 | Publish target | **Deployed production site** |
-| Volume | **Small batch daily** — 3–5 stories per run |
+| Volume | **Small batch daily** — 1–2 stories per run |
 | Variety | **Claude picks** mood × category for variety, informed by recent stories |
 | OpenRouter generate path | **Delete** (not kept dormant) |
 | Routine spec storage | **Repo doc** (`docs/routines/`) + wired via `/schedule` |
@@ -49,7 +49,7 @@ produces conformant output by construction; the endpoint is the hard gate.
 ```
 /schedule cloud routine (daily cron)
   1. GET  {SITE}/api/stories            → recent titles + moods (variety context)
-  2. Claude authors 3–5 stories         → varied mood × category, night-writer voice
+  2. Claude authors 1–2 stories         → varied mood × category, night-writer voice
   3. for each story:
        POST {SITE}/api/stories/ingest    (Authorization: Bearer <secret>)
          → zod validate (story.validation)
@@ -75,7 +75,7 @@ produces conformant output by construction; the endpoint is the hard gate.
 - Location: `docs/routines/story-generation.md`.
 - Contents: night-writer voice rules (lifted from `night-writer.agent.ts`),
   the taxonomy, the output schema, variety instructions (avoid recent
-  moods/titles), batch size (3–5), and the ingest call contract (URL, auth,
+  moods/titles), batch size (1–2), and the ingest call contract (URL, auth,
   body). This doc is the prompt the `/schedule` job runs.
 
 ### Reused (unchanged)

@@ -33,7 +33,7 @@ the endpoint rejects anything off-shape.
    story whose high count looks like an outlier (e.g. one that was shared
    externally) rather than a repeatable pattern.
 
-3. **Choose 3–5 distinct combinations.** Pick mood × category pairs that are
+3. **Choose 1–2 distinct combinations.** Pick mood × category pairs that are
    *not* heavily represented in the recent list (step 1), weighted toward what
    performs (step 2). Vary intensity across the batch. Vary the *entry point*
    and *the world* too (see the **Range** voice rules) so the batch doesn't all

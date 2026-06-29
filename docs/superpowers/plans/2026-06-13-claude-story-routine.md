@@ -476,7 +476,7 @@ Content must include, verbatim where noted:
    intensity 1–5, author, htmlBody, readTime, wordCount, seo{title≤60,
    description 120–160, keywords[1–5]}).
 4. **Variety step** — `GET {SITE}/api/stories`, read recent titles + moods,
-   deliberately choose 3–5 distinct mood × category combinations that avoid the
+   deliberately choose 1–2 distinct mood × category combinations that avoid the
    most recent ones.
 5. **Publish step** — for each story: `POST {SITE}/api/stories/ingest` with
    `Authorization: Bearer $STORY_GENERATION_SECRET` and the JSON body. Treat 201
