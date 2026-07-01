@@ -17,8 +17,12 @@ export const metadata: Metadata = {
   title: "After 2AM Stories – Midnight Whispers & Late Night Confessions",
   description:
     "A quiet, intimate storytelling platform for late-night thoughts, confessions, and haunting narratives. Choose your mood and discover stories written after 2AM.",
+  // Page-level `alternates` replaces the layout's object wholesale, so the
+  // hreflang and RSS alternates must be restated here or the homepage loses them.
   alternates: {
     canonical: "/",
+    languages: { "x-default": "/", en: "/" },
+    types: { "application/rss+xml": "/feed.xml" },
   },
 };
 
