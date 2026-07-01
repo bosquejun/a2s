@@ -78,6 +78,60 @@ Ranked hypotheses:
    for a spike in 4xx/5xx around June 12, and run **URL Inspection → Live
    test** on a recent story.
 
+## Part 2 — Content-trust deep dive (editorial layer)
+
+Follow-up audit of the layer Google's quality systems evaluate. Structurally
+the site is in better shape than most AI-content sites:
+
+- **Internal linking is strong.** Mood/category/tag archives render their
+  full story lists as real anchors (only `/stories` is scroll-loaded, and it's
+  redundant with the mood archives). The reader links next/related stories,
+  categories, and tags. Every story sits ≤ 3 hops from home.
+- Stories carry visible publish dates, unique ingest-supplied SEO
+  titles/descriptions, and a serious anti-AI-tell voice spec with a
+  self-review gate before publish.
+
+The risk profile is therefore not template hygiene — it's the shape of the
+content itself:
+
+1. **Story pages don't match any query.** At 120–320 words of fiction with
+   invented titles, individual stories have no search demand to satisfy.
+   Google indexes pages it can imagine serving for some query; hundreds of
+   short fiction snippets with near-identical intent is exactly what the
+   *Crawled – currently not indexed* bucket is for. The pages that CAN rank —
+   mood/category/tag archives matching queries like "short unsettling stories
+   to read at night" — are the site's real search surface.
+2. **Scaled-content-abuse profile.** Daily automated batches + pseudonymous
+   `Person` authors in JSON-LD + About-page copy implying human authorship
+   ("whispered in by people who couldn't sleep") is the pattern Google's
+   March-2024 spam policies target. Pseudonymous fiction is fine; the
+   combination of scale, automation, and implied human origin is the exposure.
+
+### Recommendations, in priority order
+
+1. **Aim ranking effort at archives, not stories.** Give each mood/category —
+   and the top tags — a few hundred words of unique, query-aware intro copy
+   (what these stories feel like, when to read them). These pages already
+   have the internal links and the sitemap entries; they just need enough
+   unique text to be answers rather than lists.
+2. **Add consolidation pages.** Curated collections ("seven stories for when
+   you can't sleep", "stories about the text you never sent") are the format
+   that matches real query intent at useful length, and they funnel authority
+   to individual stories. One good collection page a week beats seven new
+   stories for search.
+3. **Decide the disclosure posture.** Either align the About page with how
+   stories are actually made, or attribute stories to the site
+   (`Organization`) rather than invented `Person` authors in JSON-LD. This is
+   a positioning/brand call — flagging, not changing it here.
+4. **Prune the index.** Once GSC data flows again, periodically `noindex`
+   stories with zero impressions/engagement after ~8 weeks so the indexed set
+   stays high-signal. Keep them live for readers and the in-site loop.
+5. **Keep cadence small.** The generation routine's 1–2 stories/day with a
+   quality gate is the right zone; resist scaling volume before archives and
+   collections are earning impressions.
+6. Story pages will mostly earn traffic via **Discover, social, and RSS**
+   rather than classic ranking — measure them on that basis, not impressions.
+
 ## Checklist
 
 - [ ] GSC → Sitemaps: "last read" is recent; submitted vs. indexed counts.
