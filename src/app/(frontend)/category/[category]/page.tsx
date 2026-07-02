@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { ArchiveIntro } from "@/components/archive-intro";
 import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
+import { CATEGORY_ARCHIVE_COPY } from "@/lib/content/archive-copy";
 import {
   CATEGORIES,
   CATEGORY_ACCENTS,
-  CATEGORY_DESCRIPTIONS,
   CATEGORY_LABELS,
   CATEGORY_TAGLINES,
   type Category,
@@ -42,7 +43,7 @@ export async function generateMetadata({
   if (!category) return {};
 
   const label = CATEGORY_LABELS[category];
-  const description = CATEGORY_DESCRIPTIONS[category];
+  const description = CATEGORY_ARCHIVE_COPY[category].seoDescription;
   const url = absoluteUrl(`/category/${category.toLowerCase()}`);
 
   return {
@@ -87,7 +88,7 @@ export default async function CategoryPage({ params }: PageProps) {
       {
         "@type": "CollectionPage",
         name: `${label} Stories — After 2AM Stories`,
-        description: CATEGORY_DESCRIPTIONS[category],
+        description: CATEGORY_ARCHIVE_COPY[category].seoDescription,
         url: absoluteUrl(`/category/${slug}`),
         isPartOf: { "@id": WEBSITE_ID },
         mainEntity: storyItemList(stories),
@@ -125,10 +126,9 @@ export default async function CategoryPage({ params }: PageProps) {
             >
               {CATEGORY_TAGLINES[category]}
             </p>
-            <p className="max-w-md text-sm text-muted-foreground">
-              {CATEGORY_DESCRIPTIONS[category]}
-            </p>
           </header>
+
+          <ArchiveIntro copy={CATEGORY_ARCHIVE_COPY[category]} />
 
           <StoryFeed
             stories={stories}

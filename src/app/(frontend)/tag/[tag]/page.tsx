@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Hash } from "lucide-react";
+import { ArchiveIntro } from "@/components/archive-intro";
 import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
+import { TAG_ARCHIVE_COPY } from "@/lib/content/archive-copy";
 import { absoluteUrl, SITE_KEYWORDS, SITE_NAME } from "@/lib/seo";
 import {
   getIndexableTags,
@@ -37,7 +39,9 @@ export async function generateMetadata({
   if (!listing) return {};
 
   const { tag, slug, stories } = listing;
-  const description = `Stories tagged "${tag}" — late-night writing from After 2AM Stories.`;
+  const description =
+    TAG_ARCHIVE_COPY[slug]?.seoDescription ??
+    `Stories tagged "${tag}" — late-night writing from After 2AM Stories.`;
   const url = absoluteUrl(`/tag/${slug}`);
   const indexable = stories.length >= TAG_INDEX_MIN;
 
@@ -71,6 +75,7 @@ export default async function TagPage({ params }: PageProps) {
   }
 
   const { tag, slug, stories } = listing;
+  const curatedCopy = TAG_ARCHIVE_COPY[slug];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -111,11 +116,15 @@ export default async function TagPage({ params }: PageProps) {
               <Hash size={22} className="text-muted-foreground/50" />
               {tag}
             </h1>
-            <p className="max-w-md text-sm text-muted-foreground">
-              Everything written after 2am and tagged{" "}
-              <span className="text-foreground/80">{tag}</span>.
-            </p>
+            {!curatedCopy && (
+              <p className="max-w-md text-sm text-muted-foreground">
+                Everything written after 2am and tagged{" "}
+                <span className="text-foreground/80">{tag}</span>.
+              </p>
+            )}
           </header>
+
+          {curatedCopy && <ArchiveIntro copy={curatedCopy} />}
 
           <StoryFeed
             stories={stories}

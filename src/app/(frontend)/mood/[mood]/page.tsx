@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArchiveIntro } from "@/components/archive-intro";
 import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
+import { MOOD_ARCHIVE_COPY } from "@/lib/content/archive-copy";
 import {
-  MOOD_DESCRIPTIONS,
   MOOD_LABELS,
   MOOD_WHISPERS,
   MOODS,
@@ -41,7 +42,7 @@ export async function generateMetadata({
   if (!mood) return {};
 
   const title = `${MOOD_LABELS[mood]} — Stories ${MOOD_WHISPERS[mood]}`;
-  const description = MOOD_DESCRIPTIONS[mood];
+  const description = MOOD_ARCHIVE_COPY[mood].seoDescription;
   const url = absoluteUrl(`/mood/${mood.toLowerCase()}`);
 
   return {
@@ -84,7 +85,7 @@ export default async function MoodPage({ params }: PageProps) {
       {
         "@type": "CollectionPage",
         name: `${MOOD_LABELS[mood]} — After 2AM Stories`,
-        description: MOOD_DESCRIPTIONS[mood],
+        description: MOOD_ARCHIVE_COPY[mood].seoDescription,
         url: absoluteUrl(`/mood/${mood.toLowerCase()}`),
         isPartOf: { "@id": WEBSITE_ID },
         mainEntity: storyItemList(stories),
@@ -119,10 +120,6 @@ export default async function MoodPage({ params }: PageProps) {
             <p className="font-serif italic text-sm text-muted-foreground/60">
               {MOOD_WHISPERS[mood]}
             </p>
-            <p className="max-w-md text-sm text-muted-foreground">
-              {MOOD_DESCRIPTIONS[mood]}
-            </p>
-
             <Link
               href={`/mood/${mood.toLowerCase()}/random`}
               className="group mt-2 inline-flex items-center gap-2.5 rounded-full bg-indigo-600 px-7 py-3.5 text-[10px] font-bold uppercase tracking-[0.3em] text-white shadow-[0_10px_40px_rgba(79,70,229,0.3)] transition-all hover:bg-indigo-500 hover:shadow-[0_10px_50px_rgba(79,70,229,0.4)] active:scale-95"
@@ -134,6 +131,8 @@ export default async function MoodPage({ params }: PageProps) {
               Read one at random
             </Link>
           </header>
+
+          <ArchiveIntro copy={MOOD_ARCHIVE_COPY[mood]} />
 
           <StoryFeed
             stories={stories}
