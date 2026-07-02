@@ -43,7 +43,9 @@ export function FacebookConnectButton() {
         </p>
       )}
       {justConnected && (
-        <p style={{ color: "var(--theme-success-500)", marginBottom: "0.75rem" }}>
+        <p
+          style={{ color: "var(--theme-success-500)", marginBottom: "0.75rem" }}
+        >
           Connected to {justConnected}.
         </p>
       )}

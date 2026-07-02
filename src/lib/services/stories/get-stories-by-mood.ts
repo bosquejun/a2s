@@ -1,7 +1,4 @@
-import {
-  normalizeStorySummary,
-  type StoryDoc,
-} from "@/lib/content/normalize";
+import { normalizeStorySummary, type StoryDoc } from "@/lib/content/normalize";
 import { getPayloadClient } from "@/lib/payload";
 import type { Mood } from "@/lib/content/taxonomy";
 import type { StorySummary } from "@/lib/types";

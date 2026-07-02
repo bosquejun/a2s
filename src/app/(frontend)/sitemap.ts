@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getIndexableTags } from "@/lib/services/stories/get-stories-by-tag";
+import { getAllPublishedCollections } from "@/lib/services/collections/get-collections";
 import { tagToSlug } from "@/lib/content/tags";
 import { CATEGORIES, MOODS } from "@/lib/content/taxonomy";
 import { absoluteUrl, SITE_URL } from "@/lib/seo";
@@ -21,9 +22,10 @@ function storyDate(story: StorySummary): Date | undefined {
  * `new Date()`, and evergreen pages omit it.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [stories, indexableTags] = await Promise.all([
+  const [stories, indexableTags, collections] = await Promise.all([
     getAllPublishedStories(),
     getIndexableTags(),
+    getAllPublishedCollections(),
   ]);
 
   const newestByMood = new Map<string, Date>();
@@ -108,6 +110,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // The /collections index only earns a slot once something is published on
+  // it (the page is noindex while empty).
+  const collectionRoutes: MetadataRoute.Sitemap = collections.length
+    ? [
+        {
+          url: absoluteUrl("/collections"),
+          lastModified: collections
+            .map((c) => new Date(c.updatedAt || c.publishedAt || 0))
+            .reduce((a, b) => (a > b ? a : b)),
+          changeFrequency: "weekly" as const,
+          priority: 0.8,
+        },
+        ...collections.map((collection) => ({
+          url: absoluteUrl(`/collections/${collection.slug}`),
+          lastModified: new Date(
+            collection.updatedAt || collection.publishedAt || Date.now()
+          ),
+          changeFrequency: "monthly" as const,
+          priority: 0.8,
+        })),
+      ]
+    : [];
+
   const storyRoutes: MetadataRoute.Sitemap = stories.map((story) => ({
     url: absoluteUrl(`/story/${story.slug}`),
     lastModified: storyDate(story),
@@ -121,6 +146,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...moodRoutes,
     ...categoryRoutes,
     ...tagRoutes,
+    ...collectionRoutes,
     ...storyRoutes,
   ];
 }

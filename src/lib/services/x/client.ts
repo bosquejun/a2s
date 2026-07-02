@@ -217,7 +217,11 @@ export async function postTweet(opts: {
   /** When set, the tweet is published as a reply to this tweet id. */
   replyToTweetId?: string;
 }): Promise<string> {
-  return apiPostTweet(`Bearer ${opts.accessToken}`, opts.text, opts.replyToTweetId);
+  return apiPostTweet(
+    `Bearer ${opts.accessToken}`,
+    opts.text,
+    opts.replyToTweetId
+  );
 }
 
 /** Read the authenticated profile using OAuth 1.0a credentials. */

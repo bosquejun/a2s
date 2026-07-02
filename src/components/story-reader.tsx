@@ -33,9 +33,16 @@ interface StoryReaderProps {
   related?: StorySummary[];
   /** Deterministic next story for the "Next story" CTA. */
   next?: StorySummary | null;
+  /** Published collections this story appears in (crawlable backlinks). */
+  collections?: { slug: string; title: string }[];
 }
 
-export function StoryReader({ story, related = [], next = null }: StoryReaderProps) {
+export function StoryReader({
+  story,
+  related = [],
+  next = null,
+  collections = [],
+}: StoryReaderProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -279,6 +286,28 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
             </div>
           )}
 
+          {/* Collections this story belongs to — quiet, crawlable backlinks */}
+          {collections.length > 0 && (
+            <div className="mb-12 flex flex-col items-center space-y-3">
+              <span className="text-[9px] uppercase tracking-[0.4em] font-medium text-muted-foreground/50">
+                From the collection
+              </span>
+              <div className="flex items-center gap-2 flex-wrap justify-center max-w-2xl px-4">
+                {collections.map((collection) => (
+                  <Link
+                    key={collection.slug}
+                    href={`/collections/${collection.slug}`}
+                    className="px-4 py-2 rounded-full bg-card/60 border border-border/50 backdrop-blur-sm hover:border-indigo-400/30 hover:bg-card transition-all duration-200"
+                  >
+                    <span className="font-serif italic text-sm text-muted-foreground hover:text-foreground/90">
+                      {collection.title}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* More like this — stories ranked by shared mood, categories, tags */}
           {related.length > 0 && (
             <section className="mt-2 w-full border-t border-border/40 pt-12 pb-8">
@@ -292,41 +321,41 @@ export function StoryReader({ story, related = [], next = null }: StoryReaderPro
                 {orderedRelated.map((item) => {
                   const isRead = hydrated && readSet.has(item.slug);
                   return (
-                  <Link
-                    key={item.id}
-                    href={`/story/${item.slug}`}
-                    className={`group flex flex-col gap-1.5 rounded-2xl border border-border/40 bg-card/30 px-5 py-4 backdrop-blur-sm transition-all hover:border-indigo-400/30 hover:bg-card/60 ${
-                      isRead ? "opacity-60 hover:opacity-100" : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.25em] text-muted-foreground/60">
-                      <span className="text-indigo-300/70">
-                        {MOOD_LABELS[item.mood]}
-                      </span>
-                      <span className="h-1 w-1 rounded-full bg-border" />
-                      <span className="flex items-center gap-1">
-                        <Clock size={10} className="opacity-60" />
-                        {item.readTime} min
-                      </span>
-                      {isRead && (
-                        <>
-                          <span className="h-1 w-1 rounded-full bg-border" />
-                          <span className="flex items-center gap-1 text-muted-foreground/50">
-                            <Check size={10} className="opacity-70" />
-                            Read
-                          </span>
-                        </>
+                    <Link
+                      key={item.id}
+                      href={`/story/${item.slug}`}
+                      className={`group flex flex-col gap-1.5 rounded-2xl border border-border/40 bg-card/30 px-5 py-4 backdrop-blur-sm transition-all hover:border-indigo-400/30 hover:bg-card/60 ${
+                        isRead ? "opacity-60 hover:opacity-100" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.25em] text-muted-foreground/60">
+                        <span className="text-indigo-300/70">
+                          {MOOD_LABELS[item.mood]}
+                        </span>
+                        <span className="h-1 w-1 rounded-full bg-border" />
+                        <span className="flex items-center gap-1">
+                          <Clock size={10} className="opacity-60" />
+                          {item.readTime} min
+                        </span>
+                        {isRead && (
+                          <>
+                            <span className="h-1 w-1 rounded-full bg-border" />
+                            <span className="flex items-center gap-1 text-muted-foreground/50">
+                              <Check size={10} className="opacity-70" />
+                              Read
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <h3 className="font-serif text-lg italic leading-snug text-foreground/85 transition-colors group-hover:text-foreground">
+                        {item.title}
+                      </h3>
+                      {item.excerpt && (
+                        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/70">
+                          {item.excerpt}
+                        </p>
                       )}
-                    </div>
-                    <h3 className="font-serif text-lg italic leading-snug text-foreground/85 transition-colors group-hover:text-foreground">
-                      {item.title}
-                    </h3>
-                    {item.excerpt && (
-                      <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/70">
-                        {item.excerpt}
-                      </p>
-                    )}
-                  </Link>
+                    </Link>
                   );
                 })}
               </div>

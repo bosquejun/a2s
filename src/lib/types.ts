@@ -32,6 +32,25 @@ export interface Story {
 }
 
 /** Lightweight Story shape used for feeds, cards and sitemaps. */
+/** A curated, editor-published collection of stories. */
+export interface StoryCollection {
+  id: string;
+  title: string;
+  slug: string;
+  /** One-line promise used on cards and social shares. */
+  hook?: string | null;
+  /** Sanitized HTML of the editorial intro essay. */
+  introHtml: string;
+  /** Member stories in curated order (published ones only). */
+  stories: StorySummary[];
+  publishedAt?: string | null;
+  updatedAt?: string | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  } | null;
+}
+
 export interface StorySummary {
   id: string;
   title: string;

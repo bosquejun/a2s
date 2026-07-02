@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  Category,
-  Mood,
-  StoryRequestStatus,
-} from "@/lib/content/taxonomy";
+import { Category, Mood, StoryRequestStatus } from "@/lib/content/taxonomy";
 
 export const storyRequestSchema = z.object({
   id: z.string(),
@@ -76,7 +72,10 @@ export const nightEditorAgentOutputSchema = z.object({
         "through restraint (no drama, no invented events, no clean resolution)."
     ),
   mood: z.enum(Object.values(Mood)),
-  categories: z.array(z.enum(Object.values(Category))).min(1).max(3),
+  categories: z
+    .array(z.enum(Object.values(Category)))
+    .min(1)
+    .max(3),
   tags: z.array(z.string()).min(1).max(5),
   intensity: z.number().min(1).max(5),
   author: z.string().min(1).max(100),

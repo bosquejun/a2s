@@ -40,117 +40,115 @@ export async function carouselCoverImage(story: Story) {
   const heroSize = hero.length > 110 ? 56 : hero.length > 70 ? 64 : 74;
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "serif",
+        padding: "96px",
+      }}
+    >
+      <OgBackdrop accent={accent} />
+
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "serif",
-          padding: "96px",
+          gap: "34px",
+          maxWidth: "880px",
+          textAlign: "center",
         }}
       >
-        <OgBackdrop accent={accent} />
-
+        <div
+          style={{
+            width: "72px",
+            height: "2px",
+            backgroundColor: accent ?? OG_COLORS.accent,
+            opacity: accent ? 0.7 : 0.5,
+            display: "flex",
+          }}
+        />
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "34px",
-            maxWidth: "880px",
-            textAlign: "center",
+            fontFamily: "Newsreader",
+            fontStyle: "italic",
+            fontSize: `${heroSize}px`,
+            color: OG_COLORS.title,
+            lineHeight: 1.3,
           }}
         >
-          <div
-            style={{
-              width: "72px",
-              height: "2px",
-              backgroundColor: accent ?? OG_COLORS.accent,
-              opacity: accent ? 0.7 : 0.5,
-              display: "flex",
-            }}
-          />
-          <div
-            style={{
-              display: "flex",
-              fontFamily: "Newsreader",
-              fontStyle: "italic",
-              fontSize: `${heroSize}px`,
-              color: OG_COLORS.title,
-              lineHeight: 1.3,
-            }}
-          >
-            {hero}
-          </div>
-        </div>
-
-        <div
-          style={{
-            position: "absolute",
-            bottom: "64px",
-            left: "96px",
-            right: "96px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "12px",
-            textAlign: "center",
-          }}
-        >
-          {hook && (
-            <div
-              style={{
-                fontFamily: "Newsreader",
-                fontStyle: "italic",
-                fontSize: "24px",
-                color: OG_COLORS.muted,
-              }}
-            >
-              {title}
-            </div>
-          )}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "10px",
-              fontFamily: "Nunito Sans",
-              fontSize: "16px",
-              color: OG_COLORS.faint,
-            }}
-          >
-            {eyebrow && (
-              <span
-                style={{ textTransform: "uppercase", letterSpacing: "0.22em" }}
-              >
-                {eyebrow}
-              </span>
-            )}
-            {eyebrow && story.author && <span>·</span>}
-            {story.author && <span>{story.author}</span>}
-            {(eyebrow || story.author) && story.readTime > 0 && <span>·</span>}
-            {story.readTime > 0 && <span>{`${story.readTime} min read`}</span>}
-          </div>
-          <div
-            style={{
-              fontFamily: "Nunito Sans",
-              fontSize: "14px",
-              color: OG_COLORS.faint,
-              textTransform: "uppercase",
-              letterSpacing: "0.32em",
-            }}
-          >
-            {BRAND}
-          </div>
+          {hero}
         </div>
       </div>
-    ),
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: "64px",
+          left: "96px",
+          right: "96px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "12px",
+          textAlign: "center",
+        }}
+      >
+        {hook && (
+          <div
+            style={{
+              fontFamily: "Newsreader",
+              fontStyle: "italic",
+              fontSize: "24px",
+              color: OG_COLORS.muted,
+            }}
+          >
+            {title}
+          </div>
+        )}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "10px",
+            fontFamily: "Nunito Sans",
+            fontSize: "16px",
+            color: OG_COLORS.faint,
+          }}
+        >
+          {eyebrow && (
+            <span
+              style={{ textTransform: "uppercase", letterSpacing: "0.22em" }}
+            >
+              {eyebrow}
+            </span>
+          )}
+          {eyebrow && story.author && <span>·</span>}
+          {story.author && <span>{story.author}</span>}
+          {(eyebrow || story.author) && story.readTime > 0 && <span>·</span>}
+          {story.readTime > 0 && <span>{`${story.readTime} min read`}</span>}
+        </div>
+        <div
+          style={{
+            fontFamily: "Nunito Sans",
+            fontSize: "14px",
+            color: OG_COLORS.faint,
+            textTransform: "uppercase",
+            letterSpacing: "0.32em",
+          }}
+        >
+          {BRAND}
+        </div>
+      </div>
+    </div>,
     {
       ...IG_SQUARE_SIZE,
       ...(fonts.length ? { fonts } : {}),

@@ -41,8 +41,8 @@ export default function AboutPage() {
           </p>
           <p>
             Nothing here is loud. No twists for the sake of twists. Just the
-            ordinary, true-feeling weight of being awake when you shouldn&rsquo;t
-            be.
+            ordinary, true-feeling weight of being awake when you
+            shouldn&rsquo;t be.
           </p>
         </div>
 
@@ -58,7 +58,10 @@ export default function AboutPage() {
               href="/write"
               className="group inline-flex items-center gap-2 rounded-full border border-slate-900 px-6 py-3 text-[10px] uppercase tracking-[0.3em] text-slate-500 transition-all hover:border-indigo-500/30 hover:text-slate-200"
             >
-              <PenSquare size={13} className="text-slate-700 group-hover:text-indigo-400" />
+              <PenSquare
+                size={13}
+                className="text-slate-700 group-hover:text-indigo-400"
+              />
               Whisper a story
             </Link>
           )}

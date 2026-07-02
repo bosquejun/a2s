@@ -37,7 +37,11 @@ export function Header() {
           <nav className="flex items-center gap-2">
             {featureFlags.whisper && (
               <Link href="/write" className="touch-manipulation">
-                <Button variant="outline" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm px-3 sm:px-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 sm:h-8 text-xs sm:text-sm px-3 sm:px-4"
+                >
                   <span className="hidden sm:inline">Write a Story</span>
                   <span className="sm:hidden">Write</span>
                 </Button>

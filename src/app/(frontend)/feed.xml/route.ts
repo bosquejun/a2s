@@ -1,9 +1,4 @@
-import {
-  absoluteUrl,
-  SITE_DESCRIPTION,
-  SITE_NAME,
-  SITE_URL,
-} from "@/lib/seo";
+import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 
 // Most recent stories only — a feed is a tail, not the whole archive.

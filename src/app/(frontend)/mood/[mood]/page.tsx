@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { ArchiveIntro } from "@/components/archive-intro";
+import { RelatedCollections } from "@/components/related-collections";
 import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
 import { MOOD_ARCHIVE_COPY } from "@/lib/content/archive-copy";
@@ -14,6 +15,7 @@ import {
 } from "@/lib/content/taxonomy";
 import { absoluteUrl, SITE_KEYWORDS, SITE_NAME } from "@/lib/seo";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
+import { getCollectionsForMood } from "@/lib/services/collections/get-collections";
 import {
   breadcrumbList,
   serializeJsonLd,
@@ -76,7 +78,10 @@ export default async function MoodPage({ params }: PageProps) {
     notFound();
   }
 
-  const all = await getAllPublishedStories();
+  const [all, collections] = await Promise.all([
+    getAllPublishedStories(),
+    getCollectionsForMood(mood),
+  ]);
   const stories = all.filter((story) => story.mood === mood);
 
   const jsonLd = {
@@ -133,6 +138,8 @@ export default async function MoodPage({ params }: PageProps) {
           </header>
 
           <ArchiveIntro copy={MOOD_ARCHIVE_COPY[mood]} />
+
+          <RelatedCollections collections={collections} />
 
           <StoryFeed
             stories={stories}

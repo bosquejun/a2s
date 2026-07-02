@@ -1,9 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { cache } from "react";
-import {
-  normalizeStorySummary,
-  type StoryDoc,
-} from "@/lib/content/normalize";
+import { normalizeStorySummary, type StoryDoc } from "@/lib/content/normalize";
 import { getPayloadClient } from "@/lib/payload";
 import type { StorySummary } from "@/lib/types";
 

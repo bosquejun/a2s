@@ -19,7 +19,9 @@ function manila(
   hour: number,
   minute = 0
 ): Date {
-  return new Date(Date.UTC(year, month - 1, day, hour, minute) - MANILA_OFFSET_MS);
+  return new Date(
+    Date.UTC(year, month - 1, day, hour, minute) - MANILA_OFFSET_MS
+  );
 }
 
 /** Manila wall-clock hour (fractional) of a UTC instant. */
@@ -71,6 +73,8 @@ describe("jitterDelayMs", () => {
   it("stays within the manual jitter bound", () => {
     expect(jitterDelayMs(() => 0)).toBe(0);
     expect(jitterDelayMs(() => 0.999999)).toBeLessThan(MANUAL_MAX_JITTER_MS);
-    expect(jitterDelayMs(() => 0.5)).toBe(Math.floor(0.5 * MANUAL_MAX_JITTER_MS));
+    expect(jitterDelayMs(() => 0.5)).toBe(
+      Math.floor(0.5 * MANUAL_MAX_JITTER_MS)
+    );
   });
 });

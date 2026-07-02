@@ -21,7 +21,10 @@ export async function POST(request: Request) {
     typeof signedRequest === "string" ? signedRequest : null
   );
   if (!payload) {
-    return NextResponse.json({ error: "Invalid signed_request" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid signed_request" },
+      { status: 400 }
+    );
   }
 
   try {

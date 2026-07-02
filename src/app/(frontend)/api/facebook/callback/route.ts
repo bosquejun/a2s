@@ -41,7 +41,8 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const oauthError = searchParams.get("error_description") ?? searchParams.get("error");
+  const oauthError =
+    searchParams.get("error_description") ?? searchParams.get("error");
   if (oauthError) {
     return redirectAdmin(request, { fbError: oauthError });
   }

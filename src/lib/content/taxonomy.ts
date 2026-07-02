@@ -34,9 +34,9 @@ export const CATEGORIES = [
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
-export const Category = Object.fromEntries(
-  CATEGORIES.map((c) => [c, c])
-) as { [K in Category]: K };
+export const Category = Object.fromEntries(CATEGORIES.map((c) => [c, c])) as {
+  [K in Category]: K;
+};
 
 export const STORY_STATUSES = [
   "PENDING",
@@ -45,9 +45,9 @@ export const STORY_STATUSES = [
   "ARCHIVED",
 ] as const;
 export type Status = (typeof STORY_STATUSES)[number];
-export const Status = Object.fromEntries(
-  STORY_STATUSES.map((s) => [s, s])
-) as { [K in Status]: K };
+export const Status = Object.fromEntries(STORY_STATUSES.map((s) => [s, s])) as {
+  [K in Status]: K;
+};
 
 export const STORY_REQUEST_STATUSES = [
   "PENDING",
@@ -88,8 +88,7 @@ export const MOOD_DESCRIPTIONS: Record<Mood, string> = {
   MISS_SOMEONE:
     "Stories about absence and longing, for the nights someone is missing.",
   EMPTY: "Quiet, hollow stories for when you feel like an empty room.",
-  REFLECTIVE:
-    "Thoughtful, slow stories for when the night turns you inward.",
+  REFLECTIVE: "Thoughtful, slow stories for when the night turns you inward.",
   UNSETTLING: "Eerie, uneasy stories that sit just under the skin.",
 };
 
@@ -136,8 +135,7 @@ export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
     "Charged, kept-awake-by-someone stories — longing and tension drawn out, suggested, never spelled out.",
   SPITE:
     "Grudges, pettiness, and the unhinged little revenge fantasies that only surface long after midnight.",
-  TIES:
-    "Family, old friends, and the people we grew apart from — the bonds that aren't romance but still keep us up.",
+  TIES: "Family, old friends, and the people we grew apart from — the bonds that aren't romance but still keep us up.",
 };
 
 /**

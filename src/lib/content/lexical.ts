@@ -28,7 +28,9 @@ export function lexicalToPlainText(
     return blockTypes.includes(node.type ?? "") ? `${inner}\n` : inner;
   };
 
-  return walk(state.root).replace(/\n{2,}/g, "\n").trim();
+  return walk(state.root)
+    .replace(/\n{2,}/g, "\n")
+    .trim();
 }
 
 /** Estimate word count and reading time (minutes) from plain text. */

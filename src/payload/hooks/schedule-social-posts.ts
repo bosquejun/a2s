@@ -5,7 +5,10 @@ import { shareStoryToInstagram } from "@/lib/services/instagram/share-story";
 import { shareStoryToThreads } from "@/lib/services/threads/share-story";
 import { shareStory as shareStoryToX } from "@/lib/services/x/share-story";
 import { featureFlags } from "@/lib/feature-flags";
-import { jitterDelayMs, nextNightWindowPostAt } from "@/lib/services/social/schedule";
+import {
+  jitterDelayMs,
+  nextNightWindowPostAt,
+} from "@/lib/services/social/schedule";
 import { triggerWorkflow } from "@/lib/workflow-client/client";
 
 type Platform = "facebook" | "instagram" | "threads" | "x";
@@ -69,8 +72,10 @@ export const scheduleSocialPosts: CollectionAfterChangeHook = ({
   const delay = jitterDelayMs();
   const share = async (platform: Platform) => {
     await sleep(delay);
-    if (platform === "facebook") return shareStoryToFacebook(req.payload, doc.id);
-    if (platform === "instagram") return shareStoryToInstagram(req.payload, doc.id);
+    if (platform === "facebook")
+      return shareStoryToFacebook(req.payload, doc.id);
+    if (platform === "instagram")
+      return shareStoryToInstagram(req.payload, doc.id);
     if (platform === "threads") return shareStoryToThreads(req.payload, doc.id);
     return shareStoryToX(req.payload, doc.id);
   };

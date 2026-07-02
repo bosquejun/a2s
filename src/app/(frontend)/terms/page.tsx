@@ -41,7 +41,9 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-serif text-xl italic text-slate-100">Reading</h2>
+            <h2 className="font-serif text-xl italic text-slate-100">
+              Reading
+            </h2>
             <p className="text-base leading-relaxed text-slate-300/80">
               The stories are free to read. They&rsquo;re here to be felt, not
               scraped, resold, or republished as your own. Be gentle with what
@@ -60,7 +62,9 @@ export default function TermsPage() {
                 it here and make light edits for clarity, length, or anonymity.
               </li>
               <li>
-                <span className="text-slate-100">Only what&rsquo;s yours to tell.</span>{" "}
+                <span className="text-slate-100">
+                  Only what&rsquo;s yours to tell.
+                </span>{" "}
                 Don&rsquo;t submit someone else&rsquo;s private details, contact
                 info, or anything that would expose a real person without their
                 say.
@@ -97,7 +101,9 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-serif text-xl italic text-slate-100">Changes</h2>
+            <h2 className="font-serif text-xl italic text-slate-100">
+              Changes
+            </h2>
             <p className="text-base leading-relaxed text-slate-300/80">
               These terms may change over time. When they do, we&rsquo;ll update
               the date above.
@@ -105,7 +111,9 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-serif text-xl italic text-slate-100">Contact</h2>
+            <h2 className="font-serif text-xl italic text-slate-100">
+              Contact
+            </h2>
             <p className="text-base leading-relaxed text-slate-300/80">
               Reach us at{" "}
               <a

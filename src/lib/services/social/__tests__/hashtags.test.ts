@@ -14,14 +14,17 @@ describe("buildHashtags", () => {
 
   it("appends editorial tags after categories, CamelCasing multi-word names", () => {
     expect(
-      buildHashtags({ categories: ["HORROR"], tags: ["true crime", "sleep paralysis"] })
+      buildHashtags({
+        categories: ["HORROR"],
+        tags: ["true crime", "sleep paralysis"],
+      })
     ).toBe("#After2AM #Horror #TrueCrime #SleepParalysis");
   });
 
   it("dedupes case-insensitively across sources", () => {
-    expect(buildHashtags({ categories: ["HORROR"], tags: ["horror", "Horror"] })).toBe(
-      "#After2AM #Horror"
-    );
+    expect(
+      buildHashtags({ categories: ["HORROR"], tags: ["horror", "Horror"] })
+    ).toBe("#After2AM #Horror");
   });
 
   it("strips punctuation and diacritics from tags", () => {
@@ -31,9 +34,9 @@ describe("buildHashtags", () => {
   });
 
   it("caps the total number of hashtags at max", () => {
-    expect(
-      buildHashtags({ tags: ["one", "two", "three", "four"] }, 3)
-    ).toBe("#After2AM #One #Two");
+    expect(buildHashtags({ tags: ["one", "two", "three", "four"] }, 3)).toBe(
+      "#After2AM #One #Two"
+    );
   });
 
   it("returns an empty string when max is non-positive", () => {
@@ -41,14 +44,19 @@ describe("buildHashtags", () => {
   });
 
   it("ignores unknown category values gracefully by falling back to the raw value", () => {
-    expect(buildHashtags({ categories: ["MYSTERY"] })).toBe("#After2AM #MYSTERY");
+    expect(buildHashtags({ categories: ["MYSTERY"] })).toBe(
+      "#After2AM #MYSTERY"
+    );
   });
 });
 
 describe("extractNames", () => {
   it("reads names from populated relationship objects", () => {
     expect(
-      extractNames([{ id: 1, name: "true crime" }, { id: 2, name: "ghosts" }])
+      extractNames([
+        { id: 1, name: "true crime" },
+        { id: 2, name: "ghosts" },
+      ])
     ).toEqual(["true crime", "ghosts"]);
   });
 
