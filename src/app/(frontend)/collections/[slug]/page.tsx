@@ -4,10 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { MOOD_LABELS } from "@/lib/content/taxonomy";
-import {
-  getAllPublishedCollections,
-  getCollectionBySlug,
-} from "@/lib/services/collections/get-collections";
+import { getCollectionBySlug } from "@/lib/services/collections/get-collections";
 import { absoluteUrl, SITE_KEYWORDS, SITE_NAME } from "@/lib/seo";
 import {
   breadcrumbList,
@@ -16,13 +13,14 @@ import {
   WEBSITE_ID,
 } from "@/lib/utils/json-ld";
 
+// No generateStaticParams: Cache Components fails the build when it returns
+// an empty array (EmptyGenerateStaticParamsError), and zero published
+// collections is this route's normal starting state. Pages render on demand
+// from the cached collections list instead — same path story pages beyond
+// the prerender cap take.
+
 interface PageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const collections = await getAllPublishedCollections();
-  return collections.map((collection) => ({ slug: collection.slug }));
 }
 
 export async function generateMetadata({
