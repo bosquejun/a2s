@@ -133,12 +133,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ]
     : [];
 
+  // No image entries: image sitemaps are for imagery that appears on the
+  // page, and the /story/[slug]/og card exists only in social meta tags and
+  // JSON-LD. Listing it invites Googlebot-Image to crawl generated cards
+  // that can never rank as page imagery.
   const storyRoutes: MetadataRoute.Sitemap = stories.map((story) => ({
     url: absoluteUrl(`/story/${story.slug}`),
     lastModified: storyDate(story),
     changeFrequency: "weekly" as const,
     priority: 0.7,
-    images: [absoluteUrl(`/story/${story.slug}/og`)],
   }));
 
   return [
