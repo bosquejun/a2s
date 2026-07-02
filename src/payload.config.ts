@@ -8,6 +8,7 @@ import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { Collections } from "./payload/collections/Collections";
 import { Media } from "./payload/collections/Media";
 import { Stories } from "./payload/collections/Stories";
 import { StoryRequests } from "./payload/collections/StoryRequests";
@@ -29,7 +30,7 @@ export default buildConfig({
       titleSuffix: " — After 2AM Stories",
     },
   },
-  collections: [Stories, StoryRequests, Tags, Media, Users],
+  collections: [Stories, StoryRequests, Tags, Media, Users, Collections],
   globals: [SiteSettings, FacebookConnection, XConnection, ThreadsConnection],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
@@ -61,7 +62,7 @@ export default buildConfig({
       },
     }),
     seoPlugin({
-      collections: ["stories"],
+      collections: ["stories", "collections"],
       uploadsCollection: "media",
       generateTitle: ({ doc }: { doc?: { title?: string } }) =>
         doc?.title ? `${doc.title} — After 2AM` : "After 2AM Stories",

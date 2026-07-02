@@ -28,6 +28,12 @@ export function SiteFooter() {
             Stories
           </Link>
           <Link
+            href="/collections"
+            className="transition-colors hover:text-foreground/80"
+          >
+            Collections
+          </Link>
+          <Link
             href="/about"
             className="transition-colors hover:text-foreground/80"
           >

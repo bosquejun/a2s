@@ -2,18 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { ArchiveIntro } from "@/components/archive-intro";
+import { RelatedCollections } from "@/components/related-collections";
 import { SiteFooter } from "@/components/site-footer";
 import { StoryFeed } from "@/components/story-feed";
+import { CATEGORY_ARCHIVE_COPY } from "@/lib/content/archive-copy";
 import {
   CATEGORIES,
   CATEGORY_ACCENTS,
-  CATEGORY_DESCRIPTIONS,
   CATEGORY_LABELS,
   CATEGORY_TAGLINES,
   type Category,
 } from "@/lib/content/taxonomy";
 import { absoluteUrl, SITE_KEYWORDS, SITE_NAME } from "@/lib/seo";
 import { getStoriesByCategory } from "@/lib/services/stories/get-stories-by-category";
+import { getCollectionsForCategory } from "@/lib/services/collections/get-collections";
 import {
   breadcrumbList,
   serializeJsonLd,
@@ -42,7 +45,7 @@ export async function generateMetadata({
   if (!category) return {};
 
   const label = CATEGORY_LABELS[category];
-  const description = CATEGORY_DESCRIPTIONS[category];
+  const description = CATEGORY_ARCHIVE_COPY[category].seoDescription;
   const url = absoluteUrl(`/category/${category.toLowerCase()}`);
 
   return {
@@ -76,7 +79,10 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound();
   }
 
-  const stories = await getStoriesByCategory(category);
+  const [stories, collections] = await Promise.all([
+    getStoriesByCategory(category),
+    getCollectionsForCategory(category),
+  ]);
   const label = CATEGORY_LABELS[category];
   const slug = category.toLowerCase();
   const accent = CATEGORY_ACCENTS[category];
@@ -87,7 +93,7 @@ export default async function CategoryPage({ params }: PageProps) {
       {
         "@type": "CollectionPage",
         name: `${label} Stories — After 2AM Stories`,
-        description: CATEGORY_DESCRIPTIONS[category],
+        description: CATEGORY_ARCHIVE_COPY[category].seoDescription,
         url: absoluteUrl(`/category/${slug}`),
         isPartOf: { "@id": WEBSITE_ID },
         mainEntity: storyItemList(stories),
@@ -125,10 +131,11 @@ export default async function CategoryPage({ params }: PageProps) {
             >
               {CATEGORY_TAGLINES[category]}
             </p>
-            <p className="max-w-md text-sm text-muted-foreground">
-              {CATEGORY_DESCRIPTIONS[category]}
-            </p>
           </header>
+
+          <ArchiveIntro copy={CATEGORY_ARCHIVE_COPY[category]} />
+
+          <RelatedCollections collections={collections} />
 
           <StoryFeed
             stories={stories}

@@ -1,7 +1,7 @@
 import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import type { Category, Mood } from "@/lib/content/taxonomy";
-import type { Story, StorySummary } from "@/lib/types";
+import type { Story, StoryCollection, StorySummary } from "@/lib/types";
 import { sanitizeStoryHtml } from "@/lib/utils/sanitize-story-html";
 
 /**
@@ -103,5 +103,58 @@ export function normalizeStorySummary(doc: StoryDoc): StorySummary {
     viewCount: doc.viewCount ?? 0,
     publishedAt: doc.publishedAt ?? null,
     updatedAt: doc.updatedAt ?? null,
+  };
+}
+
+/** A loosely-typed Payload `collections` document (see StoryDoc note above). */
+export type CollectionDoc = {
+  id: string | number;
+  title: string;
+  slug: string;
+  hook?: string | null;
+  intro?: SerializedEditorState | null;
+  stories?: Array<string | number | { id?: string | number }> | null;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  } | null;
+};
+
+/**
+ * Normalize a Payload collection document. Member stories are resolved
+ * against the published-story cache (`storiesById`) rather than a deep
+ * populate, so drafts and unpublished members silently drop out and the
+ * summaries carry properly-populated tags.
+ */
+export function normalizeStoryCollection(
+  doc: CollectionDoc,
+  storiesById: ReadonlyMap<string, StorySummary>
+): StoryCollection {
+  const stories = (doc.stories ?? [])
+    .map((entry) =>
+      typeof entry === "object" && entry
+        ? String(entry.id ?? "")
+        : String(entry)
+    )
+    .map((id) => storiesById.get(id))
+    .filter((story): story is StorySummary => Boolean(story));
+
+  return {
+    id: String(doc.id),
+    title: doc.title,
+    slug: doc.slug,
+    hook: doc.hook ?? null,
+    introHtml: contentToHtml(doc.intro),
+    stories,
+    publishedAt: doc.publishedAt ?? null,
+    updatedAt: doc.updatedAt ?? null,
+    seo: doc.meta
+      ? {
+          title: doc.meta.title ?? null,
+          description: doc.meta.description ?? null,
+        }
+      : null,
   };
 }

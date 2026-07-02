@@ -4,6 +4,7 @@ import type { Category } from "@/lib/content/taxonomy";
 import { getAllPublishedStories } from "@/lib/services/stories/get-all-published-stories";
 import { getStoryBySlug } from "@/lib/services/stories/get-story";
 import { getStoryNeighbors } from "@/lib/services/stories/get-story-neighbors";
+import { getCollectionsForStorySlug } from "@/lib/services/collections/get-collections";
 import { Story } from "@/lib/types";
 import { absoluteUrl, SITE_NAME } from "@/lib/seo";
 import {
@@ -110,12 +111,10 @@ export default async function StoryPage({ params }: PageProps) {
     notFound();
   }
 
-  const { related, next } = await getStoryNeighbors(
-    story.slug,
-    story.mood,
-    story.categories,
-    story.tags
-  );
+  const [{ related, next }, collections] = await Promise.all([
+    getStoryNeighbors(story.slug, story.mood, story.categories, story.tags),
+    getCollectionsForStorySlug(story.slug),
+  ]);
 
   const storyUrl = absoluteUrl(`/story/${story.slug}`);
 
@@ -161,7 +160,15 @@ export default async function StoryPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Suspense fallback={<StoryReaderSkeleton />}>
-        <StoryReader story={story} related={related} next={next} />
+        <StoryReader
+          story={story}
+          related={related}
+          next={next}
+          collections={collections.map((collection) => ({
+            slug: collection.slug,
+            title: collection.title,
+          }))}
+        />
       </Suspense>
     </>
   );
