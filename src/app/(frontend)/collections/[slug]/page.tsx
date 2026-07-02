@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { ArrowLeft, Clock } from "lucide-react";
 import { SiteFooter } from "@/components/site-footer";
 import { MOOD_LABELS } from "@/lib/content/taxonomy";
@@ -16,8 +17,8 @@ import {
 // No generateStaticParams: Cache Components fails the build when it returns
 // an empty array (EmptyGenerateStaticParamsError), and zero published
 // collections is this route's normal starting state. Pages render on demand
-// from the cached collections list instead — same path story pages beyond
-// the prerender cap take.
+// from the cached collections list instead, with the dynamic section inside
+// <Suspense> so the static shell prerenders (same pattern as /stories).
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -57,7 +58,37 @@ export async function generateMetadata({
   };
 }
 
-export default async function CollectionPage({ params }: PageProps) {
+export default function CollectionPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<CollectionFallback />}>
+      <CollectionContent params={params} />
+    </Suspense>
+  );
+}
+
+function CollectionFallback() {
+  return (
+    <div className="relative min-h-screen text-foreground font-sans">
+      <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mb-10 flex flex-col items-center gap-5">
+          <div className="h-3 w-24 rounded-full bg-card/60 animate-pulse" />
+          <div className="h-9 w-72 max-w-full rounded-lg bg-card/60 animate-pulse" />
+          <div className="h-4 w-52 max-w-full rounded-full bg-card/40 animate-pulse" />
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-24 rounded-2xl border border-border/40 bg-card/30 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function CollectionContent({ params }: PageProps) {
   const { slug } = await params;
   const collection = await getCollectionBySlug(slug);
   if (!collection) {
