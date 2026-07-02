@@ -25,9 +25,7 @@ export interface StoredConnection {
   instagramUserId: string | null;
 }
 
-export async function getConnection(
-  payload: Payload
-): Promise<StoredConnection> {
+export async function getConnection(payload: Payload): Promise<StoredConnection> {
   const global = await payload.findGlobal({
     slug: GLOBAL_SLUG,
     overrideAccess: true,
@@ -56,10 +54,7 @@ export async function saveConnection(
 ): Promise<void> {
   let instagramUserId: string | null = null;
   try {
-    instagramUserId = await getInstagramUserId(
-      data.pageId,
-      data.pageAccessToken
-    );
+    instagramUserId = await getInstagramUserId(data.pageId, data.pageAccessToken);
   } catch {
     instagramUserId = null;
   }

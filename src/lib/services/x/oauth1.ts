@@ -58,9 +58,11 @@ export function buildOAuth1Header(opts: {
     .map((k) => `${pct(k)}=${pct(allParams[k])}`)
     .join("&");
 
-  const baseString = [method.toUpperCase(), pct(url), pct(paramString)].join(
-    "&"
-  );
+  const baseString = [
+    method.toUpperCase(),
+    pct(url),
+    pct(paramString),
+  ].join("&");
 
   const signingKey = `${pct(creds.consumerSecret)}&${pct(creds.accessTokenSecret)}`;
   const signature = createHmac("sha1", signingKey)

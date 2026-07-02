@@ -170,8 +170,8 @@ function ManualConnect() {
             }}
           >
             Paste the four OAuth 1.0a credentials from your X app
-            (developer.x.com → Keys and tokens). The app must have Read and
-            Write permissions. Stored encrypted.
+            (developer.x.com → Keys and tokens). The app must have
+            Read and Write permissions. Stored encrypted.
           </p>
           {err && (
             <p

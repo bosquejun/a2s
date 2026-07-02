@@ -8,9 +8,7 @@ describe("buildInstagramCaption", () => {
   });
 
   it("falls back to excerpt, then title", () => {
-    expect(buildInstagramCaption({ excerpt: "E", title: "T" })).toContain(
-      "E\n\n"
-    );
+    expect(buildInstagramCaption({ excerpt: "E", title: "T" })).toContain("E\n\n");
     expect(buildInstagramCaption({ title: "T" })).toContain("T\n\n");
   });
 

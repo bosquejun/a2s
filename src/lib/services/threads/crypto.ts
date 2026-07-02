@@ -44,11 +44,7 @@ export function decryptToken(value: string | null | undefined): string | null {
   const [ivHex, tagHex, dataHex] = value.slice(PREFIX.length).split(":");
   if (!ivHex || !tagHex || !dataHex) return null;
   try {
-    const decipher = createDecipheriv(
-      "aes-256-gcm",
-      getKey(),
-      Buffer.from(ivHex, "hex")
-    );
+    const decipher = createDecipheriv("aes-256-gcm", getKey(), Buffer.from(ivHex, "hex"));
     decipher.setAuthTag(Buffer.from(tagHex, "hex"));
     const decrypted = Buffer.concat([
       decipher.update(Buffer.from(dataHex, "hex")),

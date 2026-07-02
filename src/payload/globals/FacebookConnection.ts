@@ -20,8 +20,7 @@ export const FacebookConnection: GlobalConfig = {
       type: "ui",
       admin: {
         components: {
-          Field:
-            "/components/admin/FacebookConnectButton#FacebookConnectButton",
+          Field: "/components/admin/FacebookConnectButton#FacebookConnectButton",
         },
       },
     },

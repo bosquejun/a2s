@@ -132,27 +132,29 @@ const DOMAIN = "after2amstories.com";
 export async function storyOgImage(story: Story | null) {
   if (!story) {
     return new ImageResponse(
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "serif",
-        }}
-      >
-        <OgBackdrop />
+      (
         <div
           style={{
-            fontSize: "52px",
-            fontStyle: "italic",
-            color: OG_COLORS.title,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "serif",
           }}
         >
-          {BRAND}
+          <OgBackdrop />
+          <div
+            style={{
+              fontSize: "52px",
+              fontStyle: "italic",
+              color: OG_COLORS.title,
+            }}
+          >
+            {BRAND}
+          </div>
         </div>
-      </div>,
+      ),
       { ...OG_SIZE }
     );
   }
@@ -162,9 +164,7 @@ export async function storyOgImage(story: Story | null) {
   // Prefer the dedicated social hook; fall back to the excerpt.
   const rawHook = story.hook || story.excerpt || "";
   const hook = rawHook.length > 140 ? rawHook.substring(0, 137) + "…" : rawHook;
-  const eyebrow = [story.mood, story.categories[0]]
-    .filter(Boolean)
-    .join("  ·  ");
+  const eyebrow = [story.mood, story.categories[0]].filter(Boolean).join("  ·  ");
   // Tint the card to the story's primary category, so a horror piece glows
   // crimson and a romance one glows rose. Falls back to the brand violet.
   const accent = story.categories[0]
@@ -177,122 +177,124 @@ export async function storyOgImage(story: Story | null) {
   );
 
   return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "serif",
-        padding: "90px",
-      }}
-    >
-      <OgBackdrop accent={accent} />
-
+    (
       <div
         style={{
+          width: "100%",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: "30px",
-          maxWidth: "940px",
-          textAlign: "center",
+          fontFamily: "serif",
+          padding: "90px",
         }}
       >
-        {/* Hook is the sole hero, set off by a thin accent rule. Title and
-              mood/category are demoted to the footer so nothing competes. */}
+        <OgBackdrop accent={accent} />
+
         <div
           style={{
-            width: "72px",
-            height: "2px",
-            backgroundColor: accent ?? OG_COLORS.accent,
-            opacity: accent ? 0.7 : 0.5,
             display: "flex",
-          }}
-        />
-        <div
-          style={{
-            fontFamily: "Newsreader",
-            fontSize:
-              (hook || title).length > 100
-                ? "52px"
-                : (hook || title).length > 64
-                  ? "60px"
-                  : "70px",
-            fontStyle: "italic",
-            color: OG_COLORS.title,
-            lineHeight: 1.28,
-            maxWidth: "980px",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "30px",
+            maxWidth: "940px",
+            textAlign: "center",
           }}
         >
-          {hook || title}
-        </div>
-      </div>
-
-      {/* Footer: demoted title + meta (left), wordmark (right) — all faint */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "46px",
-          left: "90px",
-          right: "90px",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {/* Hook is the sole hero, set off by a thin accent rule. Title and
+              mood/category are demoted to the footer so nothing competes. */}
+          <div
+            style={{
+              width: "72px",
+              height: "2px",
+              backgroundColor: accent ?? OG_COLORS.accent,
+              opacity: accent ? 0.7 : 0.5,
+              display: "flex",
+            }}
+          />
           <div
             style={{
               fontFamily: "Newsreader",
+              fontSize:
+                (hook || title).length > 100
+                  ? "52px"
+                  : (hook || title).length > 64
+                    ? "60px"
+                    : "70px",
               fontStyle: "italic",
-              fontSize: "22px",
-              color: OG_COLORS.muted,
+              color: OG_COLORS.title,
+              lineHeight: 1.28,
+              maxWidth: "980px",
             }}
           >
-            {title}
+            {hook || title}
+          </div>
+        </div>
+
+        {/* Footer: demoted title + meta (left), wordmark (right) — all faint */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "46px",
+            left: "90px",
+            right: "90px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{
+                fontFamily: "Newsreader",
+                fontStyle: "italic",
+                fontSize: "22px",
+                color: OG_COLORS.muted,
+              }}
+            >
+              {title}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: "10px",
+                fontFamily: "Nunito Sans",
+                fontSize: "15px",
+                color: OG_COLORS.faint,
+              }}
+            >
+              {eyebrow && (
+                <span
+                  style={{ textTransform: "uppercase", letterSpacing: "0.22em" }}
+                >
+                  {eyebrow}
+                </span>
+              )}
+              {eyebrow && story.author && <span>·</span>}
+              {story.author && <span>{story.author}</span>}
+              {(eyebrow || story.author) && story.readTime > 0 && <span>·</span>}
+              {story.readTime > 0 && <span>{story.readTime} min read</span>}
+            </div>
           </div>
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "10px",
               fontFamily: "Nunito Sans",
               fontSize: "15px",
               color: OG_COLORS.faint,
+              textTransform: "uppercase",
+              letterSpacing: "0.32em",
             }}
           >
-            {eyebrow && (
-              <span
-                style={{ textTransform: "uppercase", letterSpacing: "0.22em" }}
-              >
-                {eyebrow}
-              </span>
-            )}
-            {eyebrow && story.author && <span>·</span>}
-            {story.author && <span>{story.author}</span>}
-            {(eyebrow || story.author) && story.readTime > 0 && <span>·</span>}
-            {story.readTime > 0 && <span>{story.readTime} min read</span>}
+            {BRAND}
           </div>
         </div>
-        <div
-          style={{
-            fontFamily: "Nunito Sans",
-            fontSize: "15px",
-            color: OG_COLORS.faint,
-            textTransform: "uppercase",
-            letterSpacing: "0.32em",
-          }}
-        >
-          {BRAND}
-        </div>
       </div>
-    </div>,
+    ),
     {
       ...OG_SIZE,
       ...(fonts.length ? { fonts } : {}),
@@ -326,92 +328,94 @@ export async function pageOgImage({
   const titleSize = title.length > 28 ? 64 : title.length > 18 ? 76 : 88;
 
   return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "serif",
-        padding: "90px",
-      }}
-    >
-      <OgBackdrop accent={accent} />
-
+    (
       <div
         style={{
+          width: "100%",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "30px",
-          textAlign: "center",
-          maxWidth: "960px",
+          justifyContent: "center",
+          fontFamily: "serif",
+          padding: "90px",
         }}
       >
+        <OgBackdrop accent={accent} />
+
         <div
           style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "30px",
+            textAlign: "center",
+            maxWidth: "960px",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Nunito Sans",
+              fontSize: "20px",
+              color: OG_COLORS.faint,
+              textTransform: "uppercase",
+              letterSpacing: "0.32em",
+            }}
+          >
+            {eyebrow}
+          </div>
+          <div
+            style={{
+              fontFamily: "Newsreader",
+              fontStyle: "italic",
+              fontSize: `${titleSize}px`,
+              color: OG_COLORS.title,
+              lineHeight: 1.1,
+            }}
+          >
+            {title}
+          </div>
+          <div
+            style={{
+              width: "80px",
+              height: "2px",
+              backgroundColor: accent ?? OG_COLORS.accent,
+              opacity: accent ? 0.7 : 0.5,
+              display: "flex",
+            }}
+          />
+          {subtitle ? (
+            <div
+              style={{
+                fontFamily: "Nunito Sans",
+                fontSize: "24px",
+                color: OG_COLORS.muted,
+                textTransform: "uppercase",
+                letterSpacing: "0.3em",
+                lineHeight: 1.4,
+                maxWidth: "820px",
+              }}
+            >
+              {subtitle}
+            </div>
+          ) : null}
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: "46px",
             fontFamily: "Nunito Sans",
-            fontSize: "20px",
+            fontSize: "15px",
             color: OG_COLORS.faint,
             textTransform: "uppercase",
             letterSpacing: "0.32em",
           }}
         >
-          {eyebrow}
+          {DOMAIN}
         </div>
-        <div
-          style={{
-            fontFamily: "Newsreader",
-            fontStyle: "italic",
-            fontSize: `${titleSize}px`,
-            color: OG_COLORS.title,
-            lineHeight: 1.1,
-          }}
-        >
-          {title}
-        </div>
-        <div
-          style={{
-            width: "80px",
-            height: "2px",
-            backgroundColor: accent ?? OG_COLORS.accent,
-            opacity: accent ? 0.7 : 0.5,
-            display: "flex",
-          }}
-        />
-        {subtitle ? (
-          <div
-            style={{
-              fontFamily: "Nunito Sans",
-              fontSize: "24px",
-              color: OG_COLORS.muted,
-              textTransform: "uppercase",
-              letterSpacing: "0.3em",
-              lineHeight: 1.4,
-              maxWidth: "820px",
-            }}
-          >
-            {subtitle}
-          </div>
-        ) : null}
       </div>
-
-      <div
-        style={{
-          position: "absolute",
-          bottom: "46px",
-          fontFamily: "Nunito Sans",
-          fontSize: "15px",
-          color: OG_COLORS.faint,
-          textTransform: "uppercase",
-          letterSpacing: "0.32em",
-        }}
-      >
-        {DOMAIN}
-      </div>
-    </div>,
+    ),
     {
       ...OG_SIZE,
       ...(fonts.length ? { fonts } : {}),
@@ -430,76 +434,78 @@ export async function siteOgImage() {
   );
 
   return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "serif",
-        padding: "90px",
-      }}
-    >
-      <OgBackdrop />
-
+    (
       <div
         style={{
+          width: "100%",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "34px",
-          textAlign: "center",
+          justifyContent: "center",
+          fontFamily: "serif",
+          padding: "90px",
         }}
       >
-        <div
-          style={{
-            fontFamily: "Newsreader",
-            fontStyle: "italic",
-            fontSize: "84px",
-            color: OG_COLORS.title,
-            lineHeight: 1.05,
-          }}
-        >
-          {BRAND}
-        </div>
-        <div
-          style={{
-            width: "80px",
-            height: "2px",
-            backgroundColor: OG_COLORS.accent,
-            opacity: 0.5,
-            display: "flex",
-          }}
-        />
-        <div
-          style={{
-            fontFamily: "Nunito Sans",
-            fontSize: "24px",
-            color: OG_COLORS.muted,
-            textTransform: "uppercase",
-            letterSpacing: "0.3em",
-          }}
-        >
-          {TAGLINE}
-        </div>
-      </div>
+        <OgBackdrop />
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: "46px",
-          fontFamily: "Nunito Sans",
-          fontSize: "15px",
-          color: OG_COLORS.faint,
-          textTransform: "uppercase",
-          letterSpacing: "0.32em",
-        }}
-      >
-        after2amstories.com
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "34px",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "Newsreader",
+              fontStyle: "italic",
+              fontSize: "84px",
+              color: OG_COLORS.title,
+              lineHeight: 1.05,
+            }}
+          >
+            {BRAND}
+          </div>
+          <div
+            style={{
+              width: "80px",
+              height: "2px",
+              backgroundColor: OG_COLORS.accent,
+              opacity: 0.5,
+              display: "flex",
+            }}
+          />
+          <div
+            style={{
+              fontFamily: "Nunito Sans",
+              fontSize: "24px",
+              color: OG_COLORS.muted,
+              textTransform: "uppercase",
+              letterSpacing: "0.3em",
+            }}
+          >
+            {TAGLINE}
+          </div>
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: "46px",
+            fontFamily: "Nunito Sans",
+            fontSize: "15px",
+            color: OG_COLORS.faint,
+            textTransform: "uppercase",
+            letterSpacing: "0.32em",
+          }}
+        >
+          after2amstories.com
+        </div>
       </div>
-    </div>,
+    ),
     {
       ...OG_SIZE,
       ...(fonts.length ? { fonts } : {}),

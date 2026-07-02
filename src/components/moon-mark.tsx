@@ -9,13 +9,7 @@ export function MoonMark({ className }: { className?: string }) {
         <circle cx="18" cy="20" r="13" fill="#fff" />
         <circle cx="24" cy="15" r="11" fill="#000" />
       </mask>
-      <circle
-        cx="18"
-        cy="20"
-        r="13"
-        fill="currentColor"
-        mask="url(#moonmark)"
-      />
+      <circle cx="18" cy="20" r="13" fill="currentColor" mask="url(#moonmark)" />
     </svg>
   );
 }

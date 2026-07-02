@@ -26,8 +26,7 @@ export async function POST(request: Request) {
     const result = await shareStoryToThreads(payload, body.storyId);
     return NextResponse.json(result);
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Failed to share story";
+    const message = err instanceof Error ? err.message : "Failed to share story";
     console.error("[threads/share]", err);
     return NextResponse.json({ error: message }, { status: 400 });
   }

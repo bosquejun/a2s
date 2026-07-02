@@ -67,8 +67,8 @@ export default function StoriesPage({ searchParams }: PageProps) {
             All Stories
           </h1>
           <p className="max-w-md text-sm text-slate-500">
-            Everything written after 2am. Filter by the feeling that brought you
-            here.
+            Everything written after 2am. Filter by the feeling that brought
+            you here.
           </p>
         </header>
 

@@ -64,15 +64,10 @@ export function buildOAuthUrl(state: string): string {
   return `${OAUTH_DIALOG}?${params.toString()}`;
 }
 
-async function readJson(
-  res: Response,
-  fallback: string
-): Promise<Record<string, unknown>> {
+async function readJson(res: Response, fallback: string): Promise<Record<string, unknown>> {
   const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok || json?.error) {
-    const error = json?.error as
-      | { message?: string; code?: number }
-      | undefined;
+    const error = json?.error as { message?: string; code?: number } | undefined;
     throw new ThreadsApiError(
       error?.message ?? `${fallback} (${res.status})`,
       error?.code

@@ -11,13 +11,16 @@ function publishedTime(story: StorySummary): number {
  * others are reading" signal rather than a second recency feed when the site
  * has no traffic yet. Derived from the cached full list — no extra query.
  */
-export async function getMostReadStories(limit = 3): Promise<StorySummary[]> {
+export async function getMostReadStories(
+  limit = 3
+): Promise<StorySummary[]> {
   const all = await getAllPublishedStories();
 
   return all
     .filter((story) => story.viewCount > 0)
     .sort(
-      (a, b) => b.viewCount - a.viewCount || publishedTime(b) - publishedTime(a)
+      (a, b) =>
+        b.viewCount - a.viewCount || publishedTime(b) - publishedTime(a)
     )
     .slice(0, limit);
 }

@@ -74,8 +74,7 @@ async function ensureAccessToken(
     ? Date.parse(connection.tokenExpiresAt)
     : 0;
   // Refresh once we're within a day of expiry (tokens last ≈60 days).
-  const needsRefresh =
-    !expiresAt || expiresAt - Date.now() < 24 * 60 * 60 * 1000;
+  const needsRefresh = !expiresAt || expiresAt - Date.now() < 24 * 60 * 60 * 1000;
   if (!needsRefresh) {
     return connection.accessToken as string;
   }
@@ -105,11 +104,7 @@ export async function shareStoryToThreads(
   }
 
   const connection = await getConnection(payload);
-  if (
-    !connection.connected ||
-    !connection.accessToken ||
-    !connection.threadsUserId
-  ) {
+  if (!connection.connected || !connection.accessToken || !connection.threadsUserId) {
     throw new Error("No Threads account is connected.");
   }
   if (!story.slug) throw new Error("Story has no slug");

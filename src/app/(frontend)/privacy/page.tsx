@@ -61,8 +61,8 @@ export default function PrivacyPage() {
               <li>
                 <span className="text-slate-100">Basic analytics.</span> We use
                 Vercel Analytics, which is cookieless and doesn&rsquo;t follow
-                you across other sites. It tells us roughly how many people
-                visit and which pages &mdash; nothing that identifies you.
+                you across other sites. It tells us roughly how many people visit
+                and which pages &mdash; nothing that identifies you.
               </li>
             </ul>
           </section>
@@ -74,9 +74,7 @@ export default function PrivacyPage() {
             <ul className="space-y-3 text-base leading-relaxed text-slate-300/80">
               <li>No ad trackers, no third-party advertising cookies.</li>
               <li>No selling, renting, or trading your data.</li>
-              <li>
-                No account required to read. Reading leaves no name behind.
-              </li>
+              <li>No account required to read. Reading leaves no name behind.</li>
             </ul>
           </section>
 
@@ -85,16 +83,13 @@ export default function PrivacyPage() {
               Your whispered story
             </h2>
             <p className="text-base leading-relaxed text-slate-300/80">
-              Changed your mind? Email us with your tracking code and
-              we&rsquo;ll take it down. It&rsquo;s your story &mdash; you can
-              ask for it back.
+              Changed your mind? Email us with your tracking code and we&rsquo;ll
+              take it down. It&rsquo;s your story &mdash; you can ask for it back.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-serif text-xl italic text-slate-100">
-              Contact
-            </h2>
+            <h2 className="font-serif text-xl italic text-slate-100">Contact</h2>
             <p className="text-base leading-relaxed text-slate-300/80">
               Questions about privacy? Write to{" "}
               <a

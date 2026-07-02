@@ -28,10 +28,7 @@ export async function getLinkInCommentSettings(
     });
     const group = (
       settings as {
-        linkInComment?: {
-          facebook?: boolean | null;
-          instagram?: boolean | null;
-        };
+        linkInComment?: { facebook?: boolean | null; instagram?: boolean | null };
       }
     )?.linkInComment;
     return {

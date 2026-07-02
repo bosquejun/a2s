@@ -24,7 +24,9 @@ const getRandomStoryByMoodCached = cache(
       where: {
         mood: { equals: mood },
         _status: { equals: "published" },
-        ...(excludeSlugs.length ? { slug: { not_in: excludeSlugs } } : {}),
+        ...(excludeSlugs.length
+          ? { slug: { not_in: excludeSlugs } }
+          : {}),
       },
       depth: 0,
       pagination: false,
